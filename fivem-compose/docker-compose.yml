@@ -1,0 +1,22 @@
+version: "3.3"
+services:
+  FiveM:
+    image: "spritsail/fivem"
+    restart: unless-stopped
+    ports:
+      - "30120:30120"
+    volumes:
+      - /volumes/fivem/config:/config
+  mysql:
+    image: "mysql"
+    restart: always
+    environment:
+      - MYSQL_DATABASE: db
+      - MYSQL_USER: admin
+      - MYSQL_PASSWORD:  myserver
+      - MYSQL_ROOT_USER: root
+      - MYSQL_ROOT_PASSWORD: myserverroot
+    ports:
+      - "3306"
+    volumes:
+      - /volumes/mysql:/var/lib/mysql
