@@ -10,6 +10,11 @@ services:
     ports:
       - 80:80
       - 443:443
+    depends_on:
+      - plex-compose
+      - sonarr-compose
+      - radarr-compose
+      - plexpy-compose
   # Media Player
   plex:
     container_name: plex-compose
@@ -53,8 +58,8 @@ services:
       - /mnt/media/libraries/anime:/anime
       - /mnt/media/downloads:/downloads
     depends_on:
-      - jackett
-      - deluge
+      - jackett-compose
+      - deluge-compose
     restart: unless-stopped
   radarr:
     image: "linuxserver/radarr:latest"
@@ -70,8 +75,8 @@ services:
       - /mnt/media/libraries/movies:/movies
       - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - jackett
-      - deluge
+      - jackett-compose
+      - deluge-compose
     restart: unless-stopped
   # Indexer
   jackett:
@@ -130,7 +135,7 @@ services:
       - /mnt/media/config/plexpy:/config
       - /mnt/media/config/plex/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
     depends_on:
-      - plex
+      - plex-compose
     restart: unless-stopped
 #https://192.168.1.200:32400/,
 #https://72.92.50.56:32400/,
