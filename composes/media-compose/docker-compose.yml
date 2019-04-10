@@ -139,7 +139,7 @@ services:
     # ports:
     #   - "8181:8181"
     expose:
-      - "8181:8181"
+      - "8181"
     environment:
       - TZ="America/New_York"
       - PGID=1000
