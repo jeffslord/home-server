@@ -15,6 +15,7 @@ services:
       - sonarr
       - radarr
       - tautulli
+    restart: unless-stopped
   # Media Player
   plex:
     container_name: plex-compose
