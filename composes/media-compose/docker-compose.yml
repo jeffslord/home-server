@@ -122,9 +122,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
   # Analytics
-  plexpy:
+  tautulli:
     image: "linuxserver/tautulli:latest"
-    container_name: plexpy-compose
+    container_name: tautulli-compose
     ports:
       - "8181:8181"
     environment:
