@@ -14,7 +14,7 @@ services:
       - plex
       - sonarr
       - radarr
-      - plexpy
+      - tautulli
   # Media Player
   plex:
     container_name: plex-compose
