@@ -1,5 +1,15 @@
 version: "3"
 services:
+  nginx:
+  image: nginx:latest
+  container_name: production_nginx
+  volumes:
+    - ./nginx/nginx.conf:/nginx/nginx.conf
+    - ./nginx/error.log:/nginx/error_log.log
+    - ./nginx/cache/:/nginx/cache
+  ports:
+    - 80:80
+    - 443:443
   # Media Player
   plex:
     container_name: plex-compose
