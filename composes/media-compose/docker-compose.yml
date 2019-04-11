@@ -27,7 +27,7 @@ services:
       - PGID=1000
       - TZ=America/New_York
       - URL=jeffslord.com
-      - SUBDOMAINS=www,ftp,cloud,sonarr,radarr,tatullui,plex,deluge
+      - SUBDOMAINS=www,ftp,cloud,sonarr,radarr,tautulli,plex,deluge
       - EMAIL=jeffscottlord@gmail.com
     volumes:
       - ./letsencrypt/config:/config
@@ -52,7 +52,7 @@ services:
       - 32414:32414/udp
     environment:
       - ADVERTISE_IP=http://192.168.1.200:32400/
-      - TZ="America/New_York"
+      - TZ=America/New_York
       - PLEX_CLAIM="claim-qxVKRrNKy9x1WQXzEJxD"
       - PLEX_UID=1000
       - PPLEX_GID=1000
@@ -161,7 +161,7 @@ services:
     expose:
       - "8181"
     environment:
-      - TZ="America/New_York"
+      - TZ=America/New_York
       - PGID=1000
       - PUID=1000
     volumes:
