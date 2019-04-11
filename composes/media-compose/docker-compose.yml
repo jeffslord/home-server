@@ -1,21 +1,40 @@
 version: "3"
 services:
-  nginx:
-    image: nginx:latest
-    container_name: production_nginx
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: production_nginx
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./nginx/error.log:/etc/nginx/error_log.log
+  #     - ./nginx/cache/:/etc/nginx/cache
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   depends_on:
+  #     - plex
+  #     - sonarr
+  #     - radarr
+  #     - tautulli
+  #   restart: unless-stopped
+
+  letsencrypt:
+    image: linuxserver/letsencrypt
+    container_name: letsencrypt
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - URL=jeffslord.com
+      - SUBDOMAINS=www,ftp,cloud,sonarr,radarr,tatullui,plex,deluge
+      - EMAIL=jeffscottlord@gmail.com
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/error.log:/etc/nginx/error_log.log
-      - ./nginx/cache/:/etc/nginx/cache
+      - ./letsencrypt/config:/config
     ports:
-      - 80:80
       - 443:443
-    depends_on:
-      - plex
-      - sonarr
-      - radarr
-      - tautulli
     restart: unless-stopped
+
   # Media Player
   plex:
     container_name: plex-compose
