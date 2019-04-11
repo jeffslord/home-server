@@ -2,12 +2,12 @@
 
 # listening on port 80 disabled by default, remove the "#" signs to enable
 # redirect all traffic to https
-#server {
-#	listen 80;
-#	listen [::]:80;
-#	server_name _;
-#	return 301 https://$host$request_uri;
-#}
+server {
+	listen 80;
+	listen [::]:80;
+	server_name _;
+	return 301 https://$host$request_uri;
+}
 
 # main server block
 server {

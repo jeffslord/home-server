@@ -28,11 +28,13 @@ services:
       - TZ=America/New_York
       - URL=jeffslord.com
       - SUBDOMAINS=www,ftp,cloud,sonarr,radarr,tautulli,plex,deluge
+      - VALIDATION=http
       - EMAIL=jeffscottlord@gmail.com
     volumes:
       - ./letsencrypt/config:/config
     ports:
       - 443:443
+      - 80:80
     restart: unless-stopped
 
   # Media Player
