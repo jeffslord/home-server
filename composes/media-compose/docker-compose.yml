@@ -39,7 +39,7 @@ services:
 
   # Media Player
   plex:
-    container_name: plex-compose
+    container_name: plex
     image: "plexinc/pms-docker:latest"
     restart: unless-stopped
     ports:
@@ -67,7 +67,7 @@ services:
   # Media Organizers
   sonarr:
     image: "linuxserver/sonarr:latest"
-    container_name: sonarr-compose
+    container_name: sonarr
     ports:
       - "8989:8989"
     expose:
@@ -87,7 +87,7 @@ services:
     restart: unless-stopped
   radarr:
     image: "linuxserver/radarr:latest"
-    container_name: radarr-compose
+    container_name: radarr
     ports:
       - "7878:7878"
     expose:
@@ -107,7 +107,7 @@ services:
   # Indexer
   jackett:
     image: "linuxserver/jackett:latest"
-    container_name: jackett-compose
+    container_name: jackett
     ports:
       - "9117:9117"
     expose:
@@ -123,7 +123,7 @@ services:
   # Downloader
   deluge:
     image: "binhex/arch-delugevpn:latest"
-    container_name: deluge-compose
+    container_name: deluge
     cap_add:
       - NET_ADMIN
     ports:
@@ -157,7 +157,7 @@ services:
   # Analytics
   tautulli:
     image: "linuxserver/tautulli:latest"
-    container_name: tautulli-compose
+    container_name: tautulli
     ports:
       - "8181:8181"
     expose:
