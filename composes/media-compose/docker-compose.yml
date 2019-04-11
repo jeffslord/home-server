@@ -27,7 +27,7 @@ services:
       - PGID=1000
       - TZ=America/New_York
       - URL=jeffslord.com
-      - SUBDOMAINS=www,ftp,cloud,sonarr,radarr,tautulli,plex,deluge
+      - SUBDOMAINS=www,sonarr,radarr,tautulli,plex,deluge
       - VALIDATION=http
       - EMAIL=jeffscottlord@gmail.com
     volumes:
