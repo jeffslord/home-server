@@ -15,6 +15,7 @@ services:
       - sonarr
       - radarr
       - tautulli
+      - deluge
     restart: unless-stopped
 
   # letsencrypt:
@@ -40,6 +41,7 @@ services:
   #     - sonarr
   #     - radarr
   #     - tautulli
+  #     - deluge
   #   restart: unless-stopped
 
   # Media Player
@@ -73,8 +75,8 @@ services:
   sonarr:
     image: "linuxserver/sonarr:latest"
     container_name: sonarr
-    ports:
-      - "8989:8989"
+    # ports:
+    #   - "8989:8989"
     expose:
       - "8989"
     environment:
@@ -93,8 +95,8 @@ services:
   radarr:
     image: "linuxserver/radarr:latest"
     container_name: radarr
-    ports:
-      - "7878:7878"
+    # ports:
+    #   - "7878:7878"
     expose:
       - "7878"
     environment:
@@ -113,8 +115,8 @@ services:
   jackett:
     image: "linuxserver/jackett:latest"
     container_name: jackett
-    ports:
-      - "9117:9117"
+    # ports:
+    #   - "9117:9117"
     expose:
       - "9117"
     environment:
@@ -131,11 +133,11 @@ services:
     container_name: deluge
     cap_add:
       - NET_ADMIN
-    ports:
-      - "8112:8112"
-      - "8118:8118"
-      - "58846:58846"
-      - "58946:58946"
+    # ports:
+    #   - "8112:8112"
+    #   - "8118:8118"
+    #   - "58846:58846"
+    #   - "58946:58946"
     expose:
       - "8112"
       - "8118"
@@ -163,8 +165,8 @@ services:
   tautulli:
     image: "linuxserver/tautulli:latest"
     container_name: tautulli
-    ports:
-      - "8181:8181"
+    # ports:
+    #   - "8181:8181"
     expose:
       - "8181"
     environment:

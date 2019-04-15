@@ -10,14 +10,12 @@ ARG DATA_VER
 
 WORKDIR /output
 
-RUN wget -O- v \
+RUN wget -O- http://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FIVEM_VER}/fx.tar.xz \
     | tar xJ --strip-components=1 \
     --exclude alpine/dev --exclude alpine/proc \
     --exclude alpine/run --exclude alpine/sys \
     && mkdir -p /output/opt/cfx-server-data \
-    # && wget -O- http://github.com/citizenfx/cfx-server-data/archive/${DATA_VER}.tar.gz \
     && wget -O- http://github.com/citizenfx/cfx-server-data/archive/master.tar.gz \
-
     | tar xz --strip-components=1 -C opt/cfx-server-data \
     \
     && apk -p $PWD add tini
@@ -25,7 +23,7 @@ RUN wget -O- v \
 ADD server.cfg opt/cfx-server-data
 ADD entrypoint usr/bin/entrypoint
 
-RUN chmod +x /output/usr/bin/entrypoint
+RUN chmod +x /usr/bin/entrypoint
 
 #================
 
@@ -44,7 +42,7 @@ RUN chmod +x /output/usr/bin/entrypoint
 #     io.spritsail.version.fivem=${FIVEM_VER} \
 #     io.spritsail.version.fivem_data=${DATA_VER}
 
-COPY --from=builder /output/ /
+COPY --from=builder /home/server/output/ /
 
 WORKDIR /config
 EXPOSE 30120
