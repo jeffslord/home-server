@@ -1,22 +1,23 @@
 version: "3"
 services:
-  nginx:
-    image: nginx:latest
-    container_name: production_nginx
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/error.log:/etc/nginx/error_log.log
-      - ./nginx/cache/:/etc/nginx/cache
-    ports:
-      - 80:80
-      - 443:443
-    depends_on:
-      - plex
-      - sonarr
-      - radarr
-      - tautulli
-      - deluge
-    restart: unless-stopped
+  # # Moved to other compose
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: production_nginx
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./nginx/error.log:/etc/nginx/error_log.log
+  #     - ./nginx/cache/:/etc/nginx/cache
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   depends_on:
+  #     - plex
+  #     - sonarr
+  #     - radarr
+  #     - tautulli
+  #     - deluge
+  #   restart: unless-stopped
 
   # letsencrypt:
   #   image: linuxserver/letsencrypt
@@ -71,6 +72,9 @@ services:
       - /mnt/media/libraries/shows:/data/tvshows
       - /mnt/media/libraries/movies:/data/movies
       - /mnt/media/libraries/anime:/data/anime
+      networks:
+        - nginx_media-net
+
   # Media Organizers
   sonarr:
     image: "linuxserver/sonarr:latest"
@@ -92,6 +96,9 @@ services:
       - jackett
       - deluge
     restart: unless-stopped
+    networks:
+        - nginx_media-net
+
   radarr:
     image: "linuxserver/radarr:latest"
     container_name: radarr
@@ -111,6 +118,9 @@ services:
       - jackett
       - deluge
     restart: unless-stopped
+    networks:
+        - nginx_media-net
+
   # Indexer
   jackett:
     image: "linuxserver/jackett:latest"
@@ -127,6 +137,9 @@ services:
       - /mnt/media/config/jackett:/config
       - /mnt/media/downloads:/downloads
     restart: unless-stopped
+    networks:
+        - nginx_media-net
+
   # Downloader
   deluge:
     image: "binhex/arch-delugevpn:latest"
@@ -161,6 +174,9 @@ services:
       - /mnt/media/config/deluge:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
+    networks:
+        - nginx_media-net
+    
   # Analytics
   tautulli:
     image: "linuxserver/tautulli:latest"
@@ -179,7 +195,12 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
+    networks:
+        - nginx_media-net
 #https://192.168.1.200:32400/,
 #https://72.92.50.56:32400/,
 #https://172.31.0.2:32400/
 
+networks:
+  nginx_media-net:
+    external: true
