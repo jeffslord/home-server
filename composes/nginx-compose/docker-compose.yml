@@ -21,5 +21,6 @@ services:
       - media-net
 
 networks:
-  media-net:
-    driver: bridge
+  media:
+    external:
+      name: media-net
