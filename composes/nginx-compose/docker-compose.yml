@@ -22,4 +22,5 @@ services:
 
 networks:
   media-net:
-    external: true
+    external:
+      name: media-net
