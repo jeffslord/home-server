@@ -201,6 +201,4 @@ services:
 #https://72.92.50.56:32400/,
 #https://172.31.0.2:32400/
 
-networks:
-  media:
-    name: media-net
+networks: media-net

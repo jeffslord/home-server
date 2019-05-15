@@ -21,6 +21,4 @@ services:
       - media-net
 
 networks:
-  media:
-    external:
-      name: media-net
+  media: external
