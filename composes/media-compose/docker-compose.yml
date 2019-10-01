@@ -201,6 +201,25 @@ services:
 #https://72.92.50.56:32400/,
 #https://172.31.0.2:32400/
 
+  # Request new media
+  ombi:
+    image: "linuxserver/ombi:latest"
+    container_name: ombi
+    ports:
+        - "3579:3579"
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+    volumes:
+      - /mnt/media/config/ombi:/config
+    depends_on:
+      - plex
+    restart: unless-stopped
+    networks:
+      - media-net
+
+
 networks:
   media-net:
     driver: bridge
