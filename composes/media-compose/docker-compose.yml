@@ -1,50 +1,5 @@
 version: "3.7"
 services:
-  # # Moved to other compose
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: production_nginx
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-  #     - ./nginx/error.log:/etc/nginx/error_log.log
-  #     - ./nginx/cache/:/etc/nginx/cache
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   depends_on:
-  #     - plex
-  #     - sonarr
-  #     - radarr
-  #     - tautulli
-  #     - deluge
-  #   restart: unless-stopped
-
-  # letsencrypt:
-  #   image: linuxserver/letsencrypt
-  #   container_name: letsencrypt
-  #   cap_add:
-  #     - NET_ADMIN
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=America/New_York
-  #     - URL=jeffslord.com
-  #     - SUBDOMAINS=www,sonarr,radarr,tautulli,plex,deluge
-  #     - VALIDATION=http
-  #     - EMAIL=jeffscottlord@gmail.com
-  #   volumes:
-  #     - ./letsencrypt/config:/config
-  #   ports:
-  #     - 443:443
-  #     - 80:80
-  #   depends_on:
-  #     - plex
-  #     - sonarr
-  #     - radarr
-  #     - tautulli
-  #     - deluge
-  #   restart: unless-stopped
-
   # Media Player
   plex:
     container_name: plex
@@ -72,9 +27,13 @@ services:
       - /mnt/media/libraries/shows:/data/tvshows
       - /mnt/media/libraries/movies:/data/movies
       - /mnt/media/libraries/anime:/data/anime
+      - /mnt/media/libraries/anime_movies:/data/anime_movies
     networks:
-      - media-net
-
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.http.routers.plex.rule=Host(`plex.jeffslord.com`)
   # Media Organizers
   sonarr:
     image: "linuxserver/sonarr:latest"
@@ -89,16 +48,23 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/media/config/sonarr:/config
-      - /mnt/media/libraries/shows:/tv
-      - /mnt/media/libraries/anime:/anime
+      - /mnt/media/libraries/shows:/data/tv
+      - /mnt/media/libraries/anime:/data/anime
       - /mnt/media/downloads:/downloads
     depends_on:
       - jackett
       - deluge
     restart: unless-stopped
     networks:
-      - media-net
-
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sonarr.rule=Host(`sonarr.jeffslord.com`)
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+    labels:
+      - traefik.http.routers.sonarr.rule=Host(`sonarr.jeffslord.com`)
   radarr:
     image: "linuxserver/radarr:latest"
     container_name: radarr
@@ -112,15 +78,19 @@ services:
     volumes:
       - /mnt/media/config/radarr:/config
       - /mnt/media/downloads:/downloads
-      - /mnt/media/libraries/movies:/movies
+      - /mnt/media/libraries/movies:/data/movies
+      - /mnt/media/libraries/anime_movies:/data/anime_movies
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - jackett
       - deluge
     restart: unless-stopped
     networks:
-      - media-net
-
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.http.routers.radarr.rule=Host(`radarr.jeffslord.com`)
   # Indexer
   jackett:
     image: "linuxserver/jackett:latest"
@@ -138,19 +108,17 @@ services:
       - /mnt/media/downloads:/downloads
     restart: unless-stopped
     networks:
-      - media-net
-
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.http.routers.jackett.rule=Host(`jackett.jeffslord.com`)
   # Downloader
   deluge:
     image: "binhex/arch-delugevpn:latest"
     container_name: deluge
     cap_add:
       - NET_ADMIN
-    # ports:
-    #   - "8112:8112"
-    #   - "8118:8118"
-    #   - "58846:58846"
-    #   - "58946:58946"
     expose:
       - "8112"
       - "8118"
@@ -175,8 +143,11 @@ services:
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     networks:
-      - media-net
-
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.http.routers.deluge.rule=Host(`deluge.jeffslord.com`)
   # Analytics
   tautulli:
     image: "linuxserver/tautulli:latest"
@@ -196,11 +167,11 @@ services:
       - plex
     restart: unless-stopped
     networks:
-      - media-net
-#https://192.168.1.200:32400/,
-#https://72.92.50.56:32400/,
-#https://172.31.0.2:32400/
-
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.http.routers.tautulli.rule=Host(`tautulli.jeffslord.com`)
   # Request new media
   ombi:
     image: "linuxserver/ombi:latest"
@@ -217,9 +188,57 @@ services:
       - plex
     restart: unless-stopped
     networks:
-      - media-net
-
-
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.http.routers.ombi.rule=Host(`ombi.jeffslord.com`)
+  # Media Portal
+  muximux:
+    image: "linuxserver/muximux:latest"
+    container_name: muximux
+    expose:
+        - "80"
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+    volumes:
+      - /mnt/media/config/muximux:/config
+    depends_on:
+      - plex
+    restart: unless-stopped
+    networks:
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.http.routers.muximux.rule=Host(`muximux.jeffslord.com`)
+  # Subtitles
+  bazarr:
+    image: "linuxserver/bazarr:latest"
+    container_name: bazarr
+    ports:
+        - "6767:6767"
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+    volumes:
+      - /mnt/media/config/bazarr:/config
+      - /mnt/media/libraries/shows:/data/tvshows
+      - /mnt/media/libraries/movies:/data/movies
+      - /mnt/media/libraries/anime:/data/anime
+      - /mnt/media/libraries/anime_movies:/data/anime_movies
+    depends_on:
+      - plex
+    restart: unless-stopped
+    networks:
+      # - web
+      # - media
+      - traefik
+    labels:
+      - traefik.http.routers.bazarr.rule=Host(`bazarr.jeffslord.com`)
 networks:
-  media-net:
-    driver: bridge
+  traefik:
+    external: true

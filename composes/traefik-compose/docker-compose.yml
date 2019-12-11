@@ -1,0 +1,33 @@
+version: "3.7"
+services:
+  traefik:
+    image: "traefik:v2.0.0"
+    container_name: "traefik"
+    networks:
+      - traefik
+    command:
+      - --entrypoints.web.address=:80
+      - --providers.docker=true
+      - --api.dashboard=true
+      - --api.insecure=true
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - traefik.http.routers.traefik.rule=Host(`traefik.jeffslord.com`)
+        
+  test-app:
+    image: containous/whoami:v1.3.0
+    command:
+      - --port=8082 # Our service listens on 8082
+    labels:
+      - traefik.http.routers.test-app.rule=Host(`test.jeffslord.com`)
+      - traefik.http.services.test-app.loadbalancer.server.port=8082
+
+networks:
+  traefik:
+    name: traefik
