@@ -19,7 +19,8 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - traefik.http.routers.traefik.rule=Host(`traefik.jeffslord.com`)
-        
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - traefik.http.middlewares.traefik.basicauth.users=server:$$apr1$$dmVBAsix$$7s9nj9HLlr/D0MAdvTqit1
   test-app:
     image: containous/whoami:v1.3.0
     command:
@@ -27,7 +28,7 @@ services:
     labels:
       - traefik.http.routers.test-app.rule=Host(`test.jeffslord.com`)
       - traefik.http.services.test-app.loadbalancer.server.port=8082
-
+      # - traefik.http.middlewares.test.basicauth.users=server:$$apr1$$dmVBAsix$$7s9nj9HLlr/D0MAdvTqit1
 networks:
   traefik:
     name: traefik

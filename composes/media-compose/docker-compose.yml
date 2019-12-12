@@ -2,25 +2,44 @@ version: "3.7"
 services:
   # Media Player
   plex:
-    container_name: plex
     image: "plexinc/pms-docker:latest"
+    # image: linuxserver/plex
+    container_name: plex
+    networks:
+      - traefik
     restart: unless-stopped
-    ports:
-      - 32400:32400/tcp
-      - 3005:3005/tcp
-      - 8324:8324/tcp
-      - 32469:32469/tcp
-      - 1900:1900/udp
-      - 32410:32410/udp
-      - 32412:32412/udp
-      - 32413:32413/udp
-      - 32414:32414/udp
+    # network_mode: host
+    # ports:
+    #   - 32400:32400/tcp
+    #   - 3005:3005/tcp
+    #   - 8324:8324/tcp
+    #   - 32469:32469/tcp
+    #   - 1900:1900/udp
+    #   - 32410:32410/udp
+    #   - 32412:32412/udp
+    #   - 32413:32413/udp
+    #   - 32414:32414/udp
+    expose:
+      - "32400"
+      - "3005"
+      - "8324"
+      - "32469"
+      - "1900"
+      - "32410"
+      - "32412"
+      - "32413"
+      - "32414"
     environment:
       - ADVERTISE_IP=http://192.168.1.200:32400/
       - TZ=America/New_York
       - PLEX_CLAIM="claim-qxVKRrNKy9x1WQXzEJxD"
       - PLEX_UID=1000
-      - PPLEX_GID=1000
+      - PLEX_GID=1000
+      # - PUID=1000
+      # - PGID=1000
+      # - VERSION=docker
+      # - UMASK_SET=022 #optional
+      # - PLEX_CLAIM="claim-qxVKRrNKy9x1WQXzEJxD"
     volumes:
       - /mnt/media/config/plex:/config
       - /mnt/media/transcode:/transcode
@@ -28,16 +47,16 @@ services:
       - /mnt/media/libraries/movies:/data/movies
       - /mnt/media/libraries/anime:/data/anime
       - /mnt/media/libraries/anime_movies:/data/anime_movies
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
+      - traefik.enable=true
       - traefik.http.routers.plex.rule=Host(`plex.jeffslord.com`)
+      - traefik.http.services.plex.loadbalancer.server.port=32400
   # Media Organizers
   sonarr:
     image: "linuxserver/sonarr:latest"
     container_name: sonarr
+    networks:
+      - traefik
     # ports:
     #   - "8989:8989"
     expose:
@@ -55,19 +74,16 @@ services:
       - jackett
       - deluge
     restart: unless-stopped
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host(`sonarr.jeffslord.com`)
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
-    labels:
-      - traefik.http.routers.sonarr.rule=Host(`sonarr.jeffslord.com`)
+      # - traefik.http.middlewares.sonarr.basicauth.users=server:$$apr1$$dmVBAsix$$7s9nj9HLlr/D0MAdvTqit1
   radarr:
     image: "linuxserver/radarr:latest"
     container_name: radarr
+    networks:
+      - traefik
     # ports:
     #   - "7878:7878"
     expose:
@@ -85,16 +101,15 @@ services:
       - jackett
       - deluge
     restart: unless-stopped
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
+      - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.jeffslord.com`)
   # Indexer
   jackett:
     image: "linuxserver/jackett:latest"
     container_name: jackett
+    networks:
+      - traefik
     # ports:
     #   - "9117:9117"
     expose:
@@ -107,16 +122,15 @@ services:
       - /mnt/media/config/jackett:/config
       - /mnt/media/downloads:/downloads
     restart: unless-stopped
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
+      - traefik.enable=true
       - traefik.http.routers.jackett.rule=Host(`jackett.jeffslord.com`)
   # Downloader
   deluge:
     image: "binhex/arch-delugevpn:latest"
     container_name: deluge
+    networks:
+      - traefik
     cap_add:
       - NET_ADMIN
     expose:
@@ -142,16 +156,15 @@ services:
       - /mnt/media/config/deluge:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
+      - traefik.enable=true
       - traefik.http.routers.deluge.rule=Host(`deluge.jeffslord.com`)
   # Analytics
   tautulli:
     image: "linuxserver/tautulli:latest"
     container_name: tautulli
+    networks:
+      - traefik
     # ports:
     #   - "8181:8181"
     expose:
@@ -166,18 +179,19 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
+      - traefik.enable=true
       - traefik.http.routers.tautulli.rule=Host(`tautulli.jeffslord.com`)
   # Request new media
   ombi:
     image: "linuxserver/ombi:latest"
     container_name: ombi
-    ports:
-        - "3579:3579"
+    networks:
+      - traefik
+    # ports:
+        # - "3579:3579"
+    expose:
+      - "3579"
     environment:
       - TZ=America/New_York
       - PGID=1000
@@ -187,18 +201,17 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
+      - traefik.enable=true
       - traefik.http.routers.ombi.rule=Host(`ombi.jeffslord.com`)
   # Media Portal
   muximux:
     image: "linuxserver/muximux:latest"
     container_name: muximux
+    networks:
+      - traefik
     expose:
-        - "80"
+      - "8079"
     environment:
       - TZ=America/New_York
       - PGID=1000
@@ -208,18 +221,19 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
+      - traefik.enable=true
       - traefik.http.routers.muximux.rule=Host(`muximux.jeffslord.com`)
   # Subtitles
   bazarr:
     image: "linuxserver/bazarr:latest"
     container_name: bazarr
-    ports:
-        - "6767:6767"
+    networks:
+      - traefik
+    # ports:
+    #     - "6767:6767"
+    expose:
+      - "6767"
     environment:
       - TZ=America/New_York
       - PGID=1000
@@ -233,11 +247,8 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
-    networks:
-      # - web
-      # - media
-      - traefik
     labels:
+      - traefik.enable=true
       - traefik.http.routers.bazarr.rule=Host(`bazarr.jeffslord.com`)
 networks:
   traefik:
