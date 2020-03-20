@@ -9,26 +9,26 @@ services:
       - traefik
     restart: unless-stopped
     # network_mode: host
-    # ports:
-    #   - 32400:32400/tcp
-    #   - 3005:3005/tcp
-    #   - 8324:8324/tcp
-    #   - 32469:32469/tcp
-    #   - 1900:1900/udp
-    #   - 32410:32410/udp
-    #   - 32412:32412/udp
-    #   - 32413:32413/udp
-    #   - 32414:32414/udp
-    expose:
-      - "32400"
-      - "3005"
-      - "8324"
-      - "32469"
-      - "1900"
-      - "32410"
-      - "32412"
-      - "32413"
-      - "32414"
+    ports:
+      - 32400:32400/tcp
+      - 3005:3005/tcp
+      - 8324:8324/tcp
+      - 32469:32469/tcp
+      - 1900:1900/udp
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
+    # expose:
+    #   - "32400"
+    #   - "3005"
+    #   - "8324"
+    #   - "32469"
+    #   - "1900"
+    #   - "32410"
+    #   - "32412"
+    #   - "32413"
+    #   - "32414"
     environment:
       - ADVERTISE_IP=http://192.168.1.200:32400/
       - TZ=America/New_York
@@ -51,6 +51,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.plex.rule=Host(`plex.jeffslord.com`)
       - traefik.http.services.plex.loadbalancer.server.port=32400
+      - traefik.http.routers.plex.tls=true
+      - traefik.http.routers.plex.entrypoints=websecure
+      - traefik.http.routers.plex.tls.certresolver=myresolver
   # Media Organizers
   sonarr:
     image: "linuxserver/sonarr:latest"
@@ -67,7 +70,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/media/config/sonarr:/config
-      - /mnt/media/libraries/shows:/data/tv
+      - /mnt/media/libraries/shows:/data/tvshows
       - /mnt/media/libraries/anime:/data/anime
       - /mnt/media/downloads:/downloads
     depends_on:
@@ -76,9 +79,12 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.sonarr.rule=Host(`sonarr.jeffslord.com`)
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
-      # - traefik.http.middlewares.sonarr.basicauth.users=server:$$apr1$$dmVBAsix$$7s9nj9HLlr/D0MAdvTqit1
+      - traefik.http.routers.sonarr.rule=Host(`sonarr.jeffslord.com`)
+      - traefik.http.routers.sonarr.tls=true
+      - traefik.http.routers.sonarr.entrypoints=websecure
+      - traefik.http.routers.sonarr.tls.certresolver=myresolver
+      
   radarr:
     image: "linuxserver/radarr:latest"
     container_name: radarr
@@ -104,6 +110,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.jeffslord.com`)
+      - traefik.http.routers.radarr.tls=true
+      - traefik.http.routers.radarr.tls.certresolver=myresolver
   # Indexer
   jackett:
     image: "linuxserver/jackett:latest"
@@ -125,6 +133,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.jackett.rule=Host(`jackett.jeffslord.com`)
+      - traefik.http.routers.jackett.tls=true
+      - traefik.http.routers.jackett.tls.certresolver=myresolver
   # Downloader
   deluge:
     image: "binhex/arch-delugevpn:latest"
@@ -159,6 +169,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.deluge.rule=Host(`deluge.jeffslord.com`)
+      - traefik.http.routers.deluge.tls=true
+      - traefik.http.routers.deluge.tls.certresolver=myresolver
   # Analytics
   tautulli:
     image: "linuxserver/tautulli:latest"
@@ -182,6 +194,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.tautulli.rule=Host(`tautulli.jeffslord.com`)
+      - traefik.http.routers.tautulli.tls=true
+      - traefik.http.routers.tautulli.tls.certresolver=myresolver
   # Request new media
   ombi:
     image: "linuxserver/ombi:latest"
@@ -204,6 +218,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.ombi.rule=Host(`ombi.jeffslord.com`)
+      - traefik.http.routers.ombi.tls=true
+      - traefik.http.routers.ombi.tls.certresolver=myresolver
   # Media Portal
   muximux:
     image: "linuxserver/muximux:latest"
@@ -224,6 +240,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.muximux.rule=Host(`muximux.jeffslord.com`)
+      - traefik.http.routers.muximux.tls=true
+      - traefik.http.routers.muximux.tls.certresolver=myresolver
   # Subtitles
   bazarr:
     image: "linuxserver/bazarr:latest"
@@ -250,6 +268,77 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.bazarr.rule=Host(`bazarr.jeffslord.com`)
+      - traefik.http.routers.bazarr.tls=true
+      - traefik.http.routers.bazarr.tls.certresolver=myresolver
+  # ebooks / comics
+  ubooquity:
+    image: linuxserver/ubooquity
+    container_name: ubooquity
+    networks:
+     - traefik
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: America/New_York
+    volumes:
+      - /mnt/media/config/ubooquity:/config
+      - /mnt/media/libraries/books:/books
+      - /mnt/media/libraries/comics:/comics
+      - /mnt/media/libraries/raw_files:/filesi
+    expose:
+      - "2202"
+      - "2203"
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ubooquity.rule=Host(`ubooquity.jeffslord.com`)
+      - traefik.http.routers.ubooquity.tls=true
+      - traefik.http.routers.ubooquity.tls.certresolver=myresolver
+  # audiobooks
+  booksonic:
+    image: linuxserver/booksonic
+    container_name: booksonic
+    networks:
+      - traefik
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: America/New_York
+    volumes:
+      - /mnt/media/config/booksonic:/config
+      - /mnt/media/libraries/audiobooks:/audiobooks
+      - /mnt/media/libraries/podcasts:/podcasts
+      - /mnt/media/libraries/other_audio:/othermedia
+    expose:
+      - "4040"
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.booksonic.rule=Host(`booksonic.jeffslord.com`)
+      - traefik.http.routers.booksonic.tls=true
+      - traefik.http.routers.booksonic.tls.certresolver=myresolver
+  # groceries
+  grocy:
+    image: linuxserver/grocy
+    container_name: grocy
+    networks:
+      - traefik
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: America/New_York
+    volumes:
+      - /home/server/volumes/grocy/config:/config
+    expose:
+      - "9283"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.grocy.rule=Host(`grocy.jeffslord.com`)
+      - traefik.http.routers.grocy.tls=true
+      - traefik.http.routers.grocy.tls.certresolver=myresolver
+    restart: unless-stopped
+
+
 networks:
   traefik:
     external: true

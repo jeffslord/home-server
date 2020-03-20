@@ -1,24 +1,61 @@
-version: "3"
+version: '3.2'
 services:
   minecraft-server:
-    ports:
-      - "25565:25565"
-      - "25575:25575"
-    environment:
-      - EULA=TRUE
-      - TYPE=CURSEFORGE
-      #- FORGEVERSION=14.23.4.2707
-      #- CF_SERVER_MOD=https://www.curseforge.com/minecraft/modpacks/enigmatica2expert/download/2777069/
-      #- CF_SERVER_MOD=https://www.curseforge.com/minecraft/modpacks/enigmatica2expert/download/2791604
-      - CF_SERVER_MOD=E2EServer169.zip
-      #- CF_SERVER_MOD=https://minecraft.curseforge.com/projects/modpacks/enigmatica2expert/files/2777069/download
-      #- MODPACK= ../modpacks/sevtech.zip
-      - LEVEL=world1
-      - MAX_MEMORY=12G
-    volumes:
-      - /home/server/volumes/minecraft/enigmatica2_expert_169/data/:/data
     image: itzg/minecraft-server
-    container_name: mc-enig-exp-169
+    container_name: mc-e2e-176a
+    ports:
+    #  - "25565:25565"
+    #  - "25575:25575"
+       - "25590:25565"
+    environment:
+      EULA: "true"
+      TYPE: "CURSEFORGE"
+      RCON_PASSWORD: "testing"
+      RCON_PORT: 28016
+      #- CF_SERVER_MOD=https://www.curseforge.com/minecraft/modpacks/enigmatica2expert/download/2791604
+      CF_SERVER_MOD: "E2EServer176a.zip"
+      LEVEL: "world1"
+      MAX_MEMORY: "12G"
+      #PROXY: mc_e2e.jeffslord.com
+      
+    volumes:
+      - /home/server/volumes/minecraft/e2e_176a/data/:/data
     tty: true
     stdin_open: true
     restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mc_e2e.rule=Host(`mc_e2e.jeffslord.com`)
+      - traefik.http.services.mc_e2e.loadbalancer.server.port=25565
+      - traefik.http.routers.mc_e2e.tls=true
+      - traefik.http.routers.mc_e2e.tls.certresolver=myresolver
+#      - traefik.tcp.routers.minecraft.entrypoints=minecraft
+#      - traefik.tcp.routers.minecraft.rule=HostSNI(`*`)
+#      - traefik.tcp.services.minecraft.loadbalancer.server.port=25565
+    
+    
+#    bungeecord:
+#      image: itzg/bungeecord
+#      ports:
+#        - 25577:25577
+#      volumes:
+#        - ./config.yml:/server/config.ymlz
+
+#  router:
+#    image: itzg/mc-router
+#    container_name: mc-router
+#    ports:
+#      - 25565:25565
+#    command: --mapping=mc_e2e.jeffslord.com=mc-e2e-176a:25565
+#    networks:
+#      - traefik
+#    labels:
+#      - traefik.enable=true
+#      - traefik.http.routers.mc_e2e.rule=Host(`mc_e2e.jeffslord.com`)
+#      - traefik.http.services.mc_e2e.loadbalancer.server.port=25565
+
+networks:
+  traefik:
+    external: true

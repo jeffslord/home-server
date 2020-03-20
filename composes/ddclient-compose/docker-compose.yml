@@ -12,3 +12,11 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=false
+
+
+      # for ddclient cloudflare config
+      #protocol=cloudflare          ## 
+      #server=fqdn.of.service       ## defaults to api.cloudflare.com/client/v4
+      #login=service-login          ## login name and password  registered with the service
+      #password=service-password    ##
+      #fully.qualified.host         ## the host registered with the service.
