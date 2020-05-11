@@ -32,7 +32,7 @@ services:
     environment:
       - ADVERTISE_IP=http://192.168.1.200:32400/
       - TZ=America/New_York
-      - PLEX_CLAIM="claim-qxVKRrNKy9x1WQXzEJxD"
+      - PLEX_CLAIM=${PLEX_CLAIM}
       - PLEX_UID=1000
       - PLEX_GID=1000
       # - PUID=1000
@@ -41,15 +41,15 @@ services:
       # - UMASK_SET=022 #optional
       # - PLEX_CLAIM="claim-qxVKRrNKy9x1WQXzEJxD"
     volumes:
-      - /mnt/media/config/plex:/config
-      - /mnt/media/transcode:/transcode
-      - /mnt/media/libraries/shows:/data/tvshows
-      - /mnt/media/libraries/movies:/data/movies
-      - /mnt/media/libraries/anime:/data/anime
-      - /mnt/media/libraries/anime_movies:/data/anime_movies
+      - ${HDD_BASE_PATH}/config/plex:/config
+      - ${HDD_BASE_PATH}/transcode:/transcode
+      - ${HDD_BASE_PATH}/libraries/shows:/data/tvshows
+      - ${HDD_BASE_PATH}/libraries/movies:/data/movies
+      - ${HDD_BASE_PATH}/libraries/anime:/data/anime
+      - ${HDD_BASE_PATH}/libraries/anime_movies:/data/anime_movies
     labels:
       - traefik.enable=true
-      - traefik.http.routers.plex.rule=Host(`plex.jeffslord.com`)
+      - traefik.http.routers.plex.rule=Host(`plex.${DOMAIN_NAME}`)
       - traefik.http.services.plex.loadbalancer.server.port=32400
       - traefik.http.routers.plex.tls=true
       - traefik.http.routers.plex.entrypoints=websecure
@@ -69,10 +69,10 @@ services:
       - PGID=1000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/media/config/sonarr:/config
-      - /mnt/media/libraries/shows:/data/tvshows
-      - /mnt/media/libraries/anime:/data/anime
-      - /mnt/media/downloads:/downloads
+      - ${HDD_BASE_PATH}/config/sonarr:/config
+      - ${HDD_BASE_PATH}/libraries/shows:/data/tvshows
+      - ${HDD_BASE_PATH}/libraries/anime:/data/anime
+      - ${HDD_BASE_PATH}/downloads:/downloads
     depends_on:
       - jackett
       - deluge
@@ -80,7 +80,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
-      - traefik.http.routers.sonarr.rule=Host(`sonarr.jeffslord.com`)
+      - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN_NAME}`)
       - traefik.http.routers.sonarr.tls=true
       - traefik.http.routers.sonarr.entrypoints=websecure
       - traefik.http.routers.sonarr.tls.certresolver=myresolver
@@ -98,10 +98,10 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - /mnt/media/config/radarr:/config
-      - /mnt/media/downloads:/downloads
-      - /mnt/media/libraries/movies:/data/movies
-      - /mnt/media/libraries/anime_movies:/data/anime_movies
+      - ${HDD_BASE_PATH}/config/radarr:/config
+      - ${HDD_BASE_PATH}/downloads:/downloads
+      - ${HDD_BASE_PATH}/libraries/movies:/data/movies
+      - ${HDD_BASE_PATH}/libraries/anime_movies:/data/anime_movies
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - jackett
@@ -109,7 +109,7 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.radarr.rule=Host(`radarr.jeffslord.com`)
+      - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN_NAME}`)
       - traefik.http.routers.radarr.tls=true
       - traefik.http.routers.radarr.tls.certresolver=myresolver
   # Indexer
@@ -127,12 +127,12 @@ services:
       - PUID=1000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/media/config/jackett:/config
-      - /mnt/media/downloads:/downloads
+      - ${HDD_BASE_PATH}/config/jackett:/config
+      - ${HDD_BASE_PATH}/downloads:/downloads
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jackett.rule=Host(`jackett.jeffslord.com`)
+      - traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN_NAME}`)
       - traefik.http.routers.jackett.tls=true
       - traefik.http.routers.jackett.tls.certresolver=myresolver
   # Downloader
@@ -150,8 +150,8 @@ services:
       - "58946"
     environment:
       - VPN_ENABLED=yes
-      - VPN_USER=p9301991
-      - VPN_PASS=hZkhLtbjVm
+      - VPN_USER=${VPN_USER}
+      - VPN_PASS=${VPN_PASS}
       - VPN_PROV=pia
       - STRICT_PORT_FORWARD=yes
       - ENABLE_PRIVOXY=yes
@@ -162,13 +162,13 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /mnt/media/downloads:/downloads
-      - /mnt/media/config/deluge:/config
+      - ${HDD_BASE_PATH}/downloads:/downloads
+      - ${HDD_BASE_PATH}/config/deluge:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.deluge.rule=Host(`deluge.jeffslord.com`)
+      - traefik.http.routers.deluge.rule=Host(`deluge.${DOMAIN_NAME}`)
       - traefik.http.routers.deluge.tls=true
       - traefik.http.routers.deluge.tls.certresolver=myresolver
   # Analytics
@@ -186,14 +186,14 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - /mnt/media/config/plexpy:/config
-      - /mnt/media/config/plex/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
+      - ${HDD_BASE_PATH}/config/plexpy:/config
+      - ${HDD_BASE_PATH}/config/plex/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
     depends_on:
       - plex
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.tautulli.rule=Host(`tautulli.jeffslord.com`)
+      - traefik.http.routers.tautulli.rule=Host(`tautulli.${DOMAIN_NAME}`)
       - traefik.http.routers.tautulli.tls=true
       - traefik.http.routers.tautulli.tls.certresolver=myresolver
   # Request new media
@@ -211,13 +211,13 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - /mnt/media/config/ombi:/config
+      - ${HDD_BASE_PATH}/config/ombi:/config
     depends_on:
       - plex
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ombi.rule=Host(`ombi.jeffslord.com`)
+      - traefik.http.routers.ombi.rule=Host(`ombi.${DOMAIN_NAME}`)
       - traefik.http.routers.ombi.tls=true
       - traefik.http.routers.ombi.tls.certresolver=myresolver
   # Media Portal
@@ -233,13 +233,13 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - /mnt/media/config/muximux:/config
+      - ${HDD_BASE_PATH}/config/muximux:/config
     depends_on:
       - plex
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.muximux.rule=Host(`muximux.jeffslord.com`)
+      - traefik.http.routers.muximux.rule=Host(`muximux.${DOMAIN_NAME}`)
       - traefik.http.routers.muximux.tls=true
       - traefik.http.routers.muximux.tls.certresolver=myresolver
   # Subtitles
@@ -257,17 +257,17 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - /mnt/media/config/bazarr:/config
-      - /mnt/media/libraries/shows:/data/tvshows
-      - /mnt/media/libraries/movies:/data/movies
-      - /mnt/media/libraries/anime:/data/anime
-      - /mnt/media/libraries/anime_movies:/data/anime_movies
+      - ${HDD_BASE_PATH}/config/bazarr:/config
+      - ${HDD_BASE_PATH}/libraries/shows:/data/tvshows
+      - ${HDD_BASE_PATH}/libraries/movies:/data/movies
+      - ${HDD_BASE_PATH}/libraries/anime:/data/anime
+      - ${HDD_BASE_PATH}/libraries/anime_movies:/data/anime_movies
     depends_on:
       - plex
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.bazarr.rule=Host(`bazarr.jeffslord.com`)
+      - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN_NAME}`)
       - traefik.http.routers.bazarr.tls=true
       - traefik.http.routers.bazarr.tls.certresolver=myresolver
   # ebooks / comics
@@ -281,17 +281,17 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - /mnt/media/config/ubooquity:/config
-      - /mnt/media/libraries/books:/books
-      - /mnt/media/libraries/comics:/comics
-      - /mnt/media/libraries/raw_files:/filesi
+      - ${HDD_BASE_PATH}/config/ubooquity:/config
+      - ${HDD_BASE_PATH}/libraries/books:/books
+      - ${HDD_BASE_PATH}/libraries/comics:/comics
+      - ${HDD_BASE_PATH}/libraries/raw_files:/filesi
     expose:
       - "2202"
       - "2203"
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ubooquity.rule=Host(`ubooquity.jeffslord.com`)
+      - traefik.http.routers.ubooquity.rule=Host(`ubooquity.${DOMAIN_NAME}`)
       - traefik.http.routers.ubooquity.tls=true
       - traefik.http.routers.ubooquity.tls.certresolver=myresolver
   # audiobooks
@@ -305,16 +305,16 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - /mnt/media/config/booksonic:/config
-      - /mnt/media/libraries/audiobooks:/audiobooks
-      - /mnt/media/libraries/podcasts:/podcasts
-      - /mnt/media/libraries/other_audio:/othermedia
+      - ${HDD_BASE_PATH}/config/booksonic:/config
+      - ${HDD_BASE_PATH}/libraries/audiobooks:/audiobooks
+      - ${HDD_BASE_PATH}/libraries/podcasts:/podcasts
+      - ${HDD_BASE_PATH}/libraries/other_audio:/othermedia
     expose:
       - "4040"
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.booksonic.rule=Host(`booksonic.jeffslord.com`)
+      - traefik.http.routers.booksonic.rule=Host(`booksonic.${DOMAIN_NAME}`)
       - traefik.http.routers.booksonic.tls=true
       - traefik.http.routers.booksonic.tls.certresolver=myresolver
   # groceries
@@ -328,12 +328,12 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - /home/server/volumes/grocy/config:/config
+      - ${SSD_BASE_PATH}/grocy/config:/config
     expose:
       - "9283"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.grocy.rule=Host(`grocy.jeffslord.com`)
+      - traefik.http.routers.grocy.rule=Host(`grocy.${DOMAIN_NAME}`)
       - traefik.http.routers.grocy.tls=true
       - traefik.http.routers.grocy.tls.certresolver=myresolver
     restart: unless-stopped
@@ -348,13 +348,13 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - /mnt/media/config/piwigo/config:/config
+      - ${HDD_BASE_PATH}/config/piwigo/config:/config
     expose:
       - "4049"
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.piwigo.rule=Host(`piwigo.jeffslord.com`)
+      - traefik.http.routers.piwigo.rule=Host(`piwigo.${DOMAIN_NAME}`)
       - traefik.http.routers.piwigo.tls=true
       - traefik.http.routers.piwigo.tls.certresolver=myresolver
 
@@ -373,12 +373,12 @@ services:
       - MYSQL_PASSWORD=JEFF_PASS #optional
       # - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
     volumes:
-      - /mnt/media/db/mariadb/config:/config
+      - ${HDD_BASE_PATH}/db/mariadb/config:/config
     expose:
       - "3306"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mariadb.rule=Host(`mariadb.jeffslord.com`)
+      - traefik.http.routers.mariadb.rule=Host(`mariadb.${DOMAIN_NAME}`)
       - traefik.http.routers.mariadb.tls=true
       - traefik.http.routers.mariadb.tls.certresolver=myresolver
 
