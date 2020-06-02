@@ -1,0 +1,53 @@
+version: "3"
+services:
+  letsencrypt:
+    image: "linuxserver/letsencrypt"
+    container_name: "letsencrypt"
+    cap_add:
+        - NET_ADMIN
+    environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/New_York
+        - URL=${DOMAIN}
+        - SUBDOMAINS=${SUBDOMAINS},
+        - VALIDATION=dns
+        - DNSPLUGIN=cloudflare #optional
+        # - PROPAGATION= #optional
+        # - DUCKDNSTOKEN= #optional
+        - EMAIL=${EMAIL}
+        - DHLEVEL=2048 #optional
+        - ONLY_SUBDOMAINS=false #optional
+        # - EXTRA_DOMAINS= #optional
+        # - STAGING=false #optional
+    volumes:
+        - </path/to/appdata/config>:/config
+    ports:
+        - 443:443
+        - 80:80 #optional
+    restart: unless-stopped
+
+
+  certbot:
+    image: "certbot/cerbotdns-google"
+    container_name: certbot-google
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+      - /home/.secrets/cerbot:/secrets
+    command:
+      - --dns-google
+      - --dns-google-credentials /secrets/google.json
+      - --server https://acme-v02.api.letsencrypt.org/directory
+
+
+      sudo docker run -it --name certbot --rm \
+      -v "/etc/letsencrypt:/etc/letsencrypt" \
+      -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
+      -v "/home/v_rr/.secrets/certbot:/secrets" \
+      certbot/dns-google \
+      certonly \
+      --dns-google \
+      --dns-google-credentials /secrets/google.json \
+      --server https://acme-v02.api.letsencrypt.org/directory \
+      -d '*.coehana.com'
