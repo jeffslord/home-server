@@ -66,6 +66,8 @@ services:
 
   pihole:
     container_name: pihole
+    networks:
+      - traefik
     domainname: jeffslord.com
     image: pihole/pihole:latest
     dns:

@@ -1,0 +1,32 @@
+version: '3.2'
+services:
+  minecraft-server:
+    image: itzg/minecraft-server
+    container_name: mc-rlcraft
+    ports:
+       - "25590:25565"
+    environment:
+      EULA: "true"
+      TYPE: "CURSEFORGE"
+      RCON_PASSWORD: "testing"
+      RCON_PORT: 28016
+      CF_SERVER_MOD: "rlcraft_2-8-2.zip"
+      LEVEL: "world1"
+      MAX_MEMORY: "16G"
+    volumes:
+      - /home/server/volumes/minecraft/rlcraft_2-8-2/data/:/data
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mc_rlcraft.rule=Host(`mc_rlcraft.jeffslord.com`)
+      - traefik.http.services.mc_rlcraft.loadbalancer.server.port=25565
+      - traefik.http.routers.mc_rlcraft.tls=true
+      - traefik.http.routers.mc_rlcraft.tls.certresolver=myresolver
+
+networks:
+  traefik:
+    external: true
