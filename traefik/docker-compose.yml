@@ -1,10 +1,11 @@
-version: "3.7"
+version: "3.8"
 services:
   traefik:
-    image: "traefik:v2.0.0"
+    image: "traefik:v2.3"
     container_name: "traefik"
     networks:
       - traefik
+    restart: unless-stopped
     command:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
@@ -18,7 +19,7 @@ services:
       # - --certificatesResolvers.myresolver.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
       - --certificatesResolvers.myresolver.acme.email=jeffscottlord@gmail.com
         #- --certificatesResolvers.myresolver.acme.storage=acme.json 
-      - --certificatesResolvers.myresolver.acme.storage=/acme
+      - --certificatesResolvers.myresolver.acme.storage=/acme/acme.json
       - --certificatesResolvers.myresolver.acme.httpChallenge.entryPoint=web
     environment:
         - CF_API_EMAIL=jeffscottord@gmail.com
@@ -70,9 +71,9 @@ services:
       - traefik
     domainname: jeffslord.com
     image: pihole/pihole:latest
-    dns:
-      - 127.0.0.1
-      - 1.1.1.1
+    #dns:
+    #  - 127.0.0.1
+    #  - 1.1.1.1
     cap_add:
       - NET_ADMIN
     ports:
@@ -96,9 +97,11 @@ services:
       # required when using --docker.exposedbydefault=false
       - "traefik.enable=true"
       - "traefik.http.routers.pihole.rule=Host(`pihole.jeffslord.com`)"
-      - "traefik.http.routers.pihole.entrypoints=web"
+      - "traefik.http.routers.pihole.entrypoints=websecure"
       - "traefik.docker.network=traefik"
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
+      - "traefik.http.routers.pihole.tls=true"
+      - "traefik.http.routers.pihole.tls.certresolver=myresolver"
 #endnew
   
   test-app:

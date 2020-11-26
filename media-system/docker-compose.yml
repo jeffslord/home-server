@@ -70,9 +70,10 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${HDD_BASE_PATH}/config/sonarr:/config
-      - ${HDD_BASE_PATH}/libraries/shows:/data/tvshows
-      - ${HDD_BASE_PATH}/libraries/anime:/data/anime
-      - ${HDD_BASE_PATH}/downloads:/downloads
+      # - ${HDD_BASE_PATH}/libraries/shows:/data/tvshows
+      # - ${HDD_BASE_PATH}/libraries/anime:/data/anime
+      # - ${HDD_BASE_PATH}/downloads:/downloads
+      - ${HDD_BASE_PATH}:/media
     depends_on:
       - jackett
       - deluge
@@ -99,9 +100,10 @@ services:
       - PUID=1000
     volumes:
       - ${HDD_BASE_PATH}/config/radarr:/config
-      - ${HDD_BASE_PATH}/downloads:/downloads
-      - ${HDD_BASE_PATH}/libraries/movies:/data/movies
-      - ${HDD_BASE_PATH}/libraries/anime_movies:/data/anime_movies
+      # - ${HDD_BASE_PATH}/downloads:/downloads
+      # - ${HDD_BASE_PATH}/libraries/movies:/data/movies
+      # - ${HDD_BASE_PATH}/libraries/anime_movies:/data/anime_movies
+      - ${HDD_BASE_PATH}:/media
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - jackett
@@ -154,7 +156,7 @@ services:
       - VPN_PASS=${VPN_PASS}
       - VPN_PROV=pia
         # - STRICT_PORT_FORWARD=yes #want this to be yes, but pia is changing to new type of server, causing issue
-      - STRICT_PORT_FORWARD=no
+      - STRICT_PORT_FORWARD=yes
       - ENABLE_PRIVOXY=yes
       - LAN_NETWORK=192.168.112.1/24
       - NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1
