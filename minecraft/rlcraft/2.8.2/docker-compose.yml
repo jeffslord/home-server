@@ -32,6 +32,7 @@ services:
       - traefik.http.services.mc_rlcraft.loadbalancer.server.port=25565
       - traefik.http.routers.mc_rlcraft.tls=true
       - traefik.http.routers.mc_rlcraft.tls.certresolver=myresolver
+      - traefik.http.routers.mc_rlcraft.entrypoints=mc
 
   web:
     image: itzg/rcon

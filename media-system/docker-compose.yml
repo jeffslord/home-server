@@ -56,7 +56,7 @@ services:
       - traefik.http.routers.plex.tls.certresolver=myresolver
   # Media Organizers
   sonarr:
-    image: "linuxserver/sonarr:latest"
+    image: "linuxserver/sonarr:preview"
     container_name: sonarr
     networks:
       - traefik
@@ -363,29 +363,29 @@ services:
       - traefik.http.routers.piwigo.tls=true
       - traefik.http.routers.piwigo.tls.certresolver=myresolver
 
-  mariadb:
-    image: linuxserver/mariadb
-    container_name: mariadb
-    networks:
-      - traefik
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - MYSQL_ROOT_PASSWORD=ADMIN_PASS
-      - TZ=America/New_York
-      - MYSQL_DATABASE=HOME #optional
-      - MYSQL_USER=JEFF #optional
-      - MYSQL_PASSWORD=JEFF_PASS #optional
-      # - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
-    volumes:
-      - ${HDD_BASE_PATH}/db/mariadb/config:/config
-    expose:
-      - "3306"
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.mariadb.rule=Host(`mariadb.${DOMAIN_NAME}`)
-      - traefik.http.routers.mariadb.tls=true
-      - traefik.http.routers.mariadb.tls.certresolver=myresolver
+#  mariadb:
+#    image: linuxserver/mariadb
+#    container_name: mariadb
+#    networks:
+#      - traefik
+#    environment:
+#      - PUID=1000
+#      - PGID=1000
+#      - MYSQL_ROOT_PASSWORD=ADMIN_PASS
+#      - TZ=America/New_York
+#      - MYSQL_DATABASE=HOME #optional
+#      - MYSQL_USER=JEFF #optional
+#      - MYSQL_PASSWORD=JEFF_PASS #optional
+#      # - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
+#    volumes:
+#      - ${HDD_BASE_PATH}/db/mariadb/config:/config
+#    expose:
+#      - "3306"
+#    labels:
+#      - traefik.enable=true
+#      - traefik.http.routers.mariadb.rule=Host(`mariadb.${DOMAIN_NAME}`)
+#      - traefik.http.routers.mariadb.tls=true
+#      - traefik.http.routers.mariadb.tls.certresolver=myresolver
 
 
 

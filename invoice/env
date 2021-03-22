@@ -1,0 +1,21 @@
+APP_URL=http://invoice.jeffslord.com
+APP_KEY=1yy7wTAqY2aQnc0PjuxcVBwme2LVA4Ji6QhuGM42s2c=
+APP_DEBUG=true
+MULTI_DB_ENABLED=false
+DB_HOST1=db
+DB_USERNAME1=ninja
+DB_PASSWORD1=ninja
+DB_DATABASE1=ninja
+
+#this is a system variable please do not remove
+IS_DOCKER=true
+
+PHANTOMJS_PDF_GENERATION=false
+
+#V4 env vars
+DB_STRICT=false
+DB_HOST=db
+DB_DATABASE=ninja
+DB_USERNAME=ninja
+DB_PASSWORD=ninja
+APP_CIPHER=AES-256-CBC
