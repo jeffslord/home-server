@@ -1,0 +1,5 @@
+*.env
+/media-system/nginx/cache
+/ddclient/config
+/invoice/docker
+/invoice/env
