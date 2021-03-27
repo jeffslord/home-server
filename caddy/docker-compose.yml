@@ -1,0 +1,26 @@
+version: "3.7"
+
+networks:
+  web:
+    external: true
+
+services:
+  caddy:
+    # image: caddy:latest
+    build: ./dns-dockerfile
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./data/:/data
+      - ./config:/config
+    env_file:
+      - ../global.env
+    environment:
+      - CF_API_TOKEN
+      - DOMAIN_NAME
+    networks:
+      - web

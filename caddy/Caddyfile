@@ -1,0 +1,96 @@
+# https://github.com/caddyserver/caddy/issues/3200#issuecomment-638608401
+{
+	# Global options block. Entirely optional, https is on by default
+	# Optional email key for lets encrypt
+	email jeffscottlord@gmail.com
+	# Optional staging lets encrypt for testing. Comment out for production.
+	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+	acme_dns cloudflare QVyVUVTIGbf3Cyjdul4qCcL2r5r0E1ArCy4ZUQcW
+}
+
+*.jeffslord.com {
+	# log {
+	# 	format json
+	# 	output stdout
+	# }
+	@pihole host pihole.jeffslord.com
+	handle @pihole {
+		reverse_proxy pihole
+	}
+
+	@grocy host grocy.jeffslord.com
+	handle @grocy {
+		reverse_proxy grocy
+	}
+
+	@sonarr host sonarr.jeffslord.com
+	handle @sonarr {
+		reverse_proxy sonarr:8989
+	}
+
+	@plex host plex.jeffslord.com
+	handle @plex {
+		reverse_proxy plex:32400
+	}
+
+	@radarr host radarr.jeffslord.com
+	handle @radarr {
+		reverse_proxy radarr:7878
+	}
+
+	@jackett host jackett.jeffslord.com
+	handle @jackett {
+		reverse_proxy jackett:9117
+	}
+
+	@deluge host deluge.jeffslord.com
+	handle @deluge {
+		reverse_proxy deluge:8112
+	}
+
+	@tautulli host tautulli.jeffslord.com
+	handle @tautulli {
+		reverse_proxy tautulli:8181
+	}
+
+	@ombi host ombi.jeffslord.com
+	handle @ombi {
+		reverse_proxy ombi:3579
+	}
+
+	@muximux host deluge.jeffslord.com
+	handle @muximux {
+		reverse_proxy muximux:8079
+	}
+
+	@bazarr host bazarr.jeffslord.com
+	handle @bazarr {
+		reverse_proxy bazarr:6767
+	}
+
+	@ubooquity host ubooquity.jeffslord.com
+	handle @ubooquity {
+		reverse_proxy ubooquity:2202
+	}
+
+	@booksonic host booksonic.jeffslord.com
+	handle @booksonic {
+		reverse_proxy booksonic:4040
+	}
+
+	@invoice host invoice.jeffslord.com
+	handle @invoice {
+		# reverse_proxy ninja_app:9000
+		# reverse_proxy ninja_proxy {
+			# header_up Host {invoice.jeffslord.com}
+		# }
+		reverse_proxy ninja_proxy
+		
+		# root * /var/www/app/public
+		# php_fastcgi app:9000
+		# php_fastcgi ninja_app:9000
+		# reverse_proxy ninja_app
+		# encode zstd gzip
+		# file_server browse
+	}
+}
