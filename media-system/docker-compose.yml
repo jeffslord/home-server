@@ -1,4 +1,9 @@
 version: "3.7"
+
+networks:
+  web:
+    external: true
+
 services:
   # Media Player
   plex:
@@ -6,7 +11,7 @@ services:
     # image: linuxserver/plex
     container_name: plex
     networks:
-      - traefik
+      - web
     restart: unless-stopped
     # network_mode: host
     ports:
@@ -19,27 +24,12 @@ services:
       - 32412:32412/udp
       - 32413:32413/udp
       - 32414:32414/udp
-    # expose:
-    #   - "32400"
-    #   - "3005"
-    #   - "8324"
-    #   - "32469"
-    #   - "1900"
-    #   - "32410"
-    #   - "32412"
-    #   - "32413"
-    #   - "32414"
     environment:
       - ADVERTISE_IP=http://192.168.1.200:32400/
       - TZ=America/New_York
       - PLEX_CLAIM=${PLEX_CLAIM}
       - PLEX_UID=1000
       - PLEX_GID=1000
-      # - PUID=1000
-      # - PGID=1000
-      # - VERSION=docker
-      # - UMASK_SET=022 #optional
-      # - PLEX_CLAIM="claim-qxVKRrNKy9x1WQXzEJxD"
     volumes:
       - ${HDD_BASE_PATH}/config/plex:/config
       - ${HDD_BASE_PATH}/transcode:/transcode
@@ -47,21 +37,12 @@ services:
       - ${HDD_BASE_PATH}/libraries/movies:/data/movies
       - ${HDD_BASE_PATH}/libraries/anime:/data/anime
       - ${HDD_BASE_PATH}/libraries/anime_movies:/data/anime_movies
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.plex.rule=Host(`plex.${DOMAIN_NAME}`)
-      - traefik.http.services.plex.loadbalancer.server.port=32400
-      - traefik.http.routers.plex.tls=true
-      - traefik.http.routers.plex.entrypoints=websecure
-      - traefik.http.routers.plex.tls.certresolver=myresolver
   # Media Organizers
   sonarr:
     image: "linuxserver/sonarr:preview"
     container_name: sonarr
     networks:
-      - traefik
-    # ports:
-    #   - "8989:8989"
+      - web
     expose:
       - "8989"
     environment:
@@ -70,29 +51,16 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${HDD_BASE_PATH}/config/sonarr:/config
-      # - ${HDD_BASE_PATH}/libraries/shows:/data/tvshows
-      # - ${HDD_BASE_PATH}/libraries/anime:/data/anime
-      # - ${HDD_BASE_PATH}/downloads:/downloads
       - ${HDD_BASE_PATH}:/media
     depends_on:
       - jackett
       - deluge
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.sonarr.loadbalancer.server.port=8989
-      - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN_NAME}`)
-      - traefik.http.routers.sonarr.tls=true
-      - traefik.http.routers.sonarr.entrypoints=websecure
-      - traefik.http.routers.sonarr.tls.certresolver=myresolver
-      
   radarr:
     image: "linuxserver/radarr:latest"
     container_name: radarr
     networks:
-      - traefik
-    # ports:
-    #   - "7878:7878"
+      - web
     expose:
       - "7878"
     environment:
@@ -100,28 +68,18 @@ services:
       - PUID=1000
     volumes:
       - ${HDD_BASE_PATH}/config/radarr:/config
-      # - ${HDD_BASE_PATH}/downloads:/downloads
-      # - ${HDD_BASE_PATH}/libraries/movies:/data/movies
-      # - ${HDD_BASE_PATH}/libraries/anime_movies:/data/anime_movies
       - ${HDD_BASE_PATH}:/media
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - jackett
       - deluge
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN_NAME}`)
-      - traefik.http.routers.radarr.tls=true
-      - traefik.http.routers.radarr.tls.certresolver=myresolver
   # Indexer
   jackett:
     image: "linuxserver/jackett:latest"
     container_name: jackett
     networks:
-      - traefik
-    # ports:
-    #   - "9117:9117"
+      - web
     expose:
       - "9117"
     environment:
@@ -132,17 +90,12 @@ services:
       - ${HDD_BASE_PATH}/config/jackett:/config
       - ${HDD_BASE_PATH}/downloads:/downloads
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN_NAME}`)
-      - traefik.http.routers.jackett.tls=true
-      - traefik.http.routers.jackett.tls.certresolver=myresolver
   # Downloader
   deluge:
     image: "binhex/arch-delugevpn:latest"
     container_name: deluge
     networks:
-      - traefik
+      - web
     cap_add:
       - NET_ADMIN
     expose:
@@ -171,19 +124,13 @@ services:
       - ${HDD_BASE_PATH}/config/deluge:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.deluge.rule=Host(`deluge.${DOMAIN_NAME}`)
-      - traefik.http.routers.deluge.tls=true
-      - traefik.http.routers.deluge.tls.certresolver=myresolver
   # Analytics
   tautulli:
     image: "linuxserver/tautulli:latest"
     container_name: tautulli
     networks:
-      - traefik
-    # ports:
-    #   - "8181:8181"
+      # - traefik
+      - web
     expose:
       - "8181"
     environment:
@@ -196,19 +143,12 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.tautulli.rule=Host(`tautulli.${DOMAIN_NAME}`)
-      - traefik.http.routers.tautulli.tls=true
-      - traefik.http.routers.tautulli.tls.certresolver=myresolver
   # Request new media
   ombi:
     image: "linuxserver/ombi:latest"
     container_name: ombi
     networks:
-      - traefik
-    # ports:
-        # - "3579:3579"
+      - web
     expose:
       - "3579"
     environment:
@@ -220,17 +160,12 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.ombi.rule=Host(`ombi.${DOMAIN_NAME}`)
-      - traefik.http.routers.ombi.tls=true
-      - traefik.http.routers.ombi.tls.certresolver=myresolver
   # Media Portal
   muximux:
     image: "linuxserver/muximux:latest"
     container_name: muximux
     networks:
-      - traefik
+      - web
     expose:
       - "8079"
     environment:
@@ -242,19 +177,12 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.muximux.rule=Host(`muximux.${DOMAIN_NAME}`)
-      - traefik.http.routers.muximux.tls=true
-      - traefik.http.routers.muximux.tls.certresolver=myresolver
   # Subtitles
   bazarr:
     image: "linuxserver/bazarr:latest"
     container_name: bazarr
     networks:
-      - traefik
-    # ports:
-    #     - "6767:6767"
+      - web
     expose:
       - "6767"
     environment:
@@ -270,17 +198,12 @@ services:
     depends_on:
       - plex
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN_NAME}`)
-      - traefik.http.routers.bazarr.tls=true
-      - traefik.http.routers.bazarr.tls.certresolver=myresolver
   # ebooks / comics
   ubooquity:
     image: linuxserver/ubooquity
     container_name: ubooquity
     networks:
-     - traefik
+      - web
     environment:
       PUID: 1000
       PGID: 1000
@@ -294,17 +217,12 @@ services:
       - "2202"
       - "2203"
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.ubooquity.rule=Host(`ubooquity.${DOMAIN_NAME}`)
-      - traefik.http.routers.ubooquity.tls=true
-      - traefik.http.routers.ubooquity.tls.certresolver=myresolver
   # audiobooks
   booksonic:
     image: linuxserver/booksonic
     container_name: booksonic
     networks:
-      - traefik
+      - web
     environment:
       PUID: 1000
       PGID: 1000
@@ -317,78 +235,3 @@ services:
     expose:
       - "4040"
     restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.booksonic.rule=Host(`booksonic.${DOMAIN_NAME}`)
-      - traefik.http.routers.booksonic.tls=true
-      - traefik.http.routers.booksonic.tls.certresolver=myresolver
-  # groceries
-  grocy:
-    image: linuxserver/grocy
-    container_name: grocy
-    networks:
-      - traefik
-    environment:
-      PUID: 1000
-      PGID: 1000
-      TZ: America/New_York
-    volumes:
-      - ${SSD_BASE_PATH}/grocy/config:/config
-    expose:
-      - "9283"
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.grocy.rule=Host(`grocy.${DOMAIN_NAME}`)
-      - traefik.http.routers.grocy.tls=true
-      - traefik.http.routers.grocy.tls.certresolver=myresolver
-    restart: unless-stopped
-
-  piwigo:
-    image: linuxserver/piwigo
-    container_name: piwigo
-    networks:
-      - traefik
-    environment:
-      PUID: 1000
-      PGID: 1000
-      TZ: America/New_York
-    volumes:
-      - ${HDD_BASE_PATH}/config/piwigo/config:/config
-    expose:
-      - "4049"
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.piwigo.rule=Host(`piwigo.${DOMAIN_NAME}`)
-      - traefik.http.routers.piwigo.tls=true
-      - traefik.http.routers.piwigo.tls.certresolver=myresolver
-
-#  mariadb:
-#    image: linuxserver/mariadb
-#    container_name: mariadb
-#    networks:
-#      - traefik
-#    environment:
-#      - PUID=1000
-#      - PGID=1000
-#      - MYSQL_ROOT_PASSWORD=ADMIN_PASS
-#      - TZ=America/New_York
-#      - MYSQL_DATABASE=HOME #optional
-#      - MYSQL_USER=JEFF #optional
-#      - MYSQL_PASSWORD=JEFF_PASS #optional
-#      # - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
-#    volumes:
-#      - ${HDD_BASE_PATH}/db/mariadb/config:/config
-#    expose:
-#      - "3306"
-#    labels:
-#      - traefik.enable=true
-#      - traefik.http.routers.mariadb.rule=Host(`mariadb.${DOMAIN_NAME}`)
-#      - traefik.http.routers.mariadb.tls=true
-#      - traefik.http.routers.mariadb.tls.certresolver=myresolver
-
-
-
-networks:
-  traefik:
-    external: true
