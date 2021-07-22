@@ -16,7 +16,7 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - ${SSD_BASE_PATH}/grocy/config:/config
+      - ${SSD}/grocy/config:/config
     expose:
       - "9283"
     restart: unless-stopped

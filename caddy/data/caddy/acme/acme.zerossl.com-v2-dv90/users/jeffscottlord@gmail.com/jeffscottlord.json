@@ -1,0 +1,14 @@
+{
+	"status": "valid",
+	"contact": [
+		"mailto:jeffscottlord@gmail.com"
+	],
+	"termsOfServiceAgreed": true,
+	"externalAccountBinding": {
+		"protected": "eyJhbGciOiJIUzI1NiIsImtpZCI6IlBRb1JjNWszOG5QbW44ZEFBNEFlOFEiLCJ1cmwiOiJodHRwczovL2FjbWUuemVyb3NzbC5jb20vdjIvRFY5MC9uZXdBY2NvdW50In0",
+		"payload": "eyJjcnYiOiJQLTI1NiIsImt0eSI6IkVDIiwieCI6ImJqbjBSRndtV29CUEhQaWNQeHZIdmE5OXo0R0ZobXF2TDM5dno5OVBWUjgiLCJ5IjoibmM3eG1kS3JwcVlYWmhpUE1tU0pUZ0EwXy05SU13VVNHSmdsY2JUUUdTMCJ9",
+		"signature": "6odut_Fx4YfCo1IGripqLOpHbnHjrliCeFiY-BCOM8M"
+	},
+	"orders": "https://acme.zerossl.com/v2/DV90/account/PQoRc5k38nPmn8dAA4Ae8Q/orders",
+	"location": "https://acme.zerossl.com/v2/DV90/account/PQoRc5k38nPmn8dAA4Ae8Q"
+}
