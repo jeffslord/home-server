@@ -39,7 +39,7 @@ services:
       - ${HDD}/libraries/anime_movies:/data/anime_movies
   # Media Organizers
   sonarr:
-    image: "linuxserver/sonarr:preview"
+    image: "linuxserver/sonarr:latest"
     container_name: sonarr
     networks:
       - web
@@ -53,7 +53,7 @@ services:
       - ${HDD}/config/sonarr:/config
       - ${HDD}:/media
     depends_on:
-      - jackett
+      - prowlarr
       - deluge
     restart: unless-stopped
   radarr:
@@ -71,24 +71,52 @@ services:
       - ${HDD}:/media
       - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - jackett
+      - prowlarr
       - deluge
     restart: unless-stopped
-  # Indexer
-  jackett:
-    image: "linuxserver/jackett:latest"
-    container_name: jackett
+  # jackett:
+  #   image: "linuxserver/jackett:latest"
+  #   container_name: jackett
+  #   networks:
+  #     - web
+  #   expose:
+  #     - "9117"
+  #   environment:
+  #     - PGID=1000
+  #     - PUID=1000
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${HDD}/config/jackett:/config
+  #     - ${HDD}/downloads:/downloads
+  #   sysctls:
+  #     - net.ipv6.conf.all.disable_ipv6=1
+  #   restart: unless-stopped
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
     networks:
       - web
     expose:
-      - "9117"
+      - "8191"
     environment:
-      - PGID=1000
+      - LOG_LEVEL=debug
+      - LOG_HTML=true
+      - TZ=America/New_York
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+  prowlarr:
+    image: ghcr.io/linuxserver/prowlarr:develop
+    container_name: prowlarr
+    networks:
+      - web
+    environment:
       - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ${HDD}/config/jackett:/config
-      - ${HDD}/downloads:/downloads
+      - ${SSD}/config:/config
+    expose:
+      - "9696"
     restart: unless-stopped
   # Downloader
   deluge:
@@ -100,9 +128,9 @@ services:
       - ../global.env
     cap_add:
       - NET_ADMIN
-#    sysctls:
-#      - net.ipv4.conf.all.src_valid_mark=1
-#    privileged: true
+    #    sysctls:
+    #      - net.ipv4.conf.all.src_valid_mark=1
+    #    privileged: true
     expose:
       - "8112"
       - "8118"
@@ -113,10 +141,10 @@ services:
       - VPN_USER=${VPN_USER}
       - VPN_PASS=${VPN_PASS}
       - VPN_PROV=pia
-#      - VPN_CLIENT=wireguard
+      #      - VPN_CLIENT=wireguard
       - VPN_CLIENT=openvpn
       - STRICT_PORT_FORWARD=no #want this to be yes, but pia is changing to new type of server, causing issue
-#      - STRICT_PORT_FORWARD=yes
+      #      - STRICT_PORT_FORWARD=yes
       - ENABLE_PRIVOXY=yes
       - LAN_NETWORK=192.168.112.1/24
       - NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1

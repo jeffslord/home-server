@@ -1,0 +1,22 @@
+version: "3"
+services:
+  minecraft-server:
+    ports:
+      - "25565:25565"
+
+    environment:
+      - EULA=TRUE
+      - TYPE=FTB
+      #- FORGEVERSION=14.23.4.2707
+      - FTB_SERVER_MOD=https://www.curseforge.com/minecraft/modpacks/ftb-revelation/download/2746968
+      #- MODPACK= ../modpacks/sevtech.zip
+      - LEVEL=world
+      - MAX_MEMORY="8G"
+    volumes:
+      - /home/server/volumes/minecraft/ftb_revelation_1/data/:/data
+
+    image: itzg/minecraft-server
+
+    container_name: minecraft-ftb-revelation
+
+    tty: true

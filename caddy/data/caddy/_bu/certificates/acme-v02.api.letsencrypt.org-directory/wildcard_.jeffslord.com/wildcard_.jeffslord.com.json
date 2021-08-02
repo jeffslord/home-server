@@ -1,0 +1,8 @@
+{
+	"sans": [
+		"*.jeffslord.com"
+	],
+	"issuer_data": {
+		"url": "https://acme-v02.api.letsencrypt.org/acme/cert/03d86aea2c365939851102eccd2f8e418409"
+	}
+}

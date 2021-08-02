@@ -3,6 +3,6 @@
 		"*.jeffslord.com"
 	],
 	"issuer_data": {
-		"url": "https://acme-v02.api.letsencrypt.org/acme/cert/03d86aea2c365939851102eccd2f8e418409"
+		"url": "https://acme-v02.api.letsencrypt.org/acme/cert/030d938eca6ec7b71cae3ae39fd0d7f92d72"
 	}
 }

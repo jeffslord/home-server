@@ -19,7 +19,7 @@ services:
       cap_add:
         - NET_ADMIN
       ports:
-        #- '0.0.0.0:53:53/tcp'
+        - '0.0.0.0:53:53/tcp'
         - '0.0.0.0:53:53/udp'
         - '0.0.0.0:67:67/udp'
         - '0.0.0.0:8053:80/tcp'
@@ -27,7 +27,7 @@ services:
         - ${SSD}/pihole/:/etc/pihole/
         - ${SSD}/pihole/dnsmasqd:/etc/dnsmasq.d/
         #- ./pihole.log:/var/log/pihole.log
-        - ${SSD}/pihole/pihole.log:/var/log/pihole.log
+        # - ${SSD}/pihole/pihole.log:/var/log/pihole.log
       environment:
         ServerIP: 192.168.1.200
         PROXY_LOCATION: pihole
