@@ -9,85 +9,67 @@
 }
 
 *.jeffslord.com {
-	log {
-		output stdout
-		format console
-	}
+	log
 	@pihole host pihole.jeffslord.com
 	handle @pihole {
 		reverse_proxy pihole
 	}
-
 	@grocy host grocy.jeffslord.com
 	handle @grocy {
 		reverse_proxy grocy
 	}
-
 	@sonarr host sonarr.jeffslord.com
 	handle @sonarr {
 		reverse_proxy sonarr:8989
 	}
-
 	@plex host plex.jeffslord.com
 	handle @plex {
 		reverse_proxy plex:32400
 	}
-
 	@radarr host radarr.jeffslord.com
 	handle @radarr {
 		reverse_proxy radarr:7878
 	}
-
 	@jackett host jackett.jeffslord.com
 	handle @jackett {
 		reverse_proxy jackett:9117
 	}
-
 	@deluge host deluge.jeffslord.com
 	handle @deluge {
 		reverse_proxy deluge:8112
 	}
-
 	@tautulli host tautulli.jeffslord.com
 	handle @tautulli {
 		reverse_proxy tautulli:8181
 	}
-
 	@ombi host ombi.jeffslord.com
 	handle @ombi {
 		reverse_proxy ombi:3579
 	}
-
 	@muximux host deluge.jeffslord.com
 	handle @muximux {
 		reverse_proxy muximux:8079
 	}
-
 	@bazarr host bazarr.jeffslord.com
 	handle @bazarr {
 		reverse_proxy bazarr:6767
 	}
-
 	@ubooquity host ubooquity.jeffslord.com
 	handle @ubooquity {
 		reverse_proxy ubooquity:2202
 	}
-
 	@booksonic host booksonic.jeffslord.com
 	handle @booksonic {
 		reverse_proxy booksonic:4040
 	}
-
 	@flaresolverr host flaresolverr.jeffslord.com
 	handle @flaresolverr {
 		reverse_proxy flaresolverr:8191
 	}
-
 	@prowlarr host prowlarr.jeffslord.com
 	handle @prowlarr {
 		reverse_proxy prowlarr:9696
 	}
-
 	# @invoice host invoice.jeffslord.com
 	# handle @invoice {
 	# 	reverse_proxy ninja_proxy
