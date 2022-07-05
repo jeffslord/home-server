@@ -5,7 +5,7 @@
 	email jeffscottlord@gmail.com
 	# Optional staging lets encrypt for testing. Comment out for production.
 	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-	acme_dns cloudflare QVyVUVTIGbf3Cyjdul4qCcL2r5r0E1ArCy4ZUQcW
+	acme_dns cloudflare 4KcKEz9hNcVcvvZU4NffqQgJLhq-3Mj51QDH2yPr
 }
 
 *.jeffslord.com {
@@ -70,8 +70,12 @@
 	handle @prowlarr {
 		reverse_proxy prowlarr:9696
 	}
-	# @invoice host invoice.jeffslord.com
-	# handle @invoice {
-	# 	reverse_proxy ninja_proxy
-	# }
+	@jellyfin host jellyfin.jeffslord.com
+	handle @jellyfin {
+		reverse_proxy jellyfin:8096
+	}
+	@mealie host mealie.jeffslord.com
+	handle @mealie {
+		reverse_proxy mealie:9090
+	}
 }

@@ -1,0 +1,506 @@
+INFO: 15-Apr-22 13:29:06 	Generating Default Group
+INFO: 15-Apr-22 13:29:06 	Created Site Settings: 
+ language='en-US' first_day_of_week=0 show_recent=True cards_per_section=9 categories=[]
+INFO: 15-Apr-22 13:29:06 	Generating Default User
+INFO: 15-Apr-22 13:29:09 	Checking for Images to Minify...
+INFO: 15-Apr-22 13:29:09 	Finished Minification Check
+INFO: 15-Apr-22 13:29:13 	----INIT SCHEDULE OBJECT-----
+INFO: 15-Apr-22 13:29:13 	None
+INFO: 15-Apr-22 13:29:13 	-----SYSTEM STARTUP----- 
+
+INFO: 15-Apr-22 13:29:13 	------APP SETTINGS------
+INFO: 15-Apr-22 13:29:13 	{
+    "PRODUCTION": true,
+    "BASE_URL": "http://localhost:8080",
+    "IS_DEMO": false,
+    "API_PORT": 9000,
+    "API_DOCS": true,
+    "DB_ENGINE": "postgres",
+    "POSTGRES_SERVER": "postgres",
+    "POSTGRES_PORT": "5432",
+    "POSTGRES_DB": "mealie",
+    "DB_URL_PUBLIC": "postgresql://*****:*****@postgres:5432/mealie",
+    "DEFAULT_GROUP": "Home",
+    "DEFAULT_EMAIL": "changeme@email.com",
+    "LDAP_AUTH_ENABLED": false,
+    "LDAP_SERVER_URL": null,
+    "LDAP_BIND_TEMPLATE": null,
+    "LDAP_ADMIN_FILTER": null,
+    "TOKEN_TIME": 2,
+    "RECIPE_PUBLIC": true,
+    "RECIPE_SHOW_NUTRITION": true,
+    "RECIPE_SHOW_ASSETS": true,
+    "RECIPE_LANDSCAPE_VIEW": true,
+    "RECIPE_DISABLE_COMMENTS": false,
+    "RECIPE_DISABLE_AMOUNT": false,
+    "AUTO_BACKUP_ENABLED": false,
+    "SCHEDULER_DATABASE": "sqlite:////app/data/scheduler.db"
+}
+INFO: 15-Apr-22 13:30:03 	Checking for Images to Minify...
+INFO: 15-Apr-22 13:30:03 	Finished Minification Check
+INFO: 15-Apr-22 13:30:07 	----INIT SCHEDULE OBJECT-----
+INFO: 15-Apr-22 13:30:07 	None
+INFO: 15-Apr-22 13:30:07 	-----SYSTEM STARTUP----- 
+
+INFO: 15-Apr-22 13:30:07 	------APP SETTINGS------
+INFO: 15-Apr-22 13:30:07 	{
+    "PRODUCTION": true,
+    "BASE_URL": "http://localhost:8080",
+    "IS_DEMO": false,
+    "API_PORT": 9000,
+    "API_DOCS": true,
+    "DB_ENGINE": "postgres",
+    "POSTGRES_SERVER": "postgres",
+    "POSTGRES_PORT": "5432",
+    "POSTGRES_DB": "mealie",
+    "DB_URL_PUBLIC": "postgresql://*****:*****@postgres:5432/mealie",
+    "DEFAULT_GROUP": "Home",
+    "DEFAULT_EMAIL": "changeme@email.com",
+    "LDAP_AUTH_ENABLED": false,
+    "LDAP_SERVER_URL": null,
+    "LDAP_BIND_TEMPLATE": null,
+    "LDAP_ADMIN_FILTER": null,
+    "TOKEN_TIME": 2,
+    "RECIPE_PUBLIC": true,
+    "RECIPE_SHOW_NUTRITION": true,
+    "RECIPE_SHOW_ASSETS": true,
+    "RECIPE_LANDSCAPE_VIEW": true,
+    "RECIPE_DISABLE_COMMENTS": false,
+    "RECIPE_DISABLE_AMOUNT": false,
+    "AUTO_BACKUP_ENABLED": false,
+    "SCHEDULER_DATABASE": "sqlite:////app/data/scheduler.db"
+}
+INFO: 15-Apr-22 13:39:23 	Checking for Images to Minify...
+INFO: 15-Apr-22 13:39:23 	Finished Minification Check
+INFO: 15-Apr-22 13:39:27 	----INIT SCHEDULE OBJECT-----
+INFO: 15-Apr-22 13:39:27 	None
+INFO: 15-Apr-22 13:39:27 	-----SYSTEM STARTUP----- 
+
+INFO: 15-Apr-22 13:39:27 	------APP SETTINGS------
+INFO: 15-Apr-22 13:39:27 	{
+    "PRODUCTION": true,
+    "BASE_URL": "https://mealie.jeffslord.com:9080",
+    "IS_DEMO": false,
+    "API_PORT": 9000,
+    "API_DOCS": true,
+    "DB_ENGINE": "postgres",
+    "POSTGRES_SERVER": "postgres",
+    "POSTGRES_PORT": "5432",
+    "POSTGRES_DB": "mealie",
+    "DB_URL_PUBLIC": "postgresql://*****:*****@postgres:5432/mealie",
+    "DEFAULT_GROUP": "Home",
+    "DEFAULT_EMAIL": "changeme@email.com",
+    "LDAP_AUTH_ENABLED": false,
+    "LDAP_SERVER_URL": null,
+    "LDAP_BIND_TEMPLATE": null,
+    "LDAP_ADMIN_FILTER": null,
+    "TOKEN_TIME": 2,
+    "RECIPE_PUBLIC": true,
+    "RECIPE_SHOW_NUTRITION": true,
+    "RECIPE_SHOW_ASSETS": true,
+    "RECIPE_LANDSCAPE_VIEW": true,
+    "RECIPE_DISABLE_COMMENTS": false,
+    "RECIPE_DISABLE_AMOUNT": false,
+    "AUTO_BACKUP_ENABLED": false,
+    "SCHEDULER_DATABASE": "sqlite:////app/data/scheduler.db"
+}
+INFO: 15-Apr-22 13:50:24 	Checking for Images to Minify...
+INFO: 15-Apr-22 13:50:24 	Finished Minification Check
+INFO: 15-Apr-22 13:50:28 	----INIT SCHEDULE OBJECT-----
+INFO: 15-Apr-22 13:50:28 	None
+INFO: 15-Apr-22 13:50:28 	-----SYSTEM STARTUP----- 
+
+INFO: 15-Apr-22 13:50:28 	------APP SETTINGS------
+INFO: 15-Apr-22 13:50:28 	{
+    "PRODUCTION": true,
+    "BASE_URL": "http://localhost:8080",
+    "IS_DEMO": false,
+    "API_PORT": 9000,
+    "API_DOCS": true,
+    "DB_ENGINE": "postgres",
+    "POSTGRES_SERVER": "postgres",
+    "POSTGRES_PORT": "5432",
+    "POSTGRES_DB": "mealie",
+    "DB_URL_PUBLIC": "postgresql://*****:*****@postgres:5432/mealie",
+    "DEFAULT_GROUP": "Home",
+    "DEFAULT_EMAIL": "changeme@email.com",
+    "LDAP_AUTH_ENABLED": false,
+    "LDAP_SERVER_URL": null,
+    "LDAP_BIND_TEMPLATE": null,
+    "LDAP_ADMIN_FILTER": null,
+    "TOKEN_TIME": 2,
+    "RECIPE_PUBLIC": true,
+    "RECIPE_SHOW_NUTRITION": true,
+    "RECIPE_SHOW_ASSETS": true,
+    "RECIPE_LANDSCAPE_VIEW": true,
+    "RECIPE_DISABLE_COMMENTS": false,
+    "RECIPE_DISABLE_AMOUNT": false,
+    "AUTO_BACKUP_ENABLED": false,
+    "SCHEDULER_DATABASE": "sqlite:////app/data/scheduler.db"
+}
+INFO: 15-Apr-22 14:20:28 	None
+INFO: 15-Apr-22 14:50:28 	None
+INFO: 15-Apr-22 15:20:28 	None
+INFO: 15-Apr-22 15:50:28 	None
+INFO: 15-Apr-22 16:20:28 	None
+INFO: 15-Apr-22 16:50:28 	None
+INFO: 15-Apr-22 17:20:28 	None
+INFO: 15-Apr-22 23:35:17 	Checking for Images to Minify...
+INFO: 15-Apr-22 23:35:17 	Finished Minification Check
+INFO: 15-Apr-22 23:35:21 	----INIT SCHEDULE OBJECT-----
+INFO: 15-Apr-22 23:35:21 	None
+INFO: 15-Apr-22 23:35:21 	-----SYSTEM STARTUP----- 
+
+INFO: 15-Apr-22 23:35:21 	------APP SETTINGS------
+INFO: 15-Apr-22 23:35:21 	{
+    "PRODUCTION": true,
+    "BASE_URL": "http://localhost:8080",
+    "IS_DEMO": false,
+    "API_PORT": 9000,
+    "API_DOCS": true,
+    "DB_ENGINE": "postgres",
+    "POSTGRES_SERVER": "postgres",
+    "POSTGRES_PORT": "5432",
+    "POSTGRES_DB": "mealie",
+    "DB_URL_PUBLIC": "postgresql://*****:*****@postgres:5432/mealie",
+    "DEFAULT_GROUP": "Home",
+    "DEFAULT_EMAIL": "changeme@email.com",
+    "LDAP_AUTH_ENABLED": false,
+    "LDAP_SERVER_URL": null,
+    "LDAP_BIND_TEMPLATE": null,
+    "LDAP_ADMIN_FILTER": null,
+    "TOKEN_TIME": 2,
+    "RECIPE_PUBLIC": true,
+    "RECIPE_SHOW_NUTRITION": true,
+    "RECIPE_SHOW_ASSETS": true,
+    "RECIPE_LANDSCAPE_VIEW": true,
+    "RECIPE_DISABLE_COMMENTS": false,
+    "RECIPE_DISABLE_AMOUNT": false,
+    "AUTO_BACKUP_ENABLED": false,
+    "SCHEDULER_DATABASE": "sqlite:////app/data/scheduler.db"
+}
+INFO: 16-Apr-22 00:05:21 	None
+INFO: 16-Apr-22 00:35:21 	None
+INFO: 16-Apr-22 01:05:21 	None
+INFO: 16-Apr-22 01:35:21 	None
+INFO: 16-Apr-22 02:05:21 	None
+INFO: 16-Apr-22 02:35:21 	None
+INFO: 16-Apr-22 03:05:21 	None
+INFO: 16-Apr-22 03:35:21 	None
+INFO: 16-Apr-22 04:05:21 	None
+INFO: 16-Apr-22 04:35:21 	None
+INFO: 16-Apr-22 05:05:21 	None
+INFO: 16-Apr-22 05:35:21 	None
+INFO: 16-Apr-22 06:05:21 	None
+INFO: 16-Apr-22 06:35:21 	None
+INFO: 16-Apr-22 07:05:21 	None
+INFO: 16-Apr-22 07:35:21 	None
+INFO: 16-Apr-22 08:05:21 	None
+INFO: 16-Apr-22 08:35:21 	None
+INFO: 16-Apr-22 09:05:21 	None
+INFO: 16-Apr-22 09:35:21 	None
+INFO: 16-Apr-22 10:05:21 	None
+INFO: 16-Apr-22 10:35:21 	None
+INFO: 16-Apr-22 11:05:21 	None
+INFO: 16-Apr-22 11:35:21 	None
+INFO: 16-Apr-22 12:05:21 	None
+INFO: 16-Apr-22 12:35:21 	None
+INFO: 16-Apr-22 13:05:21 	None
+INFO: 16-Apr-22 13:35:21 	None
+INFO: 16-Apr-22 14:05:21 	None
+INFO: 16-Apr-22 14:35:21 	None
+INFO: 16-Apr-22 15:05:21 	None
+INFO: 16-Apr-22 15:35:21 	None
+INFO: 16-Apr-22 16:05:21 	None
+INFO: 16-Apr-22 16:35:21 	None
+INFO: 16-Apr-22 17:05:21 	None
+INFO: 16-Apr-22 17:35:21 	None
+INFO: 16-Apr-22 18:05:21 	None
+INFO: 16-Apr-22 18:35:21 	None
+INFO: 16-Apr-22 19:05:21 	None
+INFO: 16-Apr-22 19:35:21 	None
+INFO: 16-Apr-22 20:05:21 	None
+INFO: 16-Apr-22 20:35:21 	None
+INFO: 16-Apr-22 21:05:21 	None
+INFO: 16-Apr-22 21:35:21 	None
+INFO: 16-Apr-22 22:05:21 	None
+INFO: 16-Apr-22 22:35:21 	None
+INFO: 16-Apr-22 23:05:21 	None
+INFO: 16-Apr-22 23:35:21 	Purging Events in Database
+INFO: 16-Apr-22 23:35:21 	Events Purges
+INFO: 16-Apr-22 23:35:21 	None
+INFO: 17-Apr-22 00:05:21 	None
+INFO: 17-Apr-22 00:35:21 	None
+INFO: 17-Apr-22 01:05:21 	None
+INFO: 17-Apr-22 01:35:21 	None
+INFO: 17-Apr-22 02:05:21 	None
+INFO: 17-Apr-22 02:35:21 	None
+INFO: 17-Apr-22 03:05:21 	None
+INFO: 17-Apr-22 03:35:21 	None
+INFO: 17-Apr-22 04:05:21 	None
+INFO: 17-Apr-22 04:35:21 	None
+INFO: 17-Apr-22 05:05:21 	None
+INFO: 17-Apr-22 05:35:21 	None
+INFO: 17-Apr-22 06:05:21 	None
+INFO: 17-Apr-22 06:35:21 	None
+INFO: 17-Apr-22 07:05:21 	None
+INFO: 17-Apr-22 07:35:21 	None
+INFO: 17-Apr-22 08:05:21 	None
+INFO: 17-Apr-22 08:35:21 	None
+INFO: 17-Apr-22 09:05:21 	None
+INFO: 17-Apr-22 09:35:21 	None
+INFO: 17-Apr-22 10:05:21 	None
+INFO: 17-Apr-22 10:35:21 	None
+INFO: 17-Apr-22 11:05:21 	None
+INFO: 17-Apr-22 11:35:21 	None
+INFO: 17-Apr-22 12:05:21 	None
+INFO: 17-Apr-22 12:35:21 	None
+INFO: 17-Apr-22 13:05:21 	None
+INFO: 17-Apr-22 13:35:21 	None
+INFO: 17-Apr-22 14:05:21 	None
+INFO: 17-Apr-22 14:35:21 	None
+INFO: 17-Apr-22 15:05:21 	None
+INFO: 17-Apr-22 15:35:21 	None
+INFO: 17-Apr-22 16:05:21 	None
+INFO: 17-Apr-22 16:35:21 	None
+INFO: 17-Apr-22 17:05:21 	None
+INFO: 17-Apr-22 17:35:21 	None
+INFO: 17-Apr-22 18:05:21 	None
+INFO: 17-Apr-22 18:35:21 	None
+INFO: 17-Apr-22 19:05:21 	None
+INFO: 17-Apr-22 19:35:21 	None
+INFO: 17-Apr-22 20:05:21 	None
+INFO: 17-Apr-22 20:35:21 	None
+INFO: 17-Apr-22 21:05:21 	None
+INFO: 17-Apr-22 21:35:21 	None
+INFO: 17-Apr-22 22:05:21 	None
+INFO: 17-Apr-22 22:35:21 	None
+INFO: 17-Apr-22 23:05:21 	None
+INFO: 17-Apr-22 23:35:21 	Purging Events in Database
+INFO: 17-Apr-22 23:35:21 	Events Purges
+INFO: 17-Apr-22 23:35:21 	None
+INFO: 18-Apr-22 00:05:21 	None
+INFO: 18-Apr-22 00:35:21 	None
+INFO: 18-Apr-22 01:05:21 	None
+INFO: 18-Apr-22 01:35:21 	None
+INFO: 18-Apr-22 02:05:21 	None
+INFO: 18-Apr-22 02:35:21 	None
+INFO: 18-Apr-22 03:05:21 	None
+INFO: 18-Apr-22 03:35:21 	None
+INFO: 18-Apr-22 04:05:21 	None
+INFO: 18-Apr-22 04:35:21 	None
+INFO: 18-Apr-22 05:05:21 	None
+INFO: 18-Apr-22 05:35:21 	None
+INFO: 18-Apr-22 06:05:21 	None
+INFO: 18-Apr-22 06:35:21 	None
+INFO: 18-Apr-22 07:05:21 	None
+INFO: 18-Apr-22 07:35:21 	None
+INFO: 18-Apr-22 08:05:21 	None
+INFO: 18-Apr-22 08:35:21 	None
+INFO: 18-Apr-22 09:05:21 	None
+INFO: 18-Apr-22 09:35:21 	None
+INFO: 18-Apr-22 10:05:21 	None
+INFO: 18-Apr-22 10:35:21 	None
+INFO: 18-Apr-22 11:05:21 	None
+INFO: 18-Apr-22 11:35:21 	None
+INFO: 18-Apr-22 12:05:21 	None
+INFO: 18-Apr-22 12:35:21 	None
+INFO: 18-Apr-22 13:05:21 	None
+INFO: 18-Apr-22 13:35:21 	None
+INFO: 18-Apr-22 14:05:21 	None
+INFO: 18-Apr-22 14:35:21 	None
+INFO: 18-Apr-22 15:05:21 	None
+INFO: 18-Apr-22 15:35:21 	None
+INFO: 18-Apr-22 16:05:21 	None
+INFO: 18-Apr-22 16:35:21 	None
+INFO: 18-Apr-22 17:05:21 	None
+INFO: 18-Apr-22 17:35:21 	None
+INFO: 18-Apr-22 18:05:21 	None
+INFO: 18-Apr-22 18:35:21 	None
+INFO: 18-Apr-22 19:05:21 	None
+INFO: 18-Apr-22 19:35:21 	None
+INFO: 18-Apr-22 20:05:21 	None
+INFO: 18-Apr-22 20:35:21 	None
+INFO: 18-Apr-22 21:05:21 	None
+INFO: 18-Apr-22 21:35:21 	None
+INFO: 18-Apr-22 22:05:21 	None
+INFO: 18-Apr-22 22:35:21 	None
+INFO: 18-Apr-22 23:05:21 	None
+INFO: 18-Apr-22 23:35:21 	Purging Events in Database
+INFO: 18-Apr-22 23:35:21 	Events Purges
+INFO: 18-Apr-22 23:35:21 	None
+INFO: 19-Apr-22 00:05:21 	None
+INFO: 19-Apr-22 00:35:21 	None
+INFO: 19-Apr-22 01:05:21 	None
+INFO: 19-Apr-22 01:35:21 	None
+INFO: 19-Apr-22 02:05:21 	None
+INFO: 19-Apr-22 02:35:21 	None
+INFO: 19-Apr-22 03:05:21 	None
+INFO: 19-Apr-22 03:35:21 	None
+INFO: 19-Apr-22 04:05:21 	None
+INFO: 19-Apr-22 04:35:21 	None
+INFO: 19-Apr-22 05:05:21 	None
+INFO: 19-Apr-22 05:35:21 	None
+INFO: 19-Apr-22 06:05:21 	None
+INFO: 19-Apr-22 06:35:21 	None
+INFO: 19-Apr-22 07:05:21 	None
+INFO: 19-Apr-22 07:35:21 	None
+INFO: 19-Apr-22 08:05:21 	None
+INFO: 19-Apr-22 08:35:21 	None
+INFO: 19-Apr-22 09:05:21 	None
+INFO: 19-Apr-22 09:35:21 	None
+INFO: 19-Apr-22 10:05:21 	None
+INFO: 19-Apr-22 10:35:21 	None
+INFO: 19-Apr-22 11:05:21 	None
+INFO: 19-Apr-22 11:35:21 	None
+INFO: 19-Apr-22 12:05:21 	None
+INFO: 19-Apr-22 12:35:21 	None
+INFO: 19-Apr-22 13:05:21 	None
+INFO: 19-Apr-22 13:35:21 	None
+INFO: 19-Apr-22 14:05:21 	None
+INFO: 19-Apr-22 14:35:21 	None
+INFO: 19-Apr-22 15:05:21 	None
+INFO: 19-Apr-22 15:35:21 	None
+INFO: 19-Apr-22 16:05:21 	None
+INFO: 19-Apr-22 16:35:21 	None
+INFO: 19-Apr-22 17:05:21 	None
+INFO: 19-Apr-22 17:35:21 	None
+INFO: 19-Apr-22 18:05:21 	None
+INFO: 19-Apr-22 18:35:21 	None
+INFO: 19-Apr-22 19:05:21 	None
+INFO: 19-Apr-22 19:35:21 	None
+INFO: 19-Apr-22 20:05:21 	None
+INFO: 19-Apr-22 20:35:21 	None
+INFO: 19-Apr-22 21:05:21 	None
+INFO: 19-Apr-22 21:35:21 	None
+INFO: 19-Apr-22 22:05:21 	None
+INFO: 19-Apr-22 22:35:21 	None
+INFO: 19-Apr-22 23:05:21 	None
+INFO: 19-Apr-22 23:35:21 	Purging Events in Database
+INFO: 19-Apr-22 23:35:21 	Events Purges
+INFO: 19-Apr-22 23:35:21 	None
+INFO: 20-Apr-22 00:05:21 	None
+INFO: 20-Apr-22 00:35:21 	None
+INFO: 20-Apr-22 01:05:21 	None
+INFO: 20-Apr-22 01:35:21 	None
+INFO: 20-Apr-22 02:05:21 	None
+INFO: 20-Apr-22 02:35:21 	None
+INFO: 20-Apr-22 03:05:21 	None
+INFO: 20-Apr-22 03:35:21 	None
+INFO: 20-Apr-22 04:05:21 	None
+INFO: 20-Apr-22 04:35:21 	None
+INFO: 20-Apr-22 05:05:21 	None
+INFO: 20-Apr-22 05:35:21 	None
+INFO: 20-Apr-22 06:05:21 	None
+INFO: 20-Apr-22 06:35:21 	None
+INFO: 20-Apr-22 07:05:21 	None
+INFO: 20-Apr-22 07:35:21 	None
+INFO: 20-Apr-22 08:05:21 	None
+INFO: 20-Apr-22 08:35:21 	None
+INFO: 20-Apr-22 09:05:21 	None
+INFO: 20-Apr-22 09:35:21 	None
+INFO: 20-Apr-22 10:05:21 	None
+INFO: 20-Apr-22 10:35:21 	None
+INFO: 20-Apr-22 11:05:21 	None
+INFO: 20-Apr-22 11:35:21 	None
+INFO: 20-Apr-22 12:05:21 	None
+INFO: 20-Apr-22 12:35:21 	None
+INFO: 20-Apr-22 13:05:21 	None
+INFO: 20-Apr-22 13:35:21 	None
+INFO: 20-Apr-22 14:05:21 	None
+INFO: 20-Apr-22 14:35:21 	None
+INFO: 20-Apr-22 15:05:21 	None
+INFO: 20-Apr-22 15:35:21 	None
+INFO: 20-Apr-22 16:05:21 	None
+INFO: 20-Apr-22 16:35:21 	None
+INFO: 20-Apr-22 17:05:21 	None
+INFO: 20-Apr-22 17:35:21 	None
+INFO: 20-Apr-22 18:05:21 	None
+INFO: 20-Apr-22 18:35:21 	None
+INFO: 20-Apr-22 19:05:21 	None
+INFO: 20-Apr-22 19:35:21 	None
+INFO: 20-Apr-22 20:05:21 	None
+INFO: 20-Apr-22 20:35:21 	None
+INFO: 20-Apr-22 21:05:21 	None
+INFO: 20-Apr-22 21:35:21 	None
+INFO: 20-Apr-22 22:05:21 	None
+INFO: 20-Apr-22 22:35:21 	None
+INFO: 20-Apr-22 23:05:21 	None
+INFO: 20-Apr-22 23:35:21 	Purging Events in Database
+INFO: 20-Apr-22 23:35:21 	Events Purges
+INFO: 20-Apr-22 23:35:21 	None
+INFO: 21-Apr-22 23:35:21 	Purging Events in Database
+INFO: 22-Apr-22 23:35:21 	Purging Events in Database
+INFO: 23-Apr-22 23:35:21 	Purging Events in Database
+INFO: 24-Apr-22 23:35:21 	Purging Events in Database
+INFO: 25-Apr-22 23:35:21 	Purging Events in Database
+INFO: 26-Apr-22 23:35:21 	Purging Events in Database
+INFO: 27-Apr-22 23:35:21 	Purging Events in Database
+INFO: 28-Apr-22 23:35:21 	Purging Events in Database
+INFO: 29-Apr-22 23:35:21 	Purging Events in Database
+INFO: 30-Apr-22 23:35:21 	Purging Events in Database
+INFO: 01-May-22 23:35:21 	Purging Events in Database
+INFO: 02-May-22 23:35:21 	Purging Events in Database
+INFO: 03-May-22 23:35:21 	Purging Events in Database
+INFO: 04-May-22 23:35:21 	Purging Events in Database
+INFO: 05-May-22 23:35:21 	Purging Events in Database
+INFO: 06-May-22 23:35:21 	Purging Events in Database
+INFO: 07-May-22 23:35:21 	Purging Events in Database
+INFO: 08-May-22 23:35:21 	Purging Events in Database
+INFO: 09-May-22 23:35:21 	Purging Events in Database
+INFO: 10-May-22 23:35:21 	Purging Events in Database
+INFO: 11-May-22 23:35:21 	Purging Events in Database
+INFO: 12-May-22 23:35:21 	Purging Events in Database
+INFO: 13-May-22 23:35:21 	Purging Events in Database
+INFO: 14-May-22 23:35:21 	Purging Events in Database
+INFO: 15-May-22 23:35:21 	Purging Events in Database
+INFO: 16-May-22 23:35:21 	Purging Events in Database
+INFO: 17-May-22 23:35:21 	Purging Events in Database
+INFO: 18-May-22 23:35:21 	Purging Events in Database
+INFO: 19-May-22 23:35:21 	Purging Events in Database
+INFO: 20-May-22 23:35:21 	Purging Events in Database
+INFO: 21-May-22 23:35:21 	Purging Events in Database
+INFO: 22-May-22 23:35:21 	Purging Events in Database
+INFO: 23-May-22 23:35:21 	Purging Events in Database
+INFO: 24-May-22 23:35:21 	Purging Events in Database
+INFO: 25-May-22 23:35:21 	Purging Events in Database
+INFO: 26-May-22 23:35:21 	Purging Events in Database
+INFO: 27-May-22 23:35:21 	Purging Events in Database
+INFO: 28-May-22 23:35:21 	Purging Events in Database
+INFO: 29-May-22 23:35:21 	Purging Events in Database
+INFO: 30-May-22 23:35:21 	Purging Events in Database
+INFO: 31-May-22 23:35:21 	Purging Events in Database
+INFO: 01-Jun-22 23:35:21 	Purging Events in Database
+INFO: 02-Jun-22 23:35:21 	Purging Events in Database
+INFO: 03-Jun-22 23:35:21 	Purging Events in Database
+INFO: 04-Jun-22 23:35:21 	Purging Events in Database
+INFO: 05-Jun-22 23:35:21 	Purging Events in Database
+INFO: 06-Jun-22 23:35:21 	Purging Events in Database
+INFO: 07-Jun-22 23:35:21 	Purging Events in Database
+INFO: 08-Jun-22 23:35:21 	Purging Events in Database
+INFO: 09-Jun-22 23:35:21 	Purging Events in Database
+INFO: 10-Jun-22 23:35:21 	Purging Events in Database
+INFO: 11-Jun-22 23:35:21 	Purging Events in Database
+INFO: 12-Jun-22 23:35:21 	Purging Events in Database
+INFO: 13-Jun-22 23:35:21 	Purging Events in Database
+INFO: 14-Jun-22 23:35:21 	Purging Events in Database
+INFO: 15-Jun-22 23:35:21 	Purging Events in Database
+INFO: 16-Jun-22 23:35:21 	Purging Events in Database
+INFO: 17-Jun-22 23:35:21 	Purging Events in Database
+INFO: 18-Jun-22 23:35:21 	Purging Events in Database
+INFO: 19-Jun-22 23:35:21 	Purging Events in Database
+INFO: 20-Jun-22 23:35:21 	Purging Events in Database
+INFO: 21-Jun-22 23:35:21 	Purging Events in Database
+INFO: 22-Jun-22 23:35:21 	Purging Events in Database
+INFO: 23-Jun-22 23:35:21 	Purging Events in Database
+INFO: 24-Jun-22 23:35:21 	Purging Events in Database
+INFO: 25-Jun-22 23:35:21 	Purging Events in Database
+INFO: 26-Jun-22 23:35:21 	Purging Events in Database
+INFO: 27-Jun-22 23:35:21 	Purging Events in Database
+INFO: 28-Jun-22 23:35:21 	Purging Events in Database
+INFO: 29-Jun-22 23:35:21 	Purging Events in Database
+INFO: 30-Jun-22 23:35:21 	Purging Events in Database
+INFO: 01-Jul-22 23:35:21 	Purging Events in Database
+INFO: 02-Jul-22 23:35:21 	Purging Events in Database
+INFO: 03-Jul-22 23:35:21 	Purging Events in Database
+INFO: 04-Jul-22 23:35:21 	Purging Events in Database

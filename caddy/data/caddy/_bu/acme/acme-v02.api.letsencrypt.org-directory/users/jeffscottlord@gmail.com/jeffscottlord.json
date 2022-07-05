@@ -1,9 +1,0 @@
-{
-	"status": "valid",
-	"contact": [
-		"mailto:jeffscottlord@gmail.com"
-	],
-	"termsOfServiceAgreed": true,
-	"orders": "",
-	"location": "https://acme-v02.api.letsencrypt.org/acme/acct/116719332"
-}

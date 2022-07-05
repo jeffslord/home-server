@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  cloudflare-ddns:
+    image: oznu/cloudflare-ddns:latest
+    restart: always
+    environment:
+      - API_KEY=sjLcIzydI27E93p5QZjCk1_wsk5ozXR_gfy9Bg8z  
+      - ZONE=jeffslord.com
+      - PROXIED=false

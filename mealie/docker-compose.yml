@@ -1,0 +1,46 @@
+version: "3.4"
+
+networks:
+  web:
+    external: true
+
+services:
+  mealie:
+    container_name: mealie
+    networks:
+      - web
+    image: hkotel/mealie:latest
+    restart: always
+    depends_on:
+      - "postgres"
+    ports:
+      - 9090:80
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: America/New_York
+      # Database Settings
+      DB_ENGINE: postgres # Optional: 'sqlite', 'postgres'
+      POSTGRES_USER: mealie
+      POSTGRES_PASSWORD: mealie
+      POSTGRES_SERVER: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: mealie
+      # Default Recipe Settings
+      RECIPE_PUBLIC: "true"
+      RECIPE_SHOW_NUTRITION: "true"
+      RECIPE_SHOW_ASSETS: "true"
+      RECIPE_LANDSCAPE_VIEW: "true"
+      RECIPE_DISABLE_COMMENTS: "false"
+      RECIPE_DISABLE_AMOUNT: "false"
+    volumes:
+      - ./data/:/app/data
+  postgres:
+    container_name: postgres
+    networks:
+      - web
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: mealie
+      POSTGRES_USER: mealie
