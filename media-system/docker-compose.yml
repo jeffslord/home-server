@@ -8,12 +8,10 @@ services:
   # Media Player
   plex:
     image: "plexinc/pms-docker:latest"
-    # image: linuxserver/plex
     container_name: plex
     networks:
       - web
     restart: unless-stopped
-    # network_mode: host
     ports:
       - 32400:32400/tcp
       - 3005:3005/tcp
@@ -31,8 +29,8 @@ services:
       - PLEX_UID=1000
       - PLEX_GID=1000
     volumes:
-      - ${HDD}/config/plex:/config
-      - ${HDD}/transcode:/transcode
+      - ${SSD}/plex/config:/config
+      - ${SSD}/plex/transcode:/transcode
       - ${HDD}/libraries/shows:/data/tvshows
       - ${HDD}/libraries/movies:/data/movies
       - ${HDD}/libraries/anime:/data/anime
@@ -48,28 +46,12 @@ services:
       - TZ=America/New_York
       - JELLYFIN_PublishedServerUrl=https://jellyfin.jeffslord.com #optional
     volumes:
-      # - /path/to/library:/config
-      # - /path/to/tvseries:/data/tvshows
-      # - /path/to/movies:/data/movies
-      # - /opt/vc/lib:/opt/vc/lib #optional
-      - ${HDD}/config/jellyfin:/config
-      - ${HDD}/cache/jellyfin:/cache
+      - ${SSD}/jellyfin/config:/config
+      - ${SSD}/jellyfin/cache:/cache
       - ${HDD}/libraries/shows:/data/tvshows
       - ${HDD}/libraries/movies:/data/movies
       - ${HDD}/libraries/anime:/data/anime
       - ${HDD}/libraries/anime_movies:/data/anime_movies
-    # ports:
-    #   - 8096:8096
-    #   - 8920:8920 #optional
-    #   - 7359:7359/udp #optional
-      # - 1900:1900/udp #optional
-    # devices:
-    #   - /dev/dri:/dev/dri #optional
-    #   - /dev/vcsm:/dev/vcsm #optional
-    #   - /dev/vchiq:/dev/vchiq #optional
-    #   - /dev/video10:/dev/video10 #optional
-    #   - /dev/video11:/dev/video11 #optional
-    #   - /dev/video12:/dev/video12 #optional
     restart: unless-stopped
   # Media Organizers
   sonarr:
@@ -84,7 +66,7 @@ services:
       - PGID=1000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${HDD}/config/sonarr:/config
+      - ${SSD}/sonarr/config:/config
       - ${HDD}:/media
     depends_on:
       - prowlarr
@@ -101,30 +83,13 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - ${HDD}/config/radarr:/config
+      - ${SSD}/radarr/config:/config
       - ${HDD}:/media
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - prowlarr
       - deluge
     restart: unless-stopped
-  # jackett:
-  #   image: "linuxserver/jackett:latest"
-  #   container_name: jackett
-  #   networks:
-  #     - web
-  #   expose:
-  #     - "9117"
-  #   environment:
-  #     - PGID=1000
-  #     - PUID=1000
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - ${HDD}/config/jackett:/config
-  #     - ${HDD}/downloads:/downloads
-  #   sysctls:
-  #     - net.ipv6.conf.all.disable_ipv6=1
-  #   restart: unless-stopped
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
@@ -148,7 +113,7 @@ services:
       - PGID=1000
       - TZ=Europe/London
     volumes:
-      - ${SSD}/config:/config
+      - ${SSD}/prowlarr/config:/config
     expose:
       - "9696"
     restart: unless-stopped
@@ -162,9 +127,6 @@ services:
       - ../global.env
     cap_add:
       - NET_ADMIN
-    #    sysctls:
-    #      - net.ipv4.conf.all.src_valid_mark=1
-    #    privileged: true
     expose:
       - "8112"
       - "8118"
@@ -190,28 +152,27 @@ services:
       - PGID=1000
     volumes:
       - ${HDD}/downloads:/downloads
-      - ${HDD}/config/deluge:/config
+      - ${SSD}/deluge/config:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
   # Analytics
-  tautulli:
-    image: "linuxserver/tautulli:latest"
-    container_name: tautulli
-    networks:
-      # - traefik
-      - web
-    expose:
-      - "8181"
-    environment:
-      - TZ=America/New_York
-      - PGID=1000
-      - PUID=1000
-    volumes:
-      - ${HDD}/config/plexpy:/config
-      - ${HDD}/config/plex/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
-    depends_on:
-      - plex
-    restart: unless-stopped
+  # tautulli:
+  #   image: "linuxserver/tautulli:latest"
+  #   container_name: tautulli
+  #   networks:
+  #     - web
+  #   expose:
+  #     - "8181"
+  #   environment:
+  #     - TZ=America/New_York
+  #     - PGID=1000
+  #     - PUID=1000
+  #   volumes:
+  #     - ${HDD}/config/plexpy:/config
+  #     - ${HDD}/config/plex/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
+  #   depends_on:
+  #     - plex
+  #   restart: unless-stopped
   # Request new media
   ombi:
     image: "linuxserver/ombi:latest"
@@ -225,7 +186,7 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - ${HDD}/config/ombi:/config
+      - ${SSD}/ombi/config:/config
     depends_on:
       - plex
     restart: unless-stopped
@@ -242,7 +203,7 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - ${HDD}/config/muximux:/config
+      - ${SSD}/muximux/config:/config
     depends_on:
       - plex
     restart: unless-stopped
@@ -259,7 +220,7 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - ${HDD}/config/bazarr:/config
+      - ${SSD}/bazarr/config:/config
       - ${HDD}/libraries/shows:/data/tvshows
       - ${HDD}/libraries/movies:/data/movies
       - ${HDD}/libraries/anime:/data/anime
@@ -278,7 +239,7 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - ${HDD}/config/ubooquity:/config
+      - ${SSD}/ubooquity/config:/config
       - ${HDD}/libraries/books:/books
       - ${HDD}/libraries/comics:/comics
       - ${HDD}/libraries/raw_files:/filesi
@@ -297,7 +258,7 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - ${HDD}/config/booksonic:/config
+      - ${SSD}/booksonic/config:/config
       - ${HDD}/libraries/audiobooks:/audiobooks
       - ${HDD}/libraries/podcasts:/podcasts
       - ${HDD}/libraries/other_audio:/othermedia
