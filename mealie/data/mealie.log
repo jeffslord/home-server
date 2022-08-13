@@ -504,3 +504,1048 @@ INFO: 01-Jul-22 23:35:21 	Purging Events in Database
 INFO: 02-Jul-22 23:35:21 	Purging Events in Database
 INFO: 03-Jul-22 23:35:21 	Purging Events in Database
 INFO: 04-Jul-22 23:35:21 	Purging Events in Database
+INFO: 05-Jul-22 23:35:21 	Purging Events in Database
+INFO: 06-Jul-22 23:35:21 	Purging Events in Database
+INFO: 07-Jul-22 23:35:21 	Purging Events in Database
+INFO: 08-Jul-22 23:35:21 	Purging Events in Database
+INFO: 09-Jul-22 23:35:21 	Purging Events in Database
+INFO: 10-Jul-22 23:35:21 	Purging Events in Database
+INFO: 11-Jul-22 23:35:21 	Purging Events in Database
+INFO: 12-Jul-22 15:24:31 	Generating Default Group
+INFO: 12-Jul-22 15:24:31 	Created Site Settings: 
+ language='en-US' first_day_of_week=0 show_recent=True cards_per_section=9 categories=[]
+INFO: 12-Jul-22 15:24:32 	Generating Default User
+INFO: 12-Jul-22 15:24:35 	Checking for Images to Minify...
+INFO: 12-Jul-22 15:24:35 	Finished Minification Check
+INFO: 12-Jul-22 15:24:39 	----INIT SCHEDULE OBJECT-----
+INFO: 12-Jul-22 15:24:40 	None
+INFO: 12-Jul-22 15:24:40 	-----SYSTEM STARTUP----- 
+
+INFO: 12-Jul-22 15:24:40 	------APP SETTINGS------
+INFO: 12-Jul-22 15:24:40 	{
+    "PRODUCTION": true,
+    "BASE_URL": "http://localhost:8080",
+    "IS_DEMO": false,
+    "API_PORT": 9000,
+    "API_DOCS": true,
+    "DB_ENGINE": "postgres",
+    "POSTGRES_SERVER": "postgres",
+    "POSTGRES_PORT": "5432",
+    "POSTGRES_DB": "mealie",
+    "DB_URL_PUBLIC": "postgresql://*****:*****@postgres:5432/mealie",
+    "DEFAULT_GROUP": "Home",
+    "DEFAULT_EMAIL": "changeme@email.com",
+    "LDAP_AUTH_ENABLED": false,
+    "LDAP_SERVER_URL": null,
+    "LDAP_BIND_TEMPLATE": null,
+    "LDAP_ADMIN_FILTER": null,
+    "TOKEN_TIME": 2,
+    "RECIPE_PUBLIC": true,
+    "RECIPE_SHOW_NUTRITION": true,
+    "RECIPE_SHOW_ASSETS": true,
+    "RECIPE_LANDSCAPE_VIEW": true,
+    "RECIPE_DISABLE_COMMENTS": false,
+    "RECIPE_DISABLE_AMOUNT": false,
+    "AUTO_BACKUP_ENABLED": false,
+    "SCHEDULER_DATABASE": "sqlite:////app/data/scheduler.db"
+}
+INFO: 12-Jul-22 15:54:40 	None
+INFO: 12-Jul-22 16:24:40 	None
+INFO: 12-Jul-22 16:54:40 	None
+INFO: 12-Jul-22 17:24:40 	None
+INFO: 12-Jul-22 17:54:40 	None
+INFO: 12-Jul-22 18:24:40 	None
+INFO: 12-Jul-22 18:54:40 	None
+INFO: 12-Jul-22 19:24:40 	None
+INFO: 12-Jul-22 19:54:40 	None
+INFO: 12-Jul-22 20:24:40 	None
+INFO: 12-Jul-22 20:54:40 	None
+INFO: 12-Jul-22 21:24:40 	None
+INFO: 12-Jul-22 21:54:40 	None
+INFO: 12-Jul-22 22:24:40 	None
+INFO: 12-Jul-22 22:54:40 	None
+INFO: 12-Jul-22 23:24:40 	None
+INFO: 12-Jul-22 23:54:40 	None
+INFO: 13-Jul-22 00:24:40 	None
+INFO: 13-Jul-22 00:54:40 	None
+INFO: 13-Jul-22 01:24:40 	None
+INFO: 13-Jul-22 01:54:40 	None
+INFO: 13-Jul-22 02:24:40 	None
+INFO: 13-Jul-22 02:54:40 	None
+INFO: 13-Jul-22 03:24:40 	None
+INFO: 13-Jul-22 03:54:40 	None
+INFO: 13-Jul-22 04:24:40 	None
+INFO: 13-Jul-22 04:54:40 	None
+INFO: 13-Jul-22 05:24:40 	None
+INFO: 13-Jul-22 05:54:40 	None
+INFO: 13-Jul-22 06:24:40 	None
+INFO: 13-Jul-22 06:54:40 	None
+INFO: 13-Jul-22 07:24:40 	None
+INFO: 13-Jul-22 07:54:40 	None
+INFO: 13-Jul-22 08:24:40 	None
+INFO: 13-Jul-22 08:54:40 	None
+INFO: 13-Jul-22 09:24:40 	None
+INFO: 13-Jul-22 09:54:40 	None
+INFO: 13-Jul-22 10:24:40 	None
+INFO: 13-Jul-22 10:54:40 	None
+INFO: 13-Jul-22 11:24:40 	None
+INFO: 13-Jul-22 11:54:40 	None
+INFO: 13-Jul-22 12:24:40 	None
+INFO: 13-Jul-22 12:54:40 	None
+INFO: 13-Jul-22 13:24:40 	None
+INFO: 13-Jul-22 13:54:40 	None
+INFO: 13-Jul-22 14:24:40 	None
+INFO: 13-Jul-22 14:54:40 	None
+INFO: 13-Jul-22 15:24:39 	Purging Events in Database
+INFO: 13-Jul-22 15:24:40 	Events Purges
+INFO: 13-Jul-22 15:24:40 	None
+INFO: 14-Jul-22 15:24:40 	Purging Events in Database
+INFO: 15-Jul-22 15:24:40 	Purging Events in Database
+INFO: 15-Jul-22 21:10:02 	Generating Default Group
+INFO: 15-Jul-22 21:10:02 	Created Site Settings: 
+ language='en-US' first_day_of_week=0 show_recent=True cards_per_section=9 categories=[]
+INFO: 15-Jul-22 21:10:03 	Generating Default User
+INFO: 15-Jul-22 21:10:06 	Checking for Images to Minify...
+INFO: 15-Jul-22 21:10:06 	Finished Minification Check
+INFO: 15-Jul-22 21:10:11 	----INIT SCHEDULE OBJECT-----
+INFO: 15-Jul-22 21:10:11 	None
+INFO: 15-Jul-22 21:10:11 	-----SYSTEM STARTUP----- 
+
+INFO: 15-Jul-22 21:10:11 	------APP SETTINGS------
+INFO: 15-Jul-22 21:10:11 	{
+    "PRODUCTION": true,
+    "BASE_URL": "http://localhost:8080",
+    "IS_DEMO": false,
+    "API_PORT": 9000,
+    "API_DOCS": true,
+    "DB_ENGINE": "postgres",
+    "POSTGRES_SERVER": "postgres",
+    "POSTGRES_PORT": "5432",
+    "POSTGRES_DB": "mealie",
+    "DB_URL_PUBLIC": "postgresql://*****:*****@postgres:5432/mealie",
+    "DEFAULT_GROUP": "Home",
+    "DEFAULT_EMAIL": "changeme@email.com",
+    "LDAP_AUTH_ENABLED": false,
+    "LDAP_SERVER_URL": null,
+    "LDAP_BIND_TEMPLATE": null,
+    "LDAP_ADMIN_FILTER": null,
+    "TOKEN_TIME": 2,
+    "RECIPE_PUBLIC": true,
+    "RECIPE_SHOW_NUTRITION": true,
+    "RECIPE_SHOW_ASSETS": true,
+    "RECIPE_LANDSCAPE_VIEW": true,
+    "RECIPE_DISABLE_COMMENTS": false,
+    "RECIPE_DISABLE_AMOUNT": false,
+    "AUTO_BACKUP_ENABLED": false,
+    "SCHEDULER_DATABASE": "sqlite:////app/data/scheduler.db"
+}
+INFO: 15-Jul-22 21:40:11 	None
+INFO: 15-Jul-22 22:10:11 	None
+INFO: 15-Jul-22 22:40:11 	None
+INFO: 15-Jul-22 23:10:11 	None
+INFO: 15-Jul-22 23:40:11 	None
+INFO: 16-Jul-22 00:10:11 	None
+INFO: 16-Jul-22 00:40:11 	None
+INFO: 16-Jul-22 01:10:11 	None
+INFO: 16-Jul-22 01:40:11 	None
+INFO: 16-Jul-22 02:10:11 	None
+INFO: 16-Jul-22 02:40:11 	None
+INFO: 16-Jul-22 03:10:11 	None
+INFO: 16-Jul-22 03:40:11 	None
+INFO: 16-Jul-22 04:10:11 	None
+INFO: 16-Jul-22 04:40:11 	None
+INFO: 16-Jul-22 05:10:11 	None
+INFO: 16-Jul-22 05:40:11 	None
+INFO: 16-Jul-22 06:10:11 	None
+INFO: 16-Jul-22 06:40:11 	None
+INFO: 16-Jul-22 07:10:11 	None
+INFO: 16-Jul-22 07:40:11 	None
+INFO: 16-Jul-22 08:10:11 	None
+INFO: 16-Jul-22 08:40:11 	None
+INFO: 16-Jul-22 09:10:11 	None
+INFO: 16-Jul-22 09:40:11 	None
+INFO: 16-Jul-22 10:10:11 	None
+INFO: 16-Jul-22 10:40:11 	None
+INFO: 16-Jul-22 11:10:11 	None
+INFO: 16-Jul-22 11:40:11 	None
+INFO: 16-Jul-22 12:10:11 	None
+INFO: 16-Jul-22 12:40:11 	None
+INFO: 16-Jul-22 13:10:11 	None
+INFO: 16-Jul-22 13:40:11 	None
+INFO: 16-Jul-22 14:10:11 	None
+INFO: 16-Jul-22 14:40:11 	None
+INFO: 16-Jul-22 15:10:11 	None
+INFO: 16-Jul-22 15:40:11 	None
+INFO: 16-Jul-22 16:10:11 	None
+INFO: 16-Jul-22 16:40:11 	None
+INFO: 16-Jul-22 17:10:11 	None
+INFO: 16-Jul-22 17:40:11 	None
+INFO: 16-Jul-22 18:10:11 	None
+INFO: 16-Jul-22 18:40:11 	None
+INFO: 16-Jul-22 19:10:11 	None
+INFO: 16-Jul-22 19:40:11 	None
+INFO: 16-Jul-22 20:10:11 	None
+INFO: 16-Jul-22 20:40:11 	None
+INFO: 16-Jul-22 21:10:11 	Purging Events in Database
+INFO: 16-Jul-22 21:10:11 	Events Purges
+INFO: 16-Jul-22 21:10:11 	None
+INFO: 16-Jul-22 21:40:11 	None
+INFO: 16-Jul-22 22:10:11 	None
+INFO: 16-Jul-22 22:40:11 	None
+INFO: 16-Jul-22 23:10:11 	None
+INFO: 16-Jul-22 23:40:11 	None
+INFO: 17-Jul-22 00:10:11 	None
+INFO: 17-Jul-22 00:40:11 	None
+INFO: 17-Jul-22 01:10:11 	None
+INFO: 17-Jul-22 01:40:11 	None
+INFO: 17-Jul-22 02:10:11 	None
+INFO: 17-Jul-22 02:40:11 	None
+INFO: 17-Jul-22 03:10:11 	None
+INFO: 17-Jul-22 03:40:11 	None
+INFO: 17-Jul-22 04:10:11 	None
+INFO: 17-Jul-22 04:40:11 	None
+INFO: 17-Jul-22 05:10:11 	None
+INFO: 17-Jul-22 05:40:11 	None
+INFO: 17-Jul-22 06:10:11 	None
+INFO: 17-Jul-22 06:40:11 	None
+INFO: 17-Jul-22 07:10:11 	None
+INFO: 17-Jul-22 07:40:11 	None
+INFO: 17-Jul-22 08:10:11 	None
+INFO: 17-Jul-22 08:40:11 	None
+INFO: 17-Jul-22 09:10:11 	None
+INFO: 17-Jul-22 09:40:11 	None
+INFO: 17-Jul-22 10:10:11 	None
+INFO: 17-Jul-22 10:40:11 	None
+INFO: 17-Jul-22 11:10:11 	None
+INFO: 17-Jul-22 11:40:11 	None
+INFO: 17-Jul-22 12:10:11 	None
+INFO: 17-Jul-22 12:40:11 	None
+INFO: 17-Jul-22 13:10:11 	None
+INFO: 17-Jul-22 13:40:11 	None
+INFO: 17-Jul-22 14:10:11 	None
+INFO: 17-Jul-22 14:40:11 	None
+INFO: 17-Jul-22 15:10:11 	None
+INFO: 17-Jul-22 15:40:11 	None
+INFO: 17-Jul-22 16:10:11 	None
+INFO: 17-Jul-22 16:40:11 	None
+INFO: 17-Jul-22 17:10:11 	None
+INFO: 17-Jul-22 17:40:11 	None
+INFO: 17-Jul-22 18:10:11 	None
+INFO: 17-Jul-22 18:40:11 	None
+INFO: 17-Jul-22 19:10:11 	None
+INFO: 17-Jul-22 19:40:11 	None
+INFO: 17-Jul-22 20:10:11 	None
+INFO: 17-Jul-22 20:40:11 	None
+INFO: 17-Jul-22 21:10:11 	Purging Events in Database
+INFO: 17-Jul-22 21:10:11 	Events Purges
+INFO: 17-Jul-22 21:10:11 	None
+INFO: 17-Jul-22 21:40:11 	None
+INFO: 17-Jul-22 22:10:11 	None
+INFO: 17-Jul-22 22:40:11 	None
+INFO: 17-Jul-22 23:10:11 	None
+INFO: 17-Jul-22 23:40:11 	None
+INFO: 18-Jul-22 00:10:11 	None
+INFO: 18-Jul-22 00:40:11 	None
+INFO: 18-Jul-22 01:10:11 	None
+INFO: 18-Jul-22 01:40:11 	None
+INFO: 18-Jul-22 02:10:11 	None
+INFO: 18-Jul-22 02:40:11 	None
+INFO: 18-Jul-22 03:10:11 	None
+INFO: 18-Jul-22 03:40:11 	None
+INFO: 18-Jul-22 04:10:11 	None
+INFO: 18-Jul-22 04:40:11 	None
+INFO: 18-Jul-22 05:10:11 	None
+INFO: 18-Jul-22 05:40:11 	None
+INFO: 18-Jul-22 06:10:11 	None
+INFO: 18-Jul-22 06:40:11 	None
+INFO: 18-Jul-22 07:10:11 	None
+INFO: 18-Jul-22 07:40:11 	None
+INFO: 18-Jul-22 08:10:11 	None
+INFO: 18-Jul-22 08:40:11 	None
+INFO: 18-Jul-22 09:10:11 	None
+INFO: 18-Jul-22 09:40:11 	None
+INFO: 18-Jul-22 10:10:11 	None
+INFO: 18-Jul-22 10:40:11 	None
+INFO: 18-Jul-22 11:10:11 	None
+INFO: 18-Jul-22 11:40:11 	None
+INFO: 18-Jul-22 12:10:11 	None
+INFO: 18-Jul-22 12:40:11 	None
+INFO: 18-Jul-22 13:10:11 	None
+INFO: 18-Jul-22 13:40:11 	None
+INFO: 18-Jul-22 14:10:11 	None
+INFO: 18-Jul-22 14:40:11 	None
+INFO: 18-Jul-22 15:10:11 	None
+INFO: 18-Jul-22 15:40:11 	None
+INFO: 18-Jul-22 16:10:11 	None
+INFO: 18-Jul-22 16:40:11 	None
+INFO: 18-Jul-22 17:10:11 	None
+INFO: 18-Jul-22 17:40:11 	None
+INFO: 18-Jul-22 18:10:11 	None
+INFO: 18-Jul-22 18:40:11 	None
+INFO: 18-Jul-22 19:10:11 	None
+INFO: 18-Jul-22 19:40:11 	None
+INFO: 18-Jul-22 20:10:11 	None
+INFO: 18-Jul-22 20:40:11 	None
+INFO: 18-Jul-22 21:10:11 	Purging Events in Database
+INFO: 18-Jul-22 21:10:11 	Events Purges
+INFO: 18-Jul-22 21:10:11 	None
+INFO: 18-Jul-22 21:40:11 	None
+INFO: 18-Jul-22 22:10:11 	None
+INFO: 18-Jul-22 22:40:11 	None
+INFO: 18-Jul-22 23:10:11 	None
+INFO: 18-Jul-22 23:40:11 	None
+INFO: 19-Jul-22 00:10:11 	None
+INFO: 19-Jul-22 00:40:11 	None
+INFO: 19-Jul-22 01:10:11 	None
+INFO: 19-Jul-22 01:40:11 	None
+INFO: 19-Jul-22 02:10:11 	None
+INFO: 19-Jul-22 02:40:11 	None
+INFO: 19-Jul-22 03:10:11 	None
+INFO: 19-Jul-22 03:40:11 	None
+INFO: 19-Jul-22 04:10:11 	None
+INFO: 19-Jul-22 04:40:11 	None
+INFO: 19-Jul-22 05:10:11 	None
+INFO: 19-Jul-22 05:40:11 	None
+INFO: 19-Jul-22 06:10:11 	None
+INFO: 19-Jul-22 06:40:11 	None
+INFO: 19-Jul-22 07:10:11 	None
+INFO: 19-Jul-22 07:40:11 	None
+INFO: 19-Jul-22 08:10:11 	None
+INFO: 19-Jul-22 08:40:11 	None
+INFO: 19-Jul-22 09:10:11 	None
+INFO: 19-Jul-22 09:40:11 	None
+INFO: 19-Jul-22 10:10:11 	None
+INFO: 19-Jul-22 10:40:11 	None
+INFO: 19-Jul-22 11:10:11 	None
+INFO: 19-Jul-22 11:40:11 	None
+INFO: 19-Jul-22 12:10:11 	None
+INFO: 19-Jul-22 12:40:11 	None
+INFO: 19-Jul-22 13:10:11 	None
+INFO: 19-Jul-22 13:40:11 	None
+INFO: 19-Jul-22 14:10:11 	None
+INFO: 19-Jul-22 14:40:11 	None
+INFO: 19-Jul-22 15:10:11 	None
+INFO: 19-Jul-22 15:40:11 	None
+INFO: 19-Jul-22 16:10:11 	None
+INFO: 19-Jul-22 16:40:11 	None
+INFO: 19-Jul-22 17:10:11 	None
+INFO: 19-Jul-22 17:40:11 	None
+INFO: 19-Jul-22 18:10:11 	None
+INFO: 19-Jul-22 18:40:11 	None
+INFO: 19-Jul-22 19:10:11 	None
+INFO: 19-Jul-22 19:40:11 	None
+INFO: 19-Jul-22 20:10:11 	None
+INFO: 19-Jul-22 20:40:11 	None
+INFO: 19-Jul-22 21:10:11 	Purging Events in Database
+INFO: 19-Jul-22 21:10:11 	Events Purges
+INFO: 19-Jul-22 21:10:11 	None
+INFO: 19-Jul-22 21:40:11 	None
+INFO: 19-Jul-22 22:10:11 	None
+INFO: 19-Jul-22 22:40:11 	None
+INFO: 19-Jul-22 23:10:11 	None
+INFO: 19-Jul-22 23:40:11 	None
+INFO: 20-Jul-22 00:10:11 	None
+INFO: 20-Jul-22 00:40:11 	None
+INFO: 20-Jul-22 01:10:11 	None
+INFO: 20-Jul-22 01:40:11 	None
+INFO: 20-Jul-22 02:10:11 	None
+INFO: 20-Jul-22 02:40:11 	None
+INFO: 20-Jul-22 03:10:11 	None
+INFO: 20-Jul-22 03:40:11 	None
+INFO: 20-Jul-22 04:10:11 	None
+INFO: 20-Jul-22 04:40:11 	None
+INFO: 20-Jul-22 05:10:11 	None
+INFO: 20-Jul-22 05:40:11 	None
+INFO: 20-Jul-22 06:10:11 	None
+INFO: 20-Jul-22 06:40:11 	None
+INFO: 20-Jul-22 07:10:11 	None
+INFO: 20-Jul-22 07:40:11 	None
+INFO: 20-Jul-22 08:10:11 	None
+INFO: 20-Jul-22 08:40:11 	None
+INFO: 20-Jul-22 09:10:11 	None
+INFO: 20-Jul-22 09:40:11 	None
+INFO: 20-Jul-22 10:10:11 	None
+INFO: 20-Jul-22 10:40:11 	None
+INFO: 20-Jul-22 11:10:11 	None
+INFO: 20-Jul-22 11:40:11 	None
+INFO: 20-Jul-22 12:10:11 	None
+INFO: 20-Jul-22 12:40:11 	None
+INFO: 20-Jul-22 13:10:11 	None
+INFO: 20-Jul-22 13:40:11 	None
+INFO: 20-Jul-22 14:10:11 	None
+INFO: 20-Jul-22 14:40:11 	None
+INFO: 20-Jul-22 15:10:11 	None
+INFO: 20-Jul-22 15:40:11 	None
+INFO: 20-Jul-22 16:10:11 	None
+INFO: 20-Jul-22 16:40:11 	None
+INFO: 20-Jul-22 17:10:11 	None
+INFO: 20-Jul-22 17:40:11 	None
+INFO: 20-Jul-22 18:10:11 	None
+INFO: 20-Jul-22 18:40:11 	None
+INFO: 20-Jul-22 19:10:11 	None
+INFO: 20-Jul-22 19:40:11 	None
+INFO: 20-Jul-22 20:10:11 	None
+INFO: 20-Jul-22 20:40:11 	None
+INFO: 20-Jul-22 21:10:11 	Purging Events in Database
+INFO: 20-Jul-22 21:10:11 	Events Purges
+INFO: 20-Jul-22 21:10:11 	None
+INFO: 20-Jul-22 21:40:11 	None
+INFO: 20-Jul-22 22:10:11 	None
+INFO: 20-Jul-22 22:40:11 	None
+INFO: 20-Jul-22 23:10:11 	None
+INFO: 20-Jul-22 23:40:11 	None
+INFO: 21-Jul-22 00:10:11 	None
+INFO: 21-Jul-22 00:40:11 	None
+INFO: 21-Jul-22 01:10:11 	None
+INFO: 21-Jul-22 01:40:11 	None
+INFO: 21-Jul-22 02:10:11 	None
+INFO: 21-Jul-22 02:40:11 	None
+INFO: 21-Jul-22 03:10:11 	None
+INFO: 21-Jul-22 03:40:11 	None
+INFO: 21-Jul-22 04:10:11 	None
+INFO: 21-Jul-22 04:40:11 	None
+INFO: 21-Jul-22 05:10:11 	None
+INFO: 21-Jul-22 05:40:11 	None
+INFO: 21-Jul-22 06:10:11 	None
+INFO: 21-Jul-22 06:40:11 	None
+INFO: 21-Jul-22 07:10:11 	None
+INFO: 21-Jul-22 07:40:11 	None
+INFO: 21-Jul-22 08:10:11 	None
+INFO: 21-Jul-22 08:40:11 	None
+INFO: 21-Jul-22 09:10:11 	None
+INFO: 21-Jul-22 09:40:11 	None
+INFO: 21-Jul-22 10:10:11 	None
+INFO: 21-Jul-22 10:40:11 	None
+INFO: 21-Jul-22 11:10:11 	None
+INFO: 21-Jul-22 11:40:11 	None
+INFO: 21-Jul-22 12:10:11 	None
+INFO: 21-Jul-22 12:40:11 	None
+INFO: 21-Jul-22 13:10:11 	None
+INFO: 21-Jul-22 13:40:11 	None
+INFO: 21-Jul-22 14:10:11 	None
+INFO: 21-Jul-22 14:40:11 	None
+INFO: 21-Jul-22 15:10:11 	None
+INFO: 21-Jul-22 15:40:11 	None
+INFO: 21-Jul-22 16:10:11 	None
+INFO: 21-Jul-22 16:40:11 	None
+INFO: 21-Jul-22 17:10:11 	None
+INFO: 21-Jul-22 17:40:11 	None
+INFO: 21-Jul-22 18:10:11 	None
+INFO: 21-Jul-22 18:40:11 	None
+INFO: 21-Jul-22 19:10:11 	None
+INFO: 21-Jul-22 19:40:11 	None
+INFO: 21-Jul-22 20:10:11 	None
+INFO: 21-Jul-22 20:40:11 	None
+INFO: 21-Jul-22 21:10:11 	Purging Events in Database
+INFO: 21-Jul-22 21:10:11 	Events Purges
+INFO: 21-Jul-22 21:10:11 	None
+INFO: 21-Jul-22 21:40:11 	None
+INFO: 21-Jul-22 22:10:11 	None
+INFO: 21-Jul-22 22:40:11 	None
+INFO: 21-Jul-22 23:10:11 	None
+INFO: 21-Jul-22 23:40:11 	None
+INFO: 22-Jul-22 00:10:11 	None
+INFO: 22-Jul-22 00:40:11 	None
+INFO: 22-Jul-22 01:10:11 	None
+INFO: 22-Jul-22 01:40:11 	None
+INFO: 22-Jul-22 02:10:11 	None
+INFO: 22-Jul-22 02:40:11 	None
+INFO: 22-Jul-22 03:10:11 	None
+INFO: 22-Jul-22 03:40:11 	None
+INFO: 22-Jul-22 04:10:11 	None
+INFO: 22-Jul-22 04:40:11 	None
+INFO: 22-Jul-22 05:10:11 	None
+INFO: 22-Jul-22 05:40:11 	None
+INFO: 22-Jul-22 06:10:11 	None
+INFO: 22-Jul-22 06:40:11 	None
+INFO: 22-Jul-22 07:10:11 	None
+INFO: 22-Jul-22 07:40:11 	None
+INFO: 22-Jul-22 08:10:11 	None
+INFO: 22-Jul-22 08:40:11 	None
+INFO: 22-Jul-22 09:10:11 	None
+INFO: 22-Jul-22 09:40:11 	None
+INFO: 22-Jul-22 10:10:11 	None
+INFO: 22-Jul-22 10:40:11 	None
+INFO: 22-Jul-22 11:10:11 	None
+INFO: 22-Jul-22 11:40:11 	None
+INFO: 22-Jul-22 12:10:11 	None
+INFO: 22-Jul-22 12:40:11 	None
+INFO: 22-Jul-22 13:10:11 	None
+INFO: 22-Jul-22 13:40:11 	None
+INFO: 22-Jul-22 14:10:11 	None
+INFO: 22-Jul-22 14:40:11 	None
+INFO: 22-Jul-22 15:10:11 	None
+INFO: 22-Jul-22 15:40:11 	None
+INFO: 22-Jul-22 16:10:11 	None
+INFO: 22-Jul-22 16:40:11 	None
+INFO: 22-Jul-22 17:10:11 	None
+INFO: 22-Jul-22 17:40:11 	None
+INFO: 22-Jul-22 18:10:11 	None
+INFO: 22-Jul-22 18:40:11 	None
+INFO: 22-Jul-22 19:10:11 	None
+INFO: 22-Jul-22 19:40:11 	None
+INFO: 22-Jul-22 20:10:11 	None
+INFO: 22-Jul-22 20:40:11 	None
+INFO: 22-Jul-22 21:10:11 	Purging Events in Database
+INFO: 22-Jul-22 21:10:11 	Events Purges
+INFO: 22-Jul-22 21:10:11 	None
+INFO: 22-Jul-22 21:40:11 	None
+INFO: 22-Jul-22 22:10:11 	None
+INFO: 22-Jul-22 22:40:11 	None
+INFO: 22-Jul-22 23:10:11 	None
+INFO: 22-Jul-22 23:40:11 	None
+INFO: 23-Jul-22 00:10:11 	None
+INFO: 23-Jul-22 00:40:11 	None
+INFO: 23-Jul-22 01:10:11 	None
+INFO: 23-Jul-22 01:40:11 	None
+INFO: 23-Jul-22 02:10:11 	None
+INFO: 23-Jul-22 02:40:11 	None
+INFO: 23-Jul-22 03:10:11 	None
+INFO: 23-Jul-22 03:40:11 	None
+INFO: 23-Jul-22 04:10:11 	None
+INFO: 23-Jul-22 04:40:11 	None
+INFO: 23-Jul-22 05:10:11 	None
+INFO: 23-Jul-22 05:40:11 	None
+INFO: 23-Jul-22 06:10:11 	None
+INFO: 23-Jul-22 06:40:11 	None
+INFO: 23-Jul-22 07:10:11 	None
+INFO: 23-Jul-22 07:40:11 	None
+INFO: 23-Jul-22 08:10:11 	None
+INFO: 23-Jul-22 08:40:11 	None
+INFO: 23-Jul-22 09:10:11 	None
+INFO: 23-Jul-22 09:40:11 	None
+INFO: 23-Jul-22 10:10:11 	None
+INFO: 23-Jul-22 10:40:11 	None
+INFO: 23-Jul-22 11:10:11 	None
+INFO: 23-Jul-22 11:40:11 	None
+INFO: 23-Jul-22 12:10:11 	None
+INFO: 23-Jul-22 12:40:11 	None
+INFO: 23-Jul-22 13:10:11 	None
+INFO: 23-Jul-22 13:40:11 	None
+INFO: 23-Jul-22 14:10:11 	None
+INFO: 23-Jul-22 14:40:11 	None
+INFO: 23-Jul-22 15:10:11 	None
+INFO: 23-Jul-22 15:40:11 	None
+INFO: 23-Jul-22 16:10:11 	None
+INFO: 23-Jul-22 16:40:11 	None
+INFO: 23-Jul-22 17:10:11 	None
+INFO: 23-Jul-22 17:40:11 	None
+INFO: 23-Jul-22 18:10:11 	None
+INFO: 23-Jul-22 18:40:11 	None
+INFO: 23-Jul-22 19:10:11 	None
+INFO: 23-Jul-22 19:40:11 	None
+INFO: 23-Jul-22 20:10:11 	None
+INFO: 23-Jul-22 20:40:11 	None
+INFO: 23-Jul-22 21:10:11 	Purging Events in Database
+INFO: 23-Jul-22 21:10:11 	Events Purges
+INFO: 23-Jul-22 21:10:11 	None
+INFO: 23-Jul-22 21:40:11 	None
+INFO: 23-Jul-22 22:10:11 	None
+INFO: 23-Jul-22 22:40:11 	None
+INFO: 23-Jul-22 23:10:11 	None
+INFO: 23-Jul-22 23:40:11 	None
+INFO: 24-Jul-22 00:10:11 	None
+INFO: 24-Jul-22 00:40:11 	None
+INFO: 24-Jul-22 01:10:11 	None
+INFO: 24-Jul-22 01:40:11 	None
+INFO: 24-Jul-22 02:10:11 	None
+INFO: 24-Jul-22 02:40:11 	None
+INFO: 24-Jul-22 03:10:11 	None
+INFO: 24-Jul-22 03:40:11 	None
+INFO: 24-Jul-22 04:10:11 	None
+INFO: 24-Jul-22 04:40:11 	None
+INFO: 24-Jul-22 05:10:11 	None
+INFO: 24-Jul-22 05:40:11 	None
+INFO: 24-Jul-22 06:10:11 	None
+INFO: 24-Jul-22 06:40:11 	None
+INFO: 24-Jul-22 07:10:11 	None
+INFO: 24-Jul-22 07:40:11 	None
+INFO: 24-Jul-22 08:10:11 	None
+INFO: 24-Jul-22 08:40:11 	None
+INFO: 24-Jul-22 09:10:11 	None
+INFO: 24-Jul-22 09:40:11 	None
+INFO: 24-Jul-22 10:10:11 	None
+INFO: 24-Jul-22 10:40:11 	None
+INFO: 24-Jul-22 11:10:11 	None
+INFO: 24-Jul-22 11:40:11 	None
+INFO: 24-Jul-22 12:10:11 	None
+INFO: 24-Jul-22 12:40:11 	None
+INFO: 24-Jul-22 13:10:11 	None
+INFO: 24-Jul-22 13:40:11 	None
+INFO: 24-Jul-22 14:10:11 	None
+INFO: 24-Jul-22 14:40:11 	None
+INFO: 24-Jul-22 15:10:11 	None
+INFO: 24-Jul-22 15:40:11 	None
+INFO: 24-Jul-22 16:10:11 	None
+INFO: 24-Jul-22 16:40:11 	None
+INFO: 24-Jul-22 17:10:11 	None
+INFO: 24-Jul-22 17:40:11 	None
+INFO: 24-Jul-22 18:10:11 	None
+INFO: 24-Jul-22 18:40:11 	None
+INFO: 24-Jul-22 19:10:11 	None
+INFO: 24-Jul-22 19:40:11 	None
+INFO: 24-Jul-22 20:10:11 	None
+INFO: 24-Jul-22 20:40:11 	None
+INFO: 24-Jul-22 21:10:11 	Purging Events in Database
+INFO: 24-Jul-22 21:10:11 	Events Purges
+INFO: 24-Jul-22 21:10:11 	None
+INFO: 24-Jul-22 21:40:11 	None
+INFO: 24-Jul-22 22:10:11 	None
+INFO: 24-Jul-22 22:40:11 	None
+INFO: 24-Jul-22 23:10:11 	None
+INFO: 24-Jul-22 23:40:11 	None
+INFO: 25-Jul-22 00:10:11 	None
+INFO: 25-Jul-22 00:40:11 	None
+INFO: 25-Jul-22 01:10:11 	None
+INFO: 25-Jul-22 01:40:11 	None
+INFO: 25-Jul-22 02:10:11 	None
+INFO: 25-Jul-22 02:40:11 	None
+INFO: 25-Jul-22 03:10:11 	None
+INFO: 25-Jul-22 03:40:11 	None
+INFO: 25-Jul-22 04:10:11 	None
+INFO: 25-Jul-22 04:40:11 	None
+INFO: 25-Jul-22 05:10:11 	None
+INFO: 25-Jul-22 05:40:11 	None
+INFO: 25-Jul-22 06:10:11 	None
+INFO: 25-Jul-22 06:40:11 	None
+INFO: 25-Jul-22 07:10:11 	None
+INFO: 25-Jul-22 07:40:11 	None
+INFO: 25-Jul-22 08:10:11 	None
+INFO: 25-Jul-22 08:40:11 	None
+INFO: 25-Jul-22 09:10:11 	None
+INFO: 25-Jul-22 09:40:11 	None
+INFO: 25-Jul-22 10:10:11 	None
+INFO: 25-Jul-22 10:40:11 	None
+INFO: 25-Jul-22 11:10:11 	None
+INFO: 25-Jul-22 11:40:11 	None
+INFO: 25-Jul-22 12:10:11 	None
+INFO: 25-Jul-22 12:40:11 	None
+INFO: 25-Jul-22 13:10:11 	None
+INFO: 25-Jul-22 13:40:11 	None
+INFO: 25-Jul-22 14:10:11 	None
+INFO: 25-Jul-22 14:40:11 	None
+INFO: 25-Jul-22 15:10:11 	None
+INFO: 25-Jul-22 15:40:11 	None
+INFO: 25-Jul-22 16:10:11 	None
+INFO: 25-Jul-22 16:40:11 	None
+INFO: 25-Jul-22 17:10:11 	None
+INFO: 25-Jul-22 17:40:11 	None
+INFO: 25-Jul-22 18:10:11 	None
+INFO: 25-Jul-22 18:40:11 	None
+INFO: 25-Jul-22 19:10:11 	None
+INFO: 25-Jul-22 19:40:11 	None
+INFO: 25-Jul-22 20:10:11 	None
+INFO: 25-Jul-22 20:40:11 	None
+INFO: 25-Jul-22 21:10:11 	Purging Events in Database
+INFO: 25-Jul-22 21:10:11 	Events Purges
+INFO: 25-Jul-22 21:10:11 	None
+INFO: 25-Jul-22 21:40:11 	None
+INFO: 25-Jul-22 22:10:11 	None
+INFO: 25-Jul-22 22:40:11 	None
+INFO: 25-Jul-22 23:10:11 	None
+INFO: 25-Jul-22 23:40:11 	None
+INFO: 26-Jul-22 00:10:11 	None
+INFO: 26-Jul-22 00:40:11 	None
+INFO: 26-Jul-22 01:10:11 	None
+INFO: 26-Jul-22 01:40:11 	None
+INFO: 26-Jul-22 02:10:11 	None
+INFO: 26-Jul-22 02:40:11 	None
+INFO: 26-Jul-22 03:10:11 	None
+INFO: 26-Jul-22 03:40:11 	None
+INFO: 26-Jul-22 04:10:11 	None
+INFO: 26-Jul-22 04:40:11 	None
+INFO: 26-Jul-22 05:10:11 	None
+INFO: 26-Jul-22 05:40:11 	None
+INFO: 26-Jul-22 06:10:11 	None
+INFO: 26-Jul-22 06:40:11 	None
+INFO: 26-Jul-22 07:10:11 	None
+INFO: 26-Jul-22 07:40:11 	None
+INFO: 26-Jul-22 08:10:11 	None
+INFO: 26-Jul-22 08:40:11 	None
+INFO: 26-Jul-22 09:10:11 	None
+INFO: 26-Jul-22 09:40:11 	None
+INFO: 26-Jul-22 10:10:11 	None
+INFO: 26-Jul-22 10:40:11 	None
+INFO: 26-Jul-22 11:10:11 	None
+INFO: 26-Jul-22 11:40:11 	None
+INFO: 26-Jul-22 12:10:11 	None
+INFO: 26-Jul-22 12:40:11 	None
+INFO: 26-Jul-22 13:10:11 	None
+INFO: 26-Jul-22 13:40:11 	None
+INFO: 26-Jul-22 14:10:11 	None
+INFO: 26-Jul-22 14:40:11 	None
+INFO: 26-Jul-22 15:10:11 	None
+INFO: 26-Jul-22 15:40:11 	None
+INFO: 26-Jul-22 16:10:11 	None
+INFO: 26-Jul-22 16:40:11 	None
+INFO: 26-Jul-22 17:10:11 	None
+INFO: 26-Jul-22 17:40:11 	None
+INFO: 26-Jul-22 18:10:11 	None
+INFO: 26-Jul-22 18:40:11 	None
+INFO: 26-Jul-22 19:10:11 	None
+INFO: 26-Jul-22 19:40:11 	None
+INFO: 26-Jul-22 20:10:11 	None
+INFO: 26-Jul-22 20:40:11 	None
+INFO: 26-Jul-22 21:10:11 	Purging Events in Database
+INFO: 26-Jul-22 21:10:11 	Events Purges
+INFO: 26-Jul-22 21:10:11 	None
+INFO: 26-Jul-22 21:40:11 	None
+INFO: 26-Jul-22 22:10:11 	None
+INFO: 26-Jul-22 22:40:11 	None
+INFO: 26-Jul-22 23:10:11 	None
+INFO: 26-Jul-22 23:40:11 	None
+INFO: 27-Jul-22 00:10:11 	None
+INFO: 27-Jul-22 00:40:11 	None
+INFO: 27-Jul-22 01:10:11 	None
+INFO: 27-Jul-22 01:40:11 	None
+INFO: 27-Jul-22 02:10:11 	None
+INFO: 27-Jul-22 02:40:11 	None
+INFO: 27-Jul-22 03:10:11 	None
+INFO: 27-Jul-22 03:40:11 	None
+INFO: 27-Jul-22 04:10:11 	None
+INFO: 27-Jul-22 04:40:11 	None
+INFO: 27-Jul-22 05:10:11 	None
+INFO: 27-Jul-22 05:40:11 	None
+INFO: 27-Jul-22 06:10:11 	None
+INFO: 27-Jul-22 06:40:11 	None
+INFO: 27-Jul-22 07:10:11 	None
+INFO: 27-Jul-22 07:40:11 	None
+INFO: 27-Jul-22 08:10:11 	None
+INFO: 27-Jul-22 08:40:11 	None
+INFO: 27-Jul-22 09:10:11 	None
+INFO: 27-Jul-22 09:40:11 	None
+INFO: 27-Jul-22 10:10:11 	None
+INFO: 27-Jul-22 10:40:11 	None
+INFO: 27-Jul-22 11:10:11 	None
+INFO: 27-Jul-22 11:40:11 	None
+INFO: 27-Jul-22 12:10:11 	None
+INFO: 27-Jul-22 12:40:11 	None
+INFO: 27-Jul-22 13:10:11 	None
+INFO: 27-Jul-22 13:40:11 	None
+INFO: 27-Jul-22 14:10:11 	None
+INFO: 27-Jul-22 14:40:11 	None
+INFO: 27-Jul-22 15:10:11 	None
+INFO: 27-Jul-22 15:40:11 	None
+INFO: 27-Jul-22 16:10:11 	None
+INFO: 27-Jul-22 16:40:11 	None
+INFO: 27-Jul-22 17:10:11 	None
+INFO: 27-Jul-22 17:40:11 	None
+INFO: 27-Jul-22 18:10:11 	None
+INFO: 27-Jul-22 18:40:11 	None
+INFO: 27-Jul-22 19:10:11 	None
+INFO: 27-Jul-22 19:40:11 	None
+INFO: 27-Jul-22 20:10:11 	None
+INFO: 27-Jul-22 20:40:11 	None
+INFO: 27-Jul-22 21:10:11 	Purging Events in Database
+INFO: 27-Jul-22 21:10:11 	Events Purges
+INFO: 27-Jul-22 21:10:11 	None
+INFO: 27-Jul-22 21:40:11 	None
+INFO: 27-Jul-22 22:10:11 	None
+INFO: 27-Jul-22 22:40:11 	None
+INFO: 27-Jul-22 23:10:11 	None
+INFO: 27-Jul-22 23:40:11 	None
+INFO: 28-Jul-22 00:10:11 	None
+INFO: 28-Jul-22 00:40:11 	None
+INFO: 28-Jul-22 01:10:11 	None
+INFO: 28-Jul-22 01:40:11 	None
+INFO: 28-Jul-22 02:10:11 	None
+INFO: 28-Jul-22 02:40:11 	None
+INFO: 28-Jul-22 03:10:11 	None
+INFO: 28-Jul-22 03:40:11 	None
+INFO: 28-Jul-22 04:10:11 	None
+INFO: 28-Jul-22 04:40:11 	None
+INFO: 28-Jul-22 05:10:11 	None
+INFO: 28-Jul-22 05:40:11 	None
+INFO: 28-Jul-22 06:10:11 	None
+INFO: 28-Jul-22 06:40:11 	None
+INFO: 28-Jul-22 07:10:11 	None
+INFO: 28-Jul-22 07:40:11 	None
+INFO: 28-Jul-22 08:10:11 	None
+INFO: 28-Jul-22 08:40:11 	None
+INFO: 28-Jul-22 09:10:11 	None
+INFO: 28-Jul-22 09:40:11 	None
+INFO: 28-Jul-22 10:10:11 	None
+INFO: 28-Jul-22 10:40:11 	None
+INFO: 28-Jul-22 11:10:11 	None
+INFO: 28-Jul-22 11:40:11 	None
+INFO: 28-Jul-22 12:10:11 	None
+INFO: 28-Jul-22 12:40:11 	None
+INFO: 28-Jul-22 13:10:11 	None
+INFO: 28-Jul-22 13:40:11 	None
+INFO: 28-Jul-22 14:10:11 	None
+INFO: 28-Jul-22 14:40:11 	None
+INFO: 28-Jul-22 15:10:11 	None
+INFO: 28-Jul-22 15:40:11 	None
+INFO: 28-Jul-22 16:10:11 	None
+INFO: 28-Jul-22 16:40:11 	None
+INFO: 28-Jul-22 17:10:11 	None
+INFO: 28-Jul-22 17:40:11 	None
+INFO: 28-Jul-22 18:10:11 	None
+INFO: 28-Jul-22 18:40:11 	None
+INFO: 28-Jul-22 19:10:11 	None
+INFO: 28-Jul-22 19:40:11 	None
+INFO: 28-Jul-22 20:10:11 	None
+INFO: 28-Jul-22 20:40:11 	None
+INFO: 28-Jul-22 21:10:11 	Purging Events in Database
+INFO: 28-Jul-22 21:10:11 	Events Purges
+INFO: 28-Jul-22 21:10:11 	None
+INFO: 28-Jul-22 21:40:11 	None
+INFO: 28-Jul-22 22:10:11 	None
+INFO: 28-Jul-22 22:40:11 	None
+INFO: 28-Jul-22 23:10:11 	None
+INFO: 28-Jul-22 23:40:11 	None
+INFO: 29-Jul-22 00:10:11 	None
+INFO: 29-Jul-22 00:40:11 	None
+INFO: 29-Jul-22 01:10:11 	None
+INFO: 29-Jul-22 01:40:11 	None
+INFO: 29-Jul-22 02:10:11 	None
+INFO: 29-Jul-22 02:40:11 	None
+INFO: 29-Jul-22 03:10:11 	None
+INFO: 29-Jul-22 03:40:11 	None
+INFO: 29-Jul-22 04:10:11 	None
+INFO: 29-Jul-22 04:40:11 	None
+INFO: 29-Jul-22 05:10:11 	None
+INFO: 29-Jul-22 05:40:11 	None
+INFO: 29-Jul-22 06:10:11 	None
+INFO: 29-Jul-22 06:40:11 	None
+INFO: 29-Jul-22 07:10:11 	None
+INFO: 29-Jul-22 07:40:11 	None
+INFO: 29-Jul-22 08:10:11 	None
+INFO: 29-Jul-22 08:40:11 	None
+INFO: 29-Jul-22 09:10:11 	None
+INFO: 29-Jul-22 09:40:11 	None
+INFO: 29-Jul-22 10:10:11 	None
+INFO: 29-Jul-22 10:40:11 	None
+INFO: 29-Jul-22 11:10:11 	None
+INFO: 29-Jul-22 11:40:11 	None
+INFO: 29-Jul-22 12:10:11 	None
+INFO: 29-Jul-22 12:40:11 	None
+INFO: 29-Jul-22 13:10:11 	None
+INFO: 29-Jul-22 13:40:11 	None
+INFO: 29-Jul-22 14:10:11 	None
+INFO: 29-Jul-22 14:40:11 	None
+INFO: 29-Jul-22 15:10:11 	None
+INFO: 29-Jul-22 15:40:11 	None
+INFO: 29-Jul-22 16:10:11 	None
+INFO: 29-Jul-22 16:40:11 	None
+INFO: 29-Jul-22 17:10:11 	None
+INFO: 29-Jul-22 17:40:11 	None
+INFO: 29-Jul-22 18:10:11 	None
+INFO: 29-Jul-22 18:40:11 	None
+INFO: 29-Jul-22 19:10:11 	None
+INFO: 29-Jul-22 19:40:11 	None
+INFO: 29-Jul-22 20:10:11 	None
+INFO: 29-Jul-22 20:40:11 	None
+INFO: 29-Jul-22 21:10:11 	Purging Events in Database
+INFO: 29-Jul-22 21:10:11 	Events Purges
+INFO: 29-Jul-22 21:10:11 	None
+INFO: 29-Jul-22 21:40:11 	None
+INFO: 29-Jul-22 22:10:11 	None
+INFO: 29-Jul-22 22:40:11 	None
+INFO: 29-Jul-22 23:10:11 	None
+INFO: 29-Jul-22 23:40:11 	None
+INFO: 30-Jul-22 00:10:11 	None
+INFO: 30-Jul-22 00:40:11 	None
+INFO: 30-Jul-22 01:10:11 	None
+INFO: 30-Jul-22 01:40:11 	None
+INFO: 30-Jul-22 02:10:11 	None
+INFO: 30-Jul-22 02:40:11 	None
+INFO: 30-Jul-22 03:10:11 	None
+INFO: 30-Jul-22 03:40:11 	None
+INFO: 30-Jul-22 04:10:11 	None
+INFO: 30-Jul-22 04:40:11 	None
+INFO: 30-Jul-22 05:10:11 	None
+INFO: 30-Jul-22 05:40:11 	None
+INFO: 30-Jul-22 06:10:11 	None
+INFO: 30-Jul-22 06:40:11 	None
+INFO: 30-Jul-22 07:10:11 	None
+INFO: 30-Jul-22 07:40:11 	None
+INFO: 30-Jul-22 08:10:11 	None
+INFO: 30-Jul-22 08:40:11 	None
+INFO: 30-Jul-22 09:10:11 	None
+INFO: 30-Jul-22 09:40:11 	None
+INFO: 30-Jul-22 10:10:11 	None
+INFO: 30-Jul-22 10:40:11 	None
+INFO: 30-Jul-22 11:10:11 	None
+INFO: 30-Jul-22 11:40:11 	None
+INFO: 30-Jul-22 12:10:11 	None
+INFO: 30-Jul-22 12:40:11 	None
+INFO: 30-Jul-22 13:10:11 	None
+INFO: 30-Jul-22 13:40:11 	None
+INFO: 30-Jul-22 14:10:11 	None
+INFO: 30-Jul-22 14:40:11 	None
+INFO: 30-Jul-22 15:10:11 	None
+INFO: 30-Jul-22 15:40:11 	None
+INFO: 30-Jul-22 16:10:11 	None
+INFO: 30-Jul-22 16:40:11 	None
+INFO: 30-Jul-22 17:10:11 	None
+INFO: 30-Jul-22 17:40:11 	None
+INFO: 30-Jul-22 18:10:11 	None
+INFO: 30-Jul-22 18:40:11 	None
+INFO: 30-Jul-22 19:10:11 	None
+INFO: 30-Jul-22 19:40:11 	None
+INFO: 30-Jul-22 20:10:11 	None
+INFO: 30-Jul-22 20:40:11 	None
+INFO: 30-Jul-22 21:10:11 	Purging Events in Database
+INFO: 30-Jul-22 21:10:11 	Events Purges
+INFO: 30-Jul-22 21:10:11 	None
+INFO: 30-Jul-22 21:40:11 	None
+INFO: 30-Jul-22 22:10:11 	None
+INFO: 30-Jul-22 22:40:11 	None
+INFO: 30-Jul-22 23:10:11 	None
+INFO: 30-Jul-22 23:40:11 	None
+INFO: 31-Jul-22 00:10:11 	None
+INFO: 31-Jul-22 00:40:11 	None
+INFO: 31-Jul-22 01:10:11 	None
+INFO: 31-Jul-22 01:40:11 	None
+INFO: 31-Jul-22 02:10:11 	None
+INFO: 31-Jul-22 02:40:11 	None
+INFO: 31-Jul-22 03:10:11 	None
+INFO: 31-Jul-22 03:40:11 	None
+INFO: 31-Jul-22 04:10:11 	None
+INFO: 31-Jul-22 04:40:11 	None
+INFO: 31-Jul-22 05:10:11 	None
+INFO: 31-Jul-22 05:40:11 	None
+INFO: 31-Jul-22 06:10:11 	None
+INFO: 31-Jul-22 06:40:11 	None
+INFO: 31-Jul-22 07:10:11 	None
+INFO: 31-Jul-22 07:40:11 	None
+INFO: 31-Jul-22 08:10:11 	None
+INFO: 31-Jul-22 08:40:11 	None
+INFO: 31-Jul-22 09:10:11 	None
+INFO: 31-Jul-22 09:40:11 	None
+INFO: 31-Jul-22 10:10:11 	None
+INFO: 31-Jul-22 10:40:11 	None
+INFO: 31-Jul-22 11:10:11 	None
+INFO: 31-Jul-22 11:40:11 	None
+INFO: 31-Jul-22 12:10:11 	None
+INFO: 31-Jul-22 12:40:11 	None
+INFO: 31-Jul-22 13:10:11 	None
+INFO: 31-Jul-22 13:40:11 	None
+INFO: 31-Jul-22 14:10:11 	None
+INFO: 31-Jul-22 14:40:11 	None
+INFO: 31-Jul-22 15:10:11 	None
+INFO: 31-Jul-22 15:40:11 	None
+INFO: 31-Jul-22 16:10:11 	None
+INFO: 31-Jul-22 16:40:11 	None
+INFO: 31-Jul-22 17:10:11 	None
+INFO: 31-Jul-22 17:40:11 	None
+INFO: 31-Jul-22 18:10:11 	None
+INFO: 31-Jul-22 18:40:11 	None
+INFO: 31-Jul-22 19:10:11 	None
+INFO: 31-Jul-22 19:40:11 	None
+INFO: 31-Jul-22 20:10:11 	None
+INFO: 31-Jul-22 20:40:11 	None
+INFO: 31-Jul-22 21:10:11 	Purging Events in Database
+INFO: 31-Jul-22 21:10:11 	Events Purges
+INFO: 31-Jul-22 21:10:11 	None
+INFO: 31-Jul-22 21:40:11 	None
+INFO: 31-Jul-22 22:10:11 	None
+INFO: 31-Jul-22 22:40:11 	None
+INFO: 31-Jul-22 23:10:11 	None
+INFO: 31-Jul-22 23:40:11 	None
+INFO: 01-Aug-22 00:10:11 	None
+INFO: 01-Aug-22 00:40:11 	None
+INFO: 01-Aug-22 01:10:11 	None
+INFO: 01-Aug-22 01:40:11 	None
+INFO: 01-Aug-22 02:10:11 	None
+INFO: 01-Aug-22 02:40:11 	None
+INFO: 01-Aug-22 03:10:11 	None
+INFO: 01-Aug-22 03:40:11 	None
+INFO: 01-Aug-22 04:10:11 	None
+INFO: 01-Aug-22 04:40:11 	None
+INFO: 01-Aug-22 05:10:11 	None
+INFO: 01-Aug-22 05:40:11 	None
+INFO: 01-Aug-22 06:10:11 	None
+INFO: 01-Aug-22 06:40:11 	None
+INFO: 01-Aug-22 07:10:11 	None
+INFO: 01-Aug-22 07:40:11 	None
+INFO: 01-Aug-22 08:10:11 	None
+INFO: 01-Aug-22 08:40:11 	None
+INFO: 01-Aug-22 09:10:11 	None
+INFO: 01-Aug-22 09:40:11 	None
+INFO: 01-Aug-22 10:10:11 	None
+INFO: 01-Aug-22 10:40:11 	None
+INFO: 01-Aug-22 11:10:11 	None
+INFO: 01-Aug-22 11:40:11 	None
+INFO: 01-Aug-22 12:10:11 	None
+INFO: 01-Aug-22 12:40:11 	None
+INFO: 01-Aug-22 13:10:11 	None
+INFO: 01-Aug-22 13:40:11 	None
+INFO: 01-Aug-22 14:10:11 	None
+INFO: 01-Aug-22 14:40:11 	None
+INFO: 01-Aug-22 15:10:11 	None
+INFO: 01-Aug-22 15:40:11 	None
+INFO: 01-Aug-22 16:10:11 	None
+INFO: 01-Aug-22 16:40:11 	None
+INFO: 01-Aug-22 17:10:11 	None
+INFO: 01-Aug-22 17:40:11 	None
+INFO: 01-Aug-22 18:10:11 	None
+INFO: 01-Aug-22 18:40:11 	None
+INFO: 01-Aug-22 19:10:11 	None
+INFO: 01-Aug-22 19:40:11 	None
+INFO: 01-Aug-22 20:10:11 	None
+INFO: 01-Aug-22 20:40:11 	None
+INFO: 01-Aug-22 21:10:11 	Purging Events in Database
+INFO: 01-Aug-22 21:10:11 	Events Purges
+INFO: 01-Aug-22 21:10:11 	None
+INFO: 01-Aug-22 21:40:11 	None
+INFO: 01-Aug-22 22:10:11 	None
+INFO: 01-Aug-22 22:40:11 	None
+INFO: 01-Aug-22 23:10:11 	None
+INFO: 01-Aug-22 23:40:11 	None
+INFO: 02-Aug-22 00:10:11 	None
+INFO: 02-Aug-22 00:40:11 	None
+INFO: 02-Aug-22 01:10:11 	None
+INFO: 02-Aug-22 01:40:11 	None
+INFO: 02-Aug-22 02:10:11 	None
+INFO: 02-Aug-22 02:40:11 	None
+INFO: 02-Aug-22 03:10:11 	None
+INFO: 02-Aug-22 03:40:11 	None
+INFO: 02-Aug-22 04:10:11 	None
+INFO: 02-Aug-22 04:40:11 	None
+INFO: 02-Aug-22 05:10:11 	None
+INFO: 02-Aug-22 05:40:11 	None
+INFO: 02-Aug-22 06:10:11 	None
+INFO: 02-Aug-22 06:40:11 	None
+INFO: 02-Aug-22 07:10:11 	None
+INFO: 02-Aug-22 07:40:11 	None
+INFO: 02-Aug-22 08:10:11 	None
+INFO: 02-Aug-22 08:40:11 	None
+INFO: 02-Aug-22 09:10:11 	None
+INFO: 02-Aug-22 09:40:11 	None
+INFO: 02-Aug-22 10:10:11 	None
+INFO: 02-Aug-22 10:40:11 	None
+INFO: 02-Aug-22 11:10:11 	None
+INFO: 02-Aug-22 11:40:11 	None
+INFO: 02-Aug-22 12:10:11 	None
+INFO: 02-Aug-22 12:40:11 	None
+INFO: 02-Aug-22 13:10:11 	None
+INFO: 02-Aug-22 13:40:11 	None
+INFO: 02-Aug-22 14:10:11 	None
+INFO: 02-Aug-22 14:40:11 	None
+INFO: 02-Aug-22 15:10:11 	None
+INFO: 02-Aug-22 15:40:11 	None
+INFO: 02-Aug-22 16:10:11 	None
+INFO: 02-Aug-22 16:40:11 	None
+INFO: 02-Aug-22 17:10:11 	None
+INFO: 02-Aug-22 17:40:11 	None
+INFO: 02-Aug-22 18:10:11 	None
+INFO: 02-Aug-22 18:40:11 	None
+INFO: 02-Aug-22 19:10:11 	None
+INFO: 02-Aug-22 19:40:11 	None
+INFO: 02-Aug-22 20:10:11 	None
+INFO: 02-Aug-22 20:40:11 	None
+INFO: 02-Aug-22 21:10:11 	Purging Events in Database
+INFO: 02-Aug-22 21:10:11 	Events Purges
+INFO: 02-Aug-22 21:10:11 	None
+INFO: 03-Aug-22 21:10:11 	Purging Events in Database
+INFO: 04-Aug-22 21:10:11 	Purging Events in Database
+INFO: 05-Aug-22 21:10:11 	Purging Events in Database
+INFO: 06-Aug-22 21:10:11 	Purging Events in Database
+INFO: 07-Aug-22 21:10:11 	Purging Events in Database
+INFO: 08-Aug-22 21:10:11 	Purging Events in Database
+INFO: 09-Aug-22 21:10:11 	Purging Events in Database
+INFO: 10-Aug-22 21:10:11 	Purging Events in Database
+INFO: 11-Aug-22 21:10:11 	Purging Events in Database
+INFO: 12-Aug-22 21:10:11 	Purging Events in Database

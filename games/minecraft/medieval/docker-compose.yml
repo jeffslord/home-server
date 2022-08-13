@@ -1,0 +1,47 @@
+version: '3'
+services:
+  minecraft-server:
+    image: itzg/minecraft-server
+    container_name: mc-medieval
+    ports:
+       - "25590:25565"
+    environment:
+      TZ: America/New_York
+      ENABLE_ROLLING_LOGS: "true"
+      EULA: "true"
+      TYPE: "FABRIC"
+      GENERIC_PACK: "/modpacks/Medieval+MC+Server+Pack+[FABRIC]+v5.zip"
+      VERSION: 1.19
+      # LEVEL: "world_medieval"
+      MAX_MEMORY: "16G"
+      ENABLE_RCON: "true"
+      # RCON
+      RCON_PASSWORD: "testing"
+      RCON_PORT: 28016
+      RCON_CMDS_STARTUP: |-
+        pregen start 200
+      RCON_CMDS_FIRST_CONNECT: |-
+        pregen stop
+      RCON_CMDS_LAST_DISCONNECT: |-
+        pregen start 200
+      # SERVER PROPERTIES
+      OVERRIDE_SERVER_PROPERTIES: "TRUE"
+      ENABLE_AUTOPAUSE: "TRUE"
+      DIFFICULTY: "normal"
+      MAX_PLAYERS: 15
+      VIEW_DISTANCE: 12
+      MOTD: "Medieval time"
+      MAX_TICK_TIME: -1
+
+    volumes:
+      - /volumes/games/minecraft/medieval:/data
+      - /volumes/games/minecraft/modpacks:/modpacks
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

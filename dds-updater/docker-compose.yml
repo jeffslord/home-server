@@ -4,6 +4,6 @@ services:
     image: oznu/cloudflare-ddns:latest
     restart: always
     environment:
-      - API_KEY=sjLcIzydI27E93p5QZjCk1_wsk5ozXR_gfy9Bg8z  
+      - API_KEY=${API_KEY}
       - ZONE=jeffslord.com
       - PROXIED=false

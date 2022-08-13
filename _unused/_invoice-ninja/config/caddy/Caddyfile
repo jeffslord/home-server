@@ -1,0 +1,12 @@
+# {$APP_URL} {
+#     root * /var/www/app/public
+#     php_fastcgi ninja_app:9000
+#     encode zstd gzip
+#     file_server browse
+# }
+{
+    root * /var/www/app/public
+    php_fastcgi ninja_app:9000
+    encode zstd gzip
+    file_server browse
+}
