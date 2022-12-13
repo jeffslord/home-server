@@ -78,4 +78,8 @@
 	handle @mealie {
 		reverse_proxy mealie:9090
 	}
+	@minecraft-web host minecraft-web.jeffslord.com
+	handle @minecraft-web {
+		reverse_proxy minecraft-web:4326
+	}
 }

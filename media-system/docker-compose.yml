@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3"
 
 networks:
   web:
@@ -29,12 +29,12 @@ services:
       - PLEX_UID=1000
       - PLEX_GID=1000
     volumes:
-      - ${SSD}/plex/config:/config
-      - ${SSD}/plex/transcode:/transcode
-      - ${HDD}/libraries/shows:/data/tvshows
-      - ${HDD}/libraries/movies:/data/movies
-      - ${HDD}/libraries/anime:/data/anime
-      - ${HDD}/libraries/anime_movies:/data/anime_movies
+      - ${SSD}/media-system/plex/config:/config
+      - ${SSD}/media-system/plex/transcode:/transcode
+      - ${HDD}/media-system/libraries/shows:/data/tvshows
+      - ${HDD}/media-system/libraries/movies:/data/movies
+      - ${HDD}/media-system/libraries/anime:/data/anime
+      - ${HDD}/media-system/libraries/anime_movies:/data/anime_movies
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
@@ -46,12 +46,12 @@ services:
       - TZ=America/New_York
       - JELLYFIN_PublishedServerUrl=https://jellyfin.jeffslord.com #optional
     volumes:
-      - ${SSD}/jellyfin/config:/config
-      - ${SSD}/jellyfin/cache:/cache
-      - ${HDD}/libraries/shows:/data/tvshows
-      - ${HDD}/libraries/movies:/data/movies
-      - ${HDD}/libraries/anime:/data/anime
-      - ${HDD}/libraries/anime_movies:/data/anime_movies
+      - ${SSD}/media-system/jellyfin/config:/config
+      - ${SSD}/media-system/jellyfin/cache:/cache
+      - ${HDD}/media-system/libraries/shows:/data/tvshows
+      - ${HDD}/media-system/libraries/movies:/data/movies
+      - ${HDD}/media-system/libraries/anime:/data/anime
+      - ${HDD}/media-system/libraries/anime_movies:/data/anime_movies
     restart: unless-stopped
   # Media Organizers
   sonarr:
@@ -66,8 +66,8 @@ services:
       - PGID=1000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${SSD}/sonarr/config:/config
-      - ${HDD}:/media
+      - ${SSD}/media-system/sonarr/config:/config
+      - ${HDD}/media-system:/media
     depends_on:
       - prowlarr
       - deluge
@@ -83,8 +83,8 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - ${SSD}/radarr/config:/config
-      - ${HDD}:/media
+      - ${SSD}/media-system/radarr/config:/config
+      - ${HDD}/media-system:/media
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - prowlarr
@@ -113,7 +113,7 @@ services:
       - PGID=1000
       - TZ=Europe/London
     volumes:
-      - ${SSD}/prowlarr/config:/config
+      - ${SSD}/media-system/prowlarr/config:/config
     expose:
       - "9696"
     restart: unless-stopped
@@ -123,8 +123,6 @@ services:
     container_name: deluge
     networks:
       - web
-    env_file:
-      - ../global.env
     cap_add:
       - NET_ADMIN
     expose:
@@ -137,10 +135,10 @@ services:
       - VPN_USER=${VPN_USER}
       - VPN_PASS=${VPN_PASS}
       - VPN_PROV=pia
-      #      - VPN_CLIENT=wireguard
+      # - VPN_CLIENT=wireguard
       - VPN_CLIENT=openvpn
       - STRICT_PORT_FORWARD=no #want this to be yes, but pia is changing to new type of server, causing issue
-      #      - STRICT_PORT_FORWARD=yes
+      # - STRICT_PORT_FORWARD=yes
       - ENABLE_PRIVOXY=yes
       - LAN_NETWORK=192.168.112.1/24
       - NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1
@@ -151,29 +149,10 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - ${HDD}/downloads:/downloads
-      - ${SSD}/deluge/config:/config
+      - ${HDD}/media-system/downloads:/downloads
+      - ${SSD}/media-system/deluge/config:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-  # Analytics
-  # tautulli:
-  #   image: "linuxserver/tautulli:latest"
-  #   container_name: tautulli
-  #   networks:
-  #     - web
-  #   expose:
-  #     - "8181"
-  #   environment:
-  #     - TZ=America/New_York
-  #     - PGID=1000
-  #     - PUID=1000
-  #   volumes:
-  #     - ${HDD}/config/plexpy:/config
-  #     - ${HDD}/config/plex/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
-  #   depends_on:
-  #     - plex
-  #   restart: unless-stopped
-  # Request new media
   ombi:
     image: "linuxserver/ombi:latest"
     container_name: ombi
@@ -186,7 +165,7 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - ${SSD}/ombi/config:/config
+      - ${SSD}/media-system/ombi/config:/config
     depends_on:
       - plex
     restart: unless-stopped
@@ -203,7 +182,7 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - ${SSD}/muximux/config:/config
+      - ${SSD}/media-system/muximux/config:/config
     depends_on:
       - plex
     restart: unless-stopped
@@ -220,11 +199,11 @@ services:
       - PGID=1000
       - PUID=1000
     volumes:
-      - ${SSD}/bazarr/config:/config
-      - ${HDD}/libraries/shows:/data/tvshows
-      - ${HDD}/libraries/movies:/data/movies
-      - ${HDD}/libraries/anime:/data/anime
-      - ${HDD}/libraries/anime_movies:/data/anime_movies
+      - ${SSD}/media-system/bazarr/config:/config
+      - ${HDD}/media-system/libraries/shows:/data/tvshows
+      - ${HDD}/media-system/libraries/movies:/data/movies
+      - ${HDD}/media-system/libraries/anime:/data/anime
+      - ${HDD}/media-system/libraries/anime_movies:/data/anime_movies
     depends_on:
       - plex
     restart: unless-stopped
@@ -239,10 +218,10 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - ${SSD}/ubooquity/config:/config
-      - ${HDD}/libraries/books:/books
-      - ${HDD}/libraries/comics:/comics
-      - ${HDD}/libraries/raw_files:/filesi
+      - ${SSD}/media-system/ubooquity/config:/config
+      - ${HDD}/media-system/libraries/books:/books
+      - ${HDD}/media-system/libraries/comics:/comics
+      - ${HDD}/media-system/libraries/raw_files:/filesi
     expose:
       - "2202"
       - "2203"
@@ -258,10 +237,47 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - ${SSD}/booksonic/config:/config
-      - ${HDD}/libraries/audiobooks:/audiobooks
-      - ${HDD}/libraries/podcasts:/podcasts
-      - ${HDD}/libraries/other_audio:/othermedia
+      - ${SSD}/media-system/booksonic/config:/config
+      - ${HDD}/media-system/libraries/audiobooks:/audiobooks
+      - ${HDD}/media-system/libraries/podcasts:/podcasts
+      - ${HDD}/media-system/libraries/other_audio:/othermedia
     expose:
       - "4040"
     restart: unless-stopped
+
+  stash:
+    image: stashapp/stash:latest
+    container_name: stash
+    restart: unless-stopped
+    ## the container's port must be the same with the STASH_PORT in the environment section
+    ports:
+      - "9999:9997"
+    ## If you intend to use stash's DLNA functionality uncomment the below network mode and comment out the above ports section
+    # network_mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "2m"
+    environment:
+      - STASH_STASH=/data/
+      - STASH_GENERATED=/generated/
+      - STASH_METADATA=/metadata/
+      - STASH_CACHE=/cache/
+      ## Adjust below to change default port (9999)
+      - STASH_PORT=9997
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      ## Adjust below paths (the left part) to your liking.
+      ## E.g. you can change ./config:/root/.stash to ./stash:/root/.stash
+      
+      ## Keep configs, scrapers, and plugins here.
+      - ${SSD}/media-system/stash/config:/root/.stash
+      ## Point this at your collection.
+      - ${HDD}/media-system/stash:/data
+      ## This is where your stash's metadata lives
+      - ${SSD}/media-system/stash/metadata:/metadata
+      ## Any other cache content.
+      - ${SSD}/media-system/stash/cache:/cache
+      ## Where to store generated content (screenshots,previews,transcodes,sprites)
+      - ${HDD}/media-system/stash/generated:/generated
