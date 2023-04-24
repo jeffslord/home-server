@@ -25,7 +25,16 @@
 	@plex host plex.jeffslord.com
 	handle @plex {
 		reverse_proxy plex:32400
+		reverse_proxy plex:33400
 	}
+	# @plex host plex.jeffslord.com
+	# handle @plex {
+	# 	reverse_proxy plex:33400
+	# }
+	# @webtools host plex.jeffslord.com
+	# handle @webtools {
+	# 	reverse_proxy plex:33400
+	# }
 	@radarr host radarr.jeffslord.com
 	handle @radarr {
 		reverse_proxy radarr:7878
@@ -34,19 +43,23 @@
 	handle @jackett {
 		reverse_proxy jackett:9117
 	}
-	@deluge host deluge.jeffslord.com
-	handle @deluge {
-		reverse_proxy deluge:8112
+	# @deluge host deluge.jeffslord.com
+	# handle @deluge {
+	# 	reverse_proxy deluge:8112
+	# }
+	@qbittorrent host qbittorrent.jeffslord.com
+	handle @qbittorrent {
+		reverse_proxy qbittorrent:8080
 	}
-	@tautulli host tautulli.jeffslord.com
-	handle @tautulli {
-		reverse_proxy tautulli:8181
-	}
+	# @tautulli host tautulli.jeffslord.com
+	# handle @tautulli {
+	# 	reverse_proxy tautulli:8181
+	# }
 	@ombi host ombi.jeffslord.com
 	handle @ombi {
 		reverse_proxy ombi:3579
 	}
-	@muximux host deluge.jeffslord.com
+	@muximux host muximux.jeffslord.com
 	handle @muximux {
 		reverse_proxy muximux:8079
 	}
@@ -81,5 +94,13 @@
 	@minecraft-web host minecraft-web.jeffslord.com
 	handle @minecraft-web {
 		reverse_proxy minecraft-web:4326
+	}
+	@stash host stash.jeffslord.com
+	handle @stash {
+		reverse_proxy stash:9999
+	}
+	@filebrowser host filebrowser.jeffslord.com
+	handle @filebrowser {
+		reverse_proxy filebrowser:8181
 	}
 }

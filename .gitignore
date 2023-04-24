@@ -3,3 +3,7 @@
 /ddclient/config
 /invoice/docker
 /invoice/env
+
+/stash-scraper
+/CommunityScrapers
+/stash
