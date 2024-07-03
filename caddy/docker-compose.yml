@@ -14,11 +14,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./data/:/data
-      - ./config:/config
-    env_file:
-      - ./.env
+      - ${SSD_BASE_PATH}/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ${SSD_BASE_PATH}/caddy/data/:/data
+      - ${SSD_BASE_PATH}/caddy/config:/config
     environment:
       - CF_API_TOKEN
       - DOMAIN_NAME

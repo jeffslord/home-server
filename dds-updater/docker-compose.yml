@@ -2,8 +2,9 @@ version: "3.7"
 services:
   cloudflare-ddns:
     image: oznu/cloudflare-ddns:latest
+    container_name: cloudflare-ddns
     restart: always
     environment:
-      - API_KEY=${API_KEY}
-      - ZONE=jeffslord.com
+      - API_KEY=${DDNS_API_KEY}
+      - ZONE=${DOMAIN_NAME}
       - PROXIED=false

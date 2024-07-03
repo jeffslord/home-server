@@ -6,11 +6,11 @@ networks:
 
 services:
   mealie:
+    image: hkotel/mealie:latest
     container_name: mealie
     networks:
       - web
-    image: hkotel/mealie:latest
-    restart: always
+    restart: unless-stopped
     depends_on:
       - "postgres"
     ports:

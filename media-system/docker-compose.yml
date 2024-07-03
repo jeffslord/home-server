@@ -1,282 +1,289 @@
-version: "3"
+version: "3.9"
 
 networks:
-    web:
-        external: true
+  web:
+    external: true
 
 services:
 
-    # Media Player
-    plex:
-        image: "plexinc/pms-docker:latest"
-        container_name: plex
-        networks:
-            - web
-        restart: unless-stopped
-        ports:
-            - 32400:32400/tcp
-            - 3005:3005/tcp
-            - 8324:8324/tcp
-            - 32469:32469/tcp
-            - 1900:1900/udp
-            - 32410:32410/udp
-            - 32412:32412/udp
-            - 32413:32413/udp
-            - 32414:32414/udp
-            - 33400:33400/tcp
-        environment:
-            - ADVERTISE_IP=http://192.168.1.24:32400/
-            - ADVERTISE_IP=http://192.168.1.24:33400/
-            - TZ=America/New_York
-            - PLEX_CLAIM=${PLEX_CLAIM}
-            - PLEX_UID=1000
-            - PLEX_GID=1000
-        volumes:
-            - ${SSD}/media-system/plex/config:/config
-            - ${SSD}/media-system/plex/transcode:/transcode
-            - ${HDD}/media-system/libraries/shows:/data/tvshows
-            - ${HDD}/media-system/libraries/movies:/data/movies
-            - ${HDD}/media-system/libraries/anime:/data/anime
-            - ${HDD}/media-system/libraries/anime_movies:/data/anime_movies
+  # Media Player
+  # plex:
+  #     image: "plexinc/pms-docker:latest"
+  #     container_name: plex
+  #     networks:
+  #         - web
+  #     restart: unless-stopped
+  #     ports:
+  #         - 32400:32400/tcp
+  #         - 3005:3005/tcp
+  #         - 8324:8324/tcp
+  #         - 32469:32469/tcp
+  #         - 1900:1900/udp
+  #         - 32410:32410/udp
+  #         - 32412:32412/udp
+  #         - 32413:32413/udp
+  #         - 32414:32414/udp
+  #         - 33400:33400/tcp
+  #     environment:
+  #         - ADVERTISE_IP=http://192.168.1.24:32400/
+  #         - ADVERTISE_IP=http://192.168.1.24:33400/
+  #         - TZ=America/New_York
+  #         - PLEX_CLAIM=${PLEX_CLAIM}
+  #         - PLEX_UID=1000
+  #         - PLEX_GID=1000
+  #     volumes:
+  #         - ${SSD_BASE_PATH}/media-system/plex/config:/config
+  #         - ${SSD_BASE_PATH}/media-system/plex/transcode:/transcode
+  #         - ${HDD_BASE_PATH}/media-system/libraries/shows:/data/tvshows
+  #         - ${HDD_BASE_PATH}/media-system/libraries/movies:/data/movies
+  #         - ${HDD_BASE_PATH}/media-system/libraries/anime:/data/anime
+  #         - ${HDD_BASE_PATH}/media-system/libraries/anime_movies:/data/anime_movies
 
-    jellyfin:
-        image: jellyfin/jellyfin
-        container_name: jellyfin
-        networks:
-            - web
-        environment:
-            - PUID=1000
-            - PGID=1000
-            - TZ=America/New_York
-            - JELLYFIN_PublishedServerUrl=https://jellyfin.jeffslord.com #optional
-        volumes:
-            - ${SSD}/media-system/jellyfin/config:/config
-            - ${SSD}/media-system/jellyfin/cache:/cache
-            - ${HDD}/media-system/libraries/shows:/data/tvshows
-            - ${HDD}/media-system/libraries/movies:/data/movies
-            - ${HDD}/media-system/libraries/anime:/data/anime
-            - ${HDD}/media-system/libraries/anime_movies:/data/anime_movies
-        restart: unless-stopped
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    runtime: nvidia
+    networks:
+      - web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - JELLYFIN_PublishedServerUrl=https://jellyfin.jeffslord.com #optional
+      # - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/jellyfin/config:/config
+      - ${SSD_BASE_PATH}/media-system/jellyfin/cache:/cache
+      - ${HDD_BASE_PATH}/media-system/libraries/shows:/data/tvshows
+      - ${HDD_BASE_PATH}/media-system/libraries/movies:/data/movies
+      - ${HDD_BASE_PATH}/media-system/libraries/anime:/data/anime
+      - ${HDD_BASE_PATH}/media-system/libraries/anime_movies:/data/anime_movies
+    restart: unless-stopped
+    expose:
+      - "8096"
 
-    # Media Organizers
-    sonarr:
-        image: "linuxserver/sonarr:latest"
-        container_name: sonarr
-        networks:
-            - web
-        expose:
-            - "8989"
-        environment:
-            - PUID=1000
-            - PGID=1000
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
-            - ${SSD}/media-system/sonarr/config:/config
-            - ${HDD}/media-system:/media
-        depends_on:
-            - prowlarr
-            - qbittorrent
-        restart: unless-stopped
+  # Media Organizers
+  sonarr:
+    image: "lscr.io/linuxserver/sonarr:latest"
+    container_name: sonarr
+    networks:
+      - web
+    expose:
+      - "8989"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${SSD_BASE_PATH}/media-system/sonarr/config:/config
+      - ${HDD_BASE_PATH}/media-system:/media
+    depends_on:
+      - prowlarr
+      - qbittorrent
+    restart: unless-stopped
 
-    radarr:
-        image: "linuxserver/radarr:latest"
-        container_name: radarr
-        networks:
-            - web
-        expose:
-            - "7878"
-        environment:
-            - PGID=1000
-            - PUID=1000
-        volumes:
-            - ${SSD}/media-system/radarr/config:/config
-            - ${HDD}/media-system:/media
-            - /etc/localtime:/etc/localtime:ro
-        depends_on:
-            - prowlarr
-            - qbittorrent
-        restart: unless-stopped
+  radarr:
+    image: "lscr.io/linuxserver/radarr:latest"
+    container_name: radarr
+    networks:
+      - web
+    expose:
+      - "7878"
+    environment:
+      - PGID=1000
+      - PUID=1000
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/radarr/config:/config
+      - ${HDD_BASE_PATH}/media-system:/media
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - prowlarr
+      - qbittorrent
+    restart: unless-stopped
 
-    flaresolverr:
-        image: ghcr.io/flaresolverr/flaresolverr:latest
-        container_name: flaresolverr
-        networks:
-            - web
-        expose:
-            - "8191"
-        environment:
-            - LOG_LEVEL=debug
-            - LOG_HTML=true
-            - TZ=America/New_York
-        sysctls:
-            - net.ipv6.conf.all.disable_ipv6=1
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    networks:
+      - web
+    expose:
+      - "8191"
+    environment:
+      - LOG_LEVEL=debug
+      - LOG_HTML=true
+      - TZ=America/New_York
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
 
-    prowlarr:
-        image: ghcr.io/linuxserver/prowlarr:latest
-        container_name: prowlarr
-        networks:
-            - web
-        environment:
-            - PUID=1000
-            - PGID=1000
-            - TZ=Europe/London
-        volumes:
-            - ${SSD}/media-system/prowlarr/config:/config
-        expose:
-            - "9696"
-        restart: unless-stopped
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    networks:
+      - web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/prowlarr/config:/config
+    expose:
+      - "9696"
+    restart: unless-stopped
 
-    qbittorrent:
-        container_name: qbittorrent
-        image: cr.hotio.dev/hotio/qbittorrent:latest
-        networks:
-            - web
-        ports:
-            - "8080:8080"
-            - "8118:8118"
-            - "8119:8119"
-        environment:
-            - PUID=1000
-            - PGID=1000
-            - UMASK=002
-            - TZ=America/New_York
-            - VPN_ENABLED=true
-            - VPN_LAN_NETWORK=192.168.1.0/24
-            - VPN_CONF=wg0
-            - VPN_ADDITIONAL_PORTS=8119/tcp
-            - PRIVOXY_ENABLED=false
-        volumes:
-            - ${HDD}/media-system/downloads:/downloads
-            - ${SSD}/media-system/qbittorrent/config:/config
-        cap_add:
-            - NET_ADMIN
-        sysctls:
-            - net.ipv4.conf.all.src_valid_mark=1
-            - net.ipv6.conf.all.disable_ipv6=1
-        restart: unless-stopped
+  qbittorrent:
+    container_name: qbittorrent
+    image: ghcr.io/hotio/qbittorrent:latest
+    networks:
+      - web
+    ports:
+      - "8080:8080"
+      - "8118:8118"
+      - "8119:8119"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=America/New_York
+      - VPN_ENABLED=true
+      - VPN_LAN_NETWORK=192.168.1.0/24
+      - VPN_CONF=wg0
+      - VPN_ADDITIONAL_PORTS=8119/tcp
+      - PRIVOXY_ENABLED=false
+    volumes:
+      - ${HDD_BASE_PATH}/media-system/downloads:/downloads
+      - ${SSD_BASE_PATH}/media-system/qbittorrent/config:/config
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
+    restart: unless-stopped
 
-    ombi:
-        image: "linuxserver/ombi:latest"
-        container_name: ombi
-        networks:
-            - web
-        expose:
-            - "3579"
-        environment:
-            - TZ=America/New_York
-            - PGID=1000
-            - PUID=1000
-        volumes:
-            - ${SSD}/media-system/ombi/config:/config
-        depends_on:
-            - plex
-        restart: unless-stopped
+  ombi:
+    image: "lscr.io/linuxserver/ombi:latest"
+    container_name: ombi
+    networks:
+      - web
+    expose:
+      - "3579"
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/ombi/config:/config
+    depends_on:
+      - jellyfin
+    restart: unless-stopped
 
-    # Media Portal
-    muximux:
-        image: "linuxserver/muximux:latest"
-        container_name: muximux
-        networks:
-            - web
-        expose:
-            - "8079"
-        environment:
-            - TZ=America/New_York
-            - PGID=1000
-            - PUID=1000
-        volumes:
-            - ${SSD}/media-system/muximux/config:/config
-        depends_on:
-            - plex
-        restart: unless-stopped
+  # Media Portal
+  muximux:
+    image: "lscr.io/linuxserver/muximux:latest"
+    container_name: muximux
+    networks:
+      - web
+    expose:
+      - "8079"
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/muximux/config:/config
+    depends_on:
+      - jellyfin
+    restart: unless-stopped
 
-    # Subtitles
-    bazarr:
-        image: "linuxserver/bazarr:latest"
-        container_name: bazarr
-        networks:
-            - web
-        expose:
-            - "6767"
-        environment:
-            - TZ=America/New_York
-            - PGID=1000
-            - PUID=1000
-        volumes:
-            - ${SSD}/media-system/bazarr/config:/config
-            - ${HDD}/media-system/libraries/shows:/data/tvshows
-            - ${HDD}/media-system/libraries/movies:/data/movies
-            - ${HDD}/media-system/libraries/anime:/data/anime
-            - ${HDD}/media-system/libraries/anime_movies:/data/anime_movies
-        depends_on:
-            - plex
-        restart: unless-stopped
+  # Subtitles
+  bazarr:
+    image: "lscr.io/linuxserver/bazarr:latest"
+    container_name: bazarr
+    networks:
+      - web
+    expose:
+      - "6767"
+    environment:
+      - TZ=America/New_York
+      - PGID=1000
+      - PUID=1000
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/bazarr/config:/config
+      - ${HDD_BASE_PATH}/media-system/libraries/shows:/data/tvshows
+      - ${HDD_BASE_PATH}/media-system/libraries/movies:/data/movies
+      - ${HDD_BASE_PATH}/media-system/libraries/anime:/data/anime
+      - ${HDD_BASE_PATH}/media-system/libraries/anime_movies:/data/anime_movies
+    depends_on:
+      - jellyfin
+    restart: unless-stopped
 
-    # ebooks / comics
-    ubooquity:
-        image: linuxserver/ubooquity
-        container_name: ubooquity
-        networks:
-            - web
-        environment:
-            PUID: 1000
-            PGID: 1000
-            TZ: America/New_York
-        volumes:
-            - ${SSD}/media-system/ubooquity/config:/config
-            - ${HDD}/media-system/libraries/books:/books
-            - ${HDD}/media-system/libraries/comics:/comics
-            - ${HDD}/media-system/libraries/raw_files:/filesi
-        expose:
-            - "2202"
-            - "2203"
-        restart: unless-stopped
+  # ebooks / comics
+  ubooquity:
+    image: lscr.io/linuxserver/ubooquity
+    container_name: ubooquity
+    networks:
+      - web
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: America/New_York
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/ubooquity/config:/config
+      - ${HDD_BASE_PATH}/media-system/libraries/books:/books
+      - ${HDD_BASE_PATH}/media-system/libraries/comics:/comics
+      - ${HDD_BASE_PATH}/media-system/libraries/raw_files:/filesi
+    expose:
+      - "2202"
+      - "2203"
+    restart: unless-stopped
 
-    # audiobooks
-    booksonic:
-        image: linuxserver/booksonic
-        container_name: booksonic
-        networks:
-            - web
-        environment:
-            PUID: 1000
-            PGID: 1000
-            TZ: America/New_York
-        volumes:
-            - ${SSD}/media-system/booksonic/config:/config
-            - ${HDD}/media-system/libraries/audiobooks:/audiobooks
-            - ${HDD}/media-system/libraries/podcasts:/podcasts
-            - ${HDD}/media-system/libraries/other_audio:/othermedia
-        expose:
-            - "4040"
-        restart: unless-stopped
+  # audiobooks
+  booksonic:
+    image: lscr.io/linuxserver/booksonic
+    container_name: booksonic
+    networks:
+      - web
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: America/New_York
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/booksonic/config:/config
+      - ${HDD_BASE_PATH}/media-system/libraries/audiobooks:/audiobooks
+      - ${HDD_BASE_PATH}/media-system/libraries/podcasts:/podcasts
+      - ${HDD_BASE_PATH}/media-system/libraries/other_audio:/othermedia
+    expose:
+      - "4040"
+    restart: unless-stopped
 
-    watchstate:
-        image: ghcr.io/arabcoders/watchstate:latest
-        # To change the user/group id associated with the tool change the following line.
-        user: "1000:1000"
-        container_name: watchstate
-        restart: unless-stopped
-        networks:
-            - web
-        # For information about supported environment variables visit FAQ page.
-        # works for both global and container specific environment variables. 
-        environment:
-            - WS_TZ=America/New_York # Set timezone.
-            - WS_CRON_IMPORT=1
-            - WS_CRON_EXPORT=1
-        ports:
-            - "8084:8080" # webhook listener port.
-        volumes:
-            - ${SSD}/media-system/watchstate/config:/config:rw # mount current directory to container /config directory.
+  # watchstate:
+  #     image: ghcr.io/arabcoders/watchstate:latest
+  #     # To change the user/group id associated with the tool change the following line.
+  #     user: "1000:1000"
+  #     container_name: watchstate
+  #     restart: unless-stopped
+  #     networks:
+  #         - web
+  #     # For information about supported environment variables visit FAQ page.
+  #     # works for both global and container specific environment variables. 
+  #     environment:
+  #         - WS_TZ=America/New_York # Set timezone.
+  #         - WS_CRON_IMPORT=1
+  #         - WS_CRON_EXPORT=1
+  #     ports:
+  #         - "8084:8080" # webhook listener port.
+  #     volumes:
+  #         - ${SSD_BASE_PATH}/media-system/watchstate/config:/config:rw # mount current directory to container /config directory.
 
-    filebrowser:
-        image: filebrowser/filebrowser:latest
-        container_name: filebrowser
-        restart: unless-stopped
-        ports:
-            - 8181:80
-        volumes:
-            - /:/srv
-            - ${SSD}/media-system/filebrowser/database/filebrowser.db:/database/filebrowser.db
-            - ${SSD}/media-system/filebrowser/config/filebrowser.json:/config/settings.json
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    networks:
+      - web
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=America/New_York
+    ports:
+      - 5055:5055
+    volumes:
+      - ${SSD_BASE_PATH}/media-system/jellyseerr/config:/app/config
+    restart: unless-stopped

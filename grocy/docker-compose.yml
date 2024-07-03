@@ -5,7 +5,7 @@ networks:
     external: true
 
 services:
-# groceries
+  # groceries
   grocy:
     image: linuxserver/grocy
     container_name: grocy
@@ -16,7 +16,7 @@ services:
       PGID: 1000
       TZ: America/New_York
     volumes:
-      - ${SSD}/grocy/config:/config
+      - ${SSD_BASE_PATH}/grocy/config:/config
     expose:
       - "9283"
     restart: unless-stopped
