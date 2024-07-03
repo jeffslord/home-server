@@ -34,7 +34,7 @@ services:
       RECIPE_DISABLE_COMMENTS: "false"
       RECIPE_DISABLE_AMOUNT: "false"
     volumes:
-      - ./data/:/app/data
+      - ${SSD_BASE_PATH}/mealie/data:/app/data
   postgres:
     container_name: postgres
     networks:
