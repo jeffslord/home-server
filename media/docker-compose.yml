@@ -66,21 +66,6 @@ services:
       - qbittorrent
     restart: unless-stopped
 
-  # readarr:
-  #     image: lscr.io/linuxserver/readarr:develop
-  #     container_name: readarr
-  #     networks:
-  #       - web
-  #     environment:
-  #       <<: *common-env
-  #     volumes:
-  #       - ${SSD_PATH}/media-system/readarr/config:/config 
-  #       - ${HDD_PATH}/media-system/libraries/books:/data/books
-  #       # - /path/to/downloadclient-downloads:/downloads #optional
-  #     ports:
-  #       - 8787:8787
-  #     restart: unless-stopped
-
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
@@ -140,37 +125,6 @@ services:
       - net.ipv6.conf.all.disable_ipv6=1
     restart: unless-stopped
 
-  # ombi:
-  #   image: "lscr.io/linuxserver/ombi:latest"
-  #   container_name: ombi
-  #   networks:
-  #     - web
-  #   expose:
-  #     - "3579"
-  #   environment:
-  #     <<: *common-env
-  #   volumes:
-  #     - ${SSD_PATH}/media-system/ombi/config:/config
-  #   depends_on:
-  #     - jellyfin
-  #   restart: unless-stopped
-
-  # Media Portal
-  # muximux:
-  #   image: "lscr.io/linuxserver/muximux:latest"
-  #   container_name: muximux
-  #   networks:
-  #     - web
-  #   expose:
-  #     - "8079"
-  #   environment:
-  #     <<: *common-env
-  #   volumes:
-  #     - ${SSD_PATH}/media-system/muximux/config:/config
-  #   depends_on:
-  #     - jellyfin
-  #   restart: unless-stopped
-
   # Subtitles
   bazarr:
     image: "lscr.io/linuxserver/bazarr:latest"
@@ -208,23 +162,6 @@ services:
       - "2202"
       - "2203"
     restart: unless-stopped
-
-  # audiobooks
-  # booksonic:
-  #   image: lscr.io/linuxserver/booksonic
-  #   container_name: booksonic
-  #   networks:
-  #     - web
-  #   environment:
-  #     <<: *common-env
-  #   volumes:
-  #     - ${SSD_PATH}/media-system/booksonic/config:/config
-  #     - ${HDD_PATH}/media-system/libraries/audiobooks:/audiobooks
-  #     - ${HDD_PATH}/media-system/libraries/podcasts:/podcasts
-  #     - ${HDD_PATH}/media-system/libraries/other_audio:/othermedia
-  #   expose:
-  #     - "4040"
-  #   restart: unless-stopped
 
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
