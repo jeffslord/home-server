@@ -1,6 +1,7 @@
 secrets:
   ddns_api_key:
     file: ../../_secrets/ddns_api_key.txt
+
 services:
   cloudflare-ddns:
     image: oznu/cloudflare-ddns:latest

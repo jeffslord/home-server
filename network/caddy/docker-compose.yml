@@ -1,6 +1,7 @@
 networks:
   web:
     external: true
+
 secrets:
   cf_api_token:
     file: ../_secrets/cloudflare_api_token.txt
