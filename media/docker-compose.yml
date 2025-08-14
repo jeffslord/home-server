@@ -1,0 +1,184 @@
+x-common-env: &common-env
+  PUID: ${PUID}
+  PGID: ${PGID}
+  TZ: ${TZ}
+
+networks:
+  web:
+    external: true
+
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    runtime: nvidia
+    networks:
+      - web
+    environment:
+      <<: *common-env
+      JELLYFIN_PublishedServerUrl: "https://jellyfin.jeffslord.com" #optional
+      # NVIDIA_VISIBLE_DEVICES: all
+    volumes:
+      - ${SSD_PATH}/media-system/jellyfin/config:/config
+      - ${SSD_PATH}/media-system/jellyfin/cache:/cache
+      - ${HDD_PATH}/media-system/libraries/shows:/data/tvshows
+      - ${HDD_PATH}/media-system/libraries/movies:/data/movies
+      - ${HDD_PATH}/media-system/libraries/anime:/data/anime
+      - ${HDD_PATH}/media-system/libraries/anime_movies:/data/anime_movies
+    restart: unless-stopped
+    expose:
+      - "8096"
+
+  # Media Organizers
+  sonarr:
+    image: "lscr.io/linuxserver/sonarr:latest"
+    container_name: sonarr
+    networks:
+      - web
+    expose:
+      - "8989"
+    environment:
+      <<: *common-env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${SSD_PATH}/media-system/sonarr/config:/config
+      - ${HDD_PATH}/media-system:/media
+    depends_on:
+      - prowlarr
+      - qbittorrent
+    restart: unless-stopped
+
+  radarr:
+    image: "lscr.io/linuxserver/radarr:latest"
+    container_name: radarr
+    networks:
+      - web
+    expose:
+      - "7878"
+    environment:
+      <<: *common-env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${SSD_PATH}/media-system/radarr/config:/config
+      - ${HDD_PATH}/media-system:/media
+    depends_on:
+      - prowlarr
+      - qbittorrent
+    restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    networks:
+      - web
+    expose:
+      - "8191"
+    environment:
+      <<: *common-env
+      LOG_LEVEL: debug
+      LOG_HTML: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    networks:
+      - web
+    environment:
+      <<: *common-env
+    volumes:
+      - ${SSD_PATH}/media-system/prowlarr/config:/config
+    expose:
+      - "9696"
+    restart: unless-stopped
+
+  qbittorrent:
+    # hostname: qbittorrent.internal
+    container_name: qbittorrent
+    image: ghcr.io/hotio/qbittorrent:latest
+    networks:
+      - web
+    ports:
+      - "8080:8080"
+      - "8118:8118"
+      - "8119:8119"
+    environment:
+      <<: *common-env
+      # - UMASK=002
+      VPN_ENABLED: true
+      VPN_CONF: wg0
+      VPN_PROVIDER: pia
+      VPN_PIA_USER: ${VPN_USER}
+      VPN_PIA_PASS: ${VPN_PASS}
+      VPN_LAN_NETWORK: 192.168.1.0/24
+      VPN_ADDITIONAL_PORTS: 8119/tcp
+      PRIVOXY_ENABLED: false
+    volumes:
+      - ${HDD_PATH}/media-system/downloads:/downloads
+      - ${SSD_PATH}/media-system/qbittorrent/config:/config
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
+    restart: unless-stopped
+
+  # Subtitles
+  bazarr:
+    image: "lscr.io/linuxserver/bazarr:latest"
+    container_name: bazarr
+    networks:
+      - web
+    expose:
+      - "6767"
+    environment:
+      <<: *common-env
+    volumes:
+      - ${SSD_PATH}/media-system/bazarr/config:/config
+      - ${HDD_PATH}/media-system/libraries/shows:/data/tvshows
+      - ${HDD_PATH}/media-system/libraries/movies:/data/movies
+      - ${HDD_PATH}/media-system/libraries/anime:/data/anime
+      - ${HDD_PATH}/media-system/libraries/anime_movies:/data/anime_movies
+    depends_on:
+      - jellyfin
+    restart: unless-stopped
+
+  # ebooks / comics
+  ubooquity:
+    image: lscr.io/linuxserver/ubooquity
+    container_name: ubooquity
+    networks:
+      - web
+    environment:
+      <<: *common-env
+    volumes:
+      - ${SSD_PATH}/media-system/ubooquity/config:/config
+      - ${HDD_PATH}/media-system/libraries/books:/books
+      - ${HDD_PATH}/media-system/libraries/comics:/comics
+      - ${HDD_PATH}/media-system/libraries/raw_files:/filesi
+    expose:
+      - "2202"
+      - "2203"
+    restart: unless-stopped
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    networks:
+      - web
+    environment:
+      <<: *common-env
+      LOG_LEVEL: debug
+    ports:
+      - 5055:5055
+    volumes:
+      - ${SSD_PATH}/media-system/jellyseerr/config:/app/config
+    restart: unless-stopped
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3

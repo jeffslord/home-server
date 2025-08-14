@@ -1,0 +1,20 @@
+networks:
+  web:
+    external: true
+
+services:
+  # groceries
+  grocy:
+    image: linuxserver/grocy
+    container_name: grocy
+    networks:
+      - web
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
+      - ${SSD_PATH}/grocy/config:/config
+    ports:
+      - 9283:80
+    restart: unless-stopped

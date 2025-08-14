@@ -6,4 +6,8 @@
 
 /stash-scraper
 /CommunityScrapers
-/stash
+/private
+
+/_secrets
+/_mnt
+/_storage

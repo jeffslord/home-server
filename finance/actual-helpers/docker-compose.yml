@@ -1,0 +1,13 @@
+networks:
+  web:
+    external: true
+
+version: '3.8'
+
+services:
+  actual-helpers:
+    container_name: actual-helpers
+    image: ghcr.io/psybers/actual-helpers:latest
+    env_file: .env
+    volumes:
+      - ${SSD_PATH}/actual-helpers/cache:/usr/src/app/cache

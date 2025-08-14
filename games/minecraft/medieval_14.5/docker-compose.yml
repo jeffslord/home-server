@@ -38,8 +38,8 @@ services:
       MOTD: "Medieval time"
       MAX_TICK_TIME: -1
     volumes:
-      - ${NVM_BASE_PATH}/games/minecraft/medieval_145:/data
-      - ${NVM_BASE_PATH}/games/minecraft/modpacks:/modpacks
+      - ${SSD_PATH}/games/minecraft/medieval_145:/data
+      - ${SSD_PATH}/games/minecraft/modpacks:/modpacks
     tty: true
     stdin_open: true
     restart: unless-stopped
@@ -59,10 +59,10 @@ services:
       # RCON_HOST: mc
     volumes:
     # mount the same volume used by server, but read-only
-    - ${NVM_BASE_PATH}/games/minecraft/medieval_145:/data:ro
+    - ${SSD_PATH}/games/minecraft/medieval_145:/data:ro
     # use a host attached directory so that it in turn can be backed up
     # to external/cloud storage
-    - ${HDD_BASE_PATH}/games/minecraft/medieval_145/backups:/backups
+    - ${HDD_PATH}/games/minecraft/medieval_145/backups:/backups
     # share network namespace with server to simplify rcon access
     network_mode: "service:minecraft-server"
   
