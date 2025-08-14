@@ -1,1 +1,0 @@
-docker compose -f ~/git/docker-compose-projects/games/minecraft/medieval/docker-compose.yml restart

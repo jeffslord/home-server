@@ -14,8 +14,8 @@ services:
     ports:
       - "25565:25565"
     volumes:
-      - ${NVM_BASE_PATH}/games/minecraft/${MOD_NAME}:/data
-      - ${NVM_BASE_PATH}/games/minecraft/modpacks:/modpacks
+      - ${SSD_PATH}/games/minecraft/${MOD_NAME}:/data
+      - ${SSD_PATH}/games/minecraft/modpacks:/modpacks
     environment:
       EULA: "true"
       TYPE: FABRIC
@@ -82,9 +82,9 @@ services:
       # RCON_HOST: mc
     volumes:
       # mount the same volume used by server, but read-only
-      - ${NVM_BASE_PATH}/games/minecraft/${MOD_NAME}:/data:ro
+      - ${SSD_PATH}/games/minecraft/${MOD_NAME}:/data:ro
       # use a host attached directory so that it in turn can be backed up
       # to external/cloud storage
-      - ${HDD_BASE_PATH}/games/minecraft/${MOD_NAME}/backups:/backups
+      - ${HDD_PATH}/games/minecraft/${MOD_NAME}/backups:/backups
       # share network namespace with server to simplify rcon access
       # network_mode: "service:mc-server"

@@ -20,7 +20,7 @@ services:
       - ${SSD_PATH}/media-system/plex/config/Library/Application Support/Plex Media Server/Logs:/remotelogs/plex:ro
       - ${SSD_PATH}/media-system/jellyfin/config/log:/remotelogs/jellyfin:ro
       - ${SSD_PATH}/media-system/prowlarr/config/logs:/remotelogs/prowlarr:ro
-      # - ${SSD_BASE_PATH}/media-system/:/remotelogs/flaresolverr:ro
+      # - ${SSD_PATH}/media-system/:/remotelogs/flaresolverr:ro
       - ${SSD_PATH}/media-system/qbittorrent/config/data/logs:/remotelogs/qbittorrent:ro
       - ${SSD_PATH}/media-system/ombi/config/Logs:/remotelogs/ombi:ro
       - ${SSD_PATH}/media-system/filebrowswer/config:/remotelogs/filebrowser:ro

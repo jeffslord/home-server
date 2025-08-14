@@ -15,8 +15,8 @@ services:
     ports:
       - "25565:25565"
     volumes:
-      - ${SSD_BASE_PATH}/games/minecraft/cobblemon_bcg:/data
-      - ${SSD_BASE_PATH}/games/minecraft/modpacks:/modpacks
+      - ${SSD_PATH}/games/minecraft/cobblemon_bcg:/data
+      - ${SSD_PATH}/games/minecraft/modpacks:/modpacks
     environment:
       EULA: "TRUE"
       TYPE: FABRIC
@@ -84,9 +84,9 @@ services:
       # RCON_HOST: mc
     volumes:
       # mount the same volume used by server, but read-only
-      - ${SSD_BASE_PATH}/games/minecraft/cobblemon_bcg:/data:ro
+      - ${SSD_PATH}/games/minecraft/cobblemon_bcg:/data:ro
       # use a host attached directory so that it in turn can be backed up
       # to external/cloud storage
-      - ${HDD_BASE_PATH}/games/minecraft/cobblemon_bcg/backups:/backups
+      - ${HDD_PATH}/games/minecraft/cobblemon_bcg/backups:/backups
       # share network namespace with server to simplify rcon access
       # network_mode: "service:mc-server"
