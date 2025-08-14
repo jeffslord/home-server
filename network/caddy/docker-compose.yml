@@ -1,0 +1,31 @@
+networks:
+  web:
+    external: true
+secrets:
+  cf_api_token:
+    file: ../_secrets/cloudflare_api_token.txt
+
+services:
+  caddy:
+    build: ./dns-dockerfile
+    container_name: caddy
+    networks:
+      - web
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      # - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      CF_API_TOKEN: ${CF_API_TOKEN}
+      DOMAIN_NAME: ${DOMAIN_NAME}
+    volumes:
+      - ${SSD_PATH}/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ${SSD_PATH}/caddy/site:/srv
+      - ${SSD_PATH}/caddy/data/:/data
+      - ${SSD_PATH}/caddy/config:/config
+    secrets:
+      - cf_api_token
+    command: sh -c 'export CF_API_TOKEN=$$(cat /run/secrets/cf_api_token) && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile'

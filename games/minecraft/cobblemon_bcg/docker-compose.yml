@@ -7,6 +7,7 @@ networks:
 services:
   mc:
     image: itzg/minecraft-server
+    tty: true
     container_name: mc-server
     restart: unless-stopped
     networks:
@@ -14,12 +15,13 @@ services:
     ports:
       - "25565:25565"
     volumes:
-      - ${NVM_BASE_PATH}/games/minecraft/${MOD_NAME}:/data
-      - ${NVM_BASE_PATH}/games/minecraft/modpacks:/modpacks
+      - ${SSD_BASE_PATH}/games/minecraft/cobblemon_bcg:/data
+      - ${SSD_BASE_PATH}/games/minecraft/modpacks:/modpacks
     environment:
-      EULA: "true"
+      EULA: "TRUE"
       TYPE: FABRIC
       TZ: America/New_York
+      VERSION: "1.20.1"
 
       # Overrides
       REPLACE_ENV_VARIABLES: "true"
@@ -30,8 +32,8 @@ services:
       # CF_FILENAME_MATCHER: 0.4.0
       # CF_API_KEY: ${CF_API_KEY}
       MOD_PLATFORM: "CURSEFORGE"
-      CF_SERVER_MOD: "/modpacks/All of Fabric 7-Server-1.3.2.zip"
-      VERSION: 1.20.1
+      CF_SERVER_MOD: "/modpacks/BCG-2.9.3.zip"
+      # VERSION: 1.20.1
 
       # Resources
       MEMORY: "16G"
@@ -50,13 +52,13 @@ services:
       DIFFICULTY: "normal"
       MODE: survival
       PVP: false
-      LEVEL: attempt_10
+      LEVEL: world_5
       # LEVEL_TYPE: minecraft:amplified
       MAX_PLAYERS: 10
       VIEW_DISTANCE: 20
       SIMULATION_DISTANCE: 10
       ALLOW_FLIGHT: TRUE
-      MOTD: "**UPDATED TO v1.3.2**"
+      MOTD: "**Cobblemon BCG 2.9.3**"
       SPAWN_PROTECTION: 16
       MAX_TICK_TIME: -1
 
@@ -82,9 +84,9 @@ services:
       # RCON_HOST: mc
     volumes:
       # mount the same volume used by server, but read-only
-      - ${NVM_BASE_PATH}/games/minecraft/${MOD_NAME}:/data:ro
+      - ${SSD_BASE_PATH}/games/minecraft/cobblemon_bcg:/data:ro
       # use a host attached directory so that it in turn can be backed up
       # to external/cloud storage
-      - ${HDD_BASE_PATH}/games/minecraft/${MOD_NAME}/backups:/backups
+      - ${HDD_BASE_PATH}/games/minecraft/cobblemon_bcg/backups:/backups
       # share network namespace with server to simplify rcon access
       # network_mode: "service:mc-server"
