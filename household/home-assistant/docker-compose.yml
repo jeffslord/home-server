@@ -14,7 +14,7 @@ services:
       PGID: ${PGID}
       TZ: ${TZ}
     volumes:
-      - ${SSD_BASE_PATH}/home-assistant/data:/config
+      - ${SSD_PATH}/home-assistant/data:/config
     ports:
       - 8123:8123 #optional
     restart: unless-stopped
