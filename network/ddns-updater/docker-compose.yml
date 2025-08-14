@@ -1,10 +1,12 @@
+secrets:
+  ddns_api_key:
+    file: ../../_secrets/ddns_api_key.txt
 services:
   cloudflare-ddns:
     image: oznu/cloudflare-ddns:latest
     container_name: cloudflare-ddns
     restart: always
     environment:
-      # API_KEY: ${DDNS_API_KEY}
       API_KEY_FILE: /run/secrets/ddns_api_key
       ZONE: ${DOMAIN_NAME}
       PROXIED: false
@@ -13,7 +15,3 @@ services:
       TZ: ${TZ}
     secrets:
       - ddns_api_key
-
-secrets:
-  ddns_api_key:
-    file: ../../_secrets/ddns_api_key.txt
