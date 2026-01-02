@@ -18,3 +18,59 @@ services:
     ports:
       - 8123:8123 #optional
     restart: unless-stopped
+
+  zwavejs2mqtt:
+    container_name: zwavejs2mqtt
+    networks:
+      - web
+    image: zwavejs/zwavejs2mqtt:latest
+    restart: always
+    tty: true
+    stop_signal: SIGINT
+    environment:
+      SESSION_SECRET: ${ZWAVEJS2MQTT_SECRET}
+      ZWAVEJS_EXTERNAL_CONFIG: /usr/src/app/store/.config-db
+      # Uncomment if you want log times and dates to match your timezone instead of UTC
+      # Available at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+      #- TZ=America/New_York
+    devices:
+      # Do not use /dev/ttyUSBX serial devices, as those mappings can change over time.
+      # Instead, use the /dev/serial/by-id/X serial device for your Z-Wave stick.
+      - '/dev/serial/by-id/usb-Zooz_800_Z-Wave_Stick_533D004242-if00:/dev/zwave'
+    volumes:
+      - ${SSD_PATH}/home-assistant/zwave2js2mqtt/data:/usr/src/app/store
+    ports:
+      - "8091:8091" # port for web interface
+      - "3001:3000" # port for Z-Wave JS websocket server
+
+  ring-mqtt:
+    networks:
+      - web
+    container_name: ring-mqtt
+    restart: unless-stopped
+    image: tsightler/ring-mqtt
+    ports:
+      - 8554:8554 # Enable RTSP port for external media player access
+    volumes:
+      - ${SSD_PATH}/home-assistant/ring-mqtt/data:/data # Mapping of local folder to provide persistent storage
+    logging:
+      #limit logs to 10m and 3 files
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  mosquitto:
+    networks:
+      - web
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    restart: unless-stopped
+    volumes:
+      - ${SSD_PATH}/home-assistant/mosquitto/config:/mosquitto/config
+      - ${SSD_PATH}/home-assistant/mosquitto/data:/mosquitto/data
+      - ${SSD_PATH}/home-assistant/mosquitto/log:/mosquitto/log
+    ports:
+      - 1883:1883
+      - 9001:9001
+    stdin_open: true
+    tty: true

@@ -1,0 +1,87 @@
+networks:
+  web:
+    external: true
+
+services:
+  mc:
+    image: itzg/minecraft-server:latest
+    pull_policy: daily
+    tty: true
+    stdin_open: true
+    container_name: mc-server
+    restart: unless-stopped
+    networks:
+      - web
+    ports:
+      - "25565:25565"
+    volumes:
+      - ${SSD_PATH}/games/minecraft/cobbleverse:/data
+      - ${SSD_PATH}/games/minecraft/modpacks:/modpacks
+    environment:
+      TZ: America/New_York
+      EULA: TRUE
+      # TYPE: FABRIC
+      MODRINTH_PROJECTS: |
+        cloth-config
+      MODPACK_PLATFORM: "MODRINTH"
+      MODRINTH_MODPACK: https://modrinth.com/modpack/cobbleverse/version/1.7.0c
+
+      # Overrides
+      REPLACE_ENV_VARIABLES: "true"
+      OVERRIDE_SERVER_PROPERTIES: "true"
+
+      # Resources
+      MEMORY: "16G"
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=75"
+
+      # RCON
+      ENABLE_RCON: true
+      RCON_PASSWORD: "testing"
+      RCON_PORT: 28016
+
+      # Server Properties
+      ENABLE_ROLLING_LOGS: true
+      SERVER_NAME: It's minecraft time
+      OPS: |
+        jeoffrey
+      DIFFICULTY: "normal"
+      MODE: survival
+      PVP: false
+      LEVEL: world_1
+      # LEVEL_TYPE: minecraft:amplified
+      MAX_PLAYERS: 10
+      VIEW_DISTANCE: 32
+      SIMULATION_DISTANCE: 10
+      ALLOW_FLIGHT: TRUE
+      MOTD: "**COBBLEVERSE 1.7.0c**"
+      SPAWN_PROTECTION: 16
+      MAX_TICK_TIME: -1
+
+      # Autopause
+      ENABLE_AUTOPAUSE: TRUE
+      AUTOPAUSE_TIMEOUT_EST: 360
+      AUTOPAUSE_TIMEOUT_INIT: 360
+
+  minecraft-backup:
+    image: itzg/mc-backup
+    container_name: mc-backup
+    restart: unless-stopped
+    networks:
+      - web
+    environment:
+      TZ: America/New_York
+      RCON_HOST: mc-server
+      RCON_PORT: 28016
+      RCON_PASSWORD: "testing"
+      BACKUP_INTERVAL: "6h"
+      PRUNE_BACKUPS_DAYS: 4
+      # instead of network_mode below, could declare RCON_HOST
+      # RCON_HOST: mc
+    volumes:
+      # mount the same volume used by server, but read-only
+      - ${SSD_PATH}/games/minecraft/cobbleverse:/data:ro
+      # use a host attached directory so that it in turn can be backed up
+      # to external/cloud storage
+      - ${HDD_PATH}/backup/games/minecraft/cobbleverse/1.7.0c:/backups
+      # share network namespace with server to simplify rcon access
+      # network_mode: "service:mc-server"

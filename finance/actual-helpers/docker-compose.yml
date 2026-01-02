@@ -2,8 +2,6 @@ networks:
   web:
     external: true
 
-version: '3.8'
-
 services:
   actual-helpers:
     container_name: actual-helpers
@@ -11,3 +9,6 @@ services:
     env_file: .env
     volumes:
       - ${SSD_PATH}/actual-helpers/cache:/usr/src/app/cache
+    environment:
+      - PUID=1000
+      - PGID=1000

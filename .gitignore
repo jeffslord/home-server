@@ -1,13 +1,6 @@
 *.env
-/media-system/nginx/cache
-/ddclient/config
-/invoice/docker
-/invoice/env
+!env_template.env
 
-/stash-scraper
-/CommunityScrapers
 /private
-
 /_secrets
-/_mnt
 /_storage

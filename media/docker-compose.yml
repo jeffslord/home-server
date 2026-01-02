@@ -11,20 +11,21 @@ services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
-    runtime: nvidia
     networks:
       - web
+    gpus: all
     environment:
       <<: *common-env
       JELLYFIN_PublishedServerUrl: "https://jellyfin.jeffslord.com" #optional
-      # NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,video,utility
     volumes:
       - ${SSD_PATH}/media-system/jellyfin/config:/config
       - ${SSD_PATH}/media-system/jellyfin/cache:/cache
-      - ${HDD_PATH}/media-system/libraries/shows:/data/tvshows
-      - ${HDD_PATH}/media-system/libraries/movies:/data/movies
-      - ${HDD_PATH}/media-system/libraries/anime:/data/anime
-      - ${HDD_PATH}/media-system/libraries/anime_movies:/data/anime_movies
+      - ${HDD_PATH}/media/libraries/shows:/data/tvshows
+      - ${HDD_PATH}/media/libraries/movies:/data/movies
+      - ${HDD_PATH}/media/libraries/anime:/data/anime
+      - ${HDD_PATH}/media/libraries/anime_movies:/data/anime_movies
     restart: unless-stopped
     expose:
       - "8096"
@@ -42,10 +43,9 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${SSD_PATH}/media-system/sonarr/config:/config
-      - ${HDD_PATH}/media-system:/media
+      - ${HDD_PATH}/media:/media
     depends_on:
       - prowlarr
-      - qbittorrent
     restart: unless-stopped
 
   radarr:
@@ -60,10 +60,9 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${SSD_PATH}/media-system/radarr/config:/config
-      - ${HDD_PATH}/media-system:/media
+      - ${HDD_PATH}/media:/media
     depends_on:
       - prowlarr
-      - qbittorrent
     restart: unless-stopped
 
   flaresolverr:
@@ -94,35 +93,39 @@ services:
       - "9696"
     restart: unless-stopped
 
-  qbittorrent:
-    # hostname: qbittorrent.internal
-    container_name: qbittorrent
-    image: ghcr.io/hotio/qbittorrent:latest
+  sabnzbdvpn:
+    image: binhex/arch-sabnzbdvpn:latest
+    container_name: sabnzbdvpn
     networks:
       - web
-    ports:
-      - "8080:8080"
-      - "8118:8118"
-      - "8119:8119"
-    environment:
-      <<: *common-env
-      # - UMASK=002
-      VPN_ENABLED: true
-      VPN_CONF: wg0
-      VPN_PROVIDER: pia
-      VPN_PIA_USER: ${VPN_USER}
-      VPN_PIA_PASS: ${VPN_PASS}
-      VPN_LAN_NETWORK: 192.168.1.0/24
-      VPN_ADDITIONAL_PORTS: 8119/tcp
-      PRIVOXY_ENABLED: false
-    volumes:
-      - ${HDD_PATH}/media-system/downloads:/downloads
-      - ${SSD_PATH}/media-system/qbittorrent/config:/config
-    cap_add:
-      - NET_ADMIN
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.all.disable_ipv6=1
+    privileged: true
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+      - "8118:8118"
+      - "9118:9118"
+      - "58946:58946"
+      - "58946:58946/udp"
+    environment:
+      <<: *common-env
+      VPN_ENABLED: true
+      VPN_CLIENT: wireguard
+      VPN_PROV: pia
+      VPN_USER: ${VPN_USER}
+      VPN_PASS: ${VPN_PASS}
+      ENABLE_PRIVOXY: true
+      STRICT_PORT_FORWARD: true
+      ENABLE_SOCKS: true
+      SOCKS_USER: ${VPN_USER}
+      SOCKS_PASS: ${VPN_PASS}
+      LAN_NETWORK: 192.168.1.0/24
+      NAME_SERVERS: 1.1.1.1,1.0.0.1
+    volumes:
+      - ${HDD_PATH}/media:/data
+      - ${HDD_PATH}/media:/media
+      - ${SSD_PATH}/media-system/sabnzbdvpn/config:/config
     restart: unless-stopped
 
   # Subtitles
@@ -137,30 +140,12 @@ services:
       <<: *common-env
     volumes:
       - ${SSD_PATH}/media-system/bazarr/config:/config
-      - ${HDD_PATH}/media-system/libraries/shows:/data/tvshows
-      - ${HDD_PATH}/media-system/libraries/movies:/data/movies
-      - ${HDD_PATH}/media-system/libraries/anime:/data/anime
-      - ${HDD_PATH}/media-system/libraries/anime_movies:/data/anime_movies
+      - ${HDD_PATH}/media/libraries/shows:/data/tvshows
+      - ${HDD_PATH}/media/libraries/movies:/data/movies
+      - ${HDD_PATH}/media/libraries/anime:/data/anime
+      - ${HDD_PATH}/media/libraries/anime_movies:/data/anime_movies
     depends_on:
       - jellyfin
-    restart: unless-stopped
-
-  # ebooks / comics
-  ubooquity:
-    image: lscr.io/linuxserver/ubooquity
-    container_name: ubooquity
-    networks:
-      - web
-    environment:
-      <<: *common-env
-    volumes:
-      - ${SSD_PATH}/media-system/ubooquity/config:/config
-      - ${HDD_PATH}/media-system/libraries/books:/books
-      - ${HDD_PATH}/media-system/libraries/comics:/comics
-      - ${HDD_PATH}/media-system/libraries/raw_files:/filesi
-    expose:
-      - "2202"
-      - "2203"
     restart: unless-stopped
 
   jellyseerr:
