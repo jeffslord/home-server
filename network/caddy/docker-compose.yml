@@ -4,7 +4,7 @@ networks:
 
 secrets:
   cf_api_token:
-    file: ../_secrets/cloudflare_api_token.txt
+    file: ../../_secrets/cloudflare_api_token.txt
 
 services:
   caddy:
