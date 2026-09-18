@@ -67,6 +67,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${SSD_PATH}/home-assistant/mosquitto/config:/mosquitto/config
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro # pwfile stays in the volume
       - ${SSD_PATH}/home-assistant/mosquitto/data:/mosquitto/data
       - ${SSD_PATH}/home-assistant/mosquitto/log:/mosquitto/log
     ports:

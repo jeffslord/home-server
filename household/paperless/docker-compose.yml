@@ -65,4 +65,4 @@ services:
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
-      PAPERLESS_URL: https://paperless.jeffslord.com
+      PAPERLESS_URL: https://paperless.${DOMAIN_NAME}
