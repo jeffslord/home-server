@@ -1,0 +1,27 @@
+x-common-env: &common-env
+  PUID: ${PUID}
+  PGID: ${PGID}
+  TZ: ${TZ}
+
+networks:
+  web:
+    external: true
+
+services:
+  vintagestory:
+    image: zsuatem/vintagestory:1.21.6
+    container_name: vintagestory
+    restart: unless-stopped
+    group_add:
+      - tty
+    ports:
+      - 42420:42420/tcp
+      - 42420:42420/udp
+      - 42425:42425
+    volumes:
+      - ${SSD_PATH}/games/vintagestory/data:/vintagestory/data
+    stdin_open: true
+    tty: true
+    # Optional: Set custom user/group IDs
+    environment:
+      <<: *common-env

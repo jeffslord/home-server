@@ -1,0 +1,37 @@
+x-common-env: &common-env
+  PUID: ${PUID}
+  PGID: ${PGID}
+  TZ: ${TZ}
+
+networks:
+  web:
+    external: true
+
+services:
+  space-engineers:
+    image: devidian/spaceengineers:latest
+    container_name: space-engineers
+    restart: unless-stopped
+    ports:
+      - target: 27016
+        published: 27016
+        protocol: udp
+        mode: host
+    volumes:
+      - ${SSD_PATH}/games/space-engineers/plugins:/appdata/space-engineers/plugins
+      - ${SSD_PATH}/games/space-engineers/instances:/appdata/space-engineers/instances
+      - ${SSD_PATH}/games/space-engineers/SpaceEngineersDedicated:/appdata/space-engineers/SpaceEngineersDedicated
+      - ${SSD_PATH}/games/space-engineers/steamcmd:/root/.steam
+    environment:
+      <<: *common-env
+      WINEDEBUG: -all
+      INSTANCE_NAME: ${SE_INSTANCE_NAME}
+      PUBLIC_IP: ${SE_PUBLIC_IP}
+    # The image's healthcheck asks Steam for servers at $PUBLIC_IP, which goes
+    # stale when the ISP changes the address. Look the IP up at check time instead.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s \"https://api.steampowered.com/ISteamApps/GetServersAtAddress/v1?addr=$(curl -s --max-time 5 https://api.ipify.org)\" | grep -q 'Space Engineers'"]
+      interval: 60s
+      timeout: 30s
+      start_period: 10m
+      retries: 3
