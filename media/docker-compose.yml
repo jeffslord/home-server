@@ -16,7 +16,7 @@ services:
     gpus: all
     environment:
       <<: *common-env
-      JELLYFIN_PublishedServerUrl: "https://jellyfin.jeffslord.com" #optional
+      JELLYFIN_PublishedServerUrl: "https://jellyfin.${DOMAIN_NAME}" #optional
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,video,utility
     volumes:
@@ -120,12 +120,40 @@ services:
       ENABLE_SOCKS: true
       SOCKS_USER: ${VPN_USER}
       SOCKS_PASS: ${VPN_PASS}
-      LAN_NETWORK: 192.168.1.0/24
+      LAN_NETWORK: ${LAN_NETWORK}
       NAME_SERVERS: 1.1.1.1,1.0.0.1
     volumes:
       - ${HDD_PATH}/media:/data
       - ${HDD_PATH}/media:/media
       - ${SSD_PATH}/media-system/sabnzbdvpn/config:/config
+    restart: unless-stopped
+
+  qbittorrentvpn:
+    image: ghcr.io/hotio/qbittorrent:latest
+    container_name: qbittorrentvpn
+    networks:
+      - web
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    ports:
+      - "8095:8080"
+    environment:
+      <<: *common-env
+      VPN_ENABLED: "true"
+      VPN_TYPE: wireguard
+      VPN_PROVIDER: pia
+      VPN_PIA_USER: ${VPN_USER}
+      VPN_PIA_PASS: ${VPN_PASS}
+      VPN_LAN_NETWORK: ${LAN_NETWORK}
+    volumes:
+      - ${SSD_PATH}/media-system/qbittorrent/config:/config
+      - ${HDD_PATH}/media:/media
+      - ${HDD_PATH}/stash/downloads:/stash-downloads
     restart: unless-stopped
 
   # Subtitles
@@ -148,9 +176,10 @@ services:
       - jellyfin
     restart: unless-stopped
 
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    init: true
     networks:
       - web
     environment:
