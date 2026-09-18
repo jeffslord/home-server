@@ -1,0 +1,42 @@
+groups:
+  - name: blackbox
+    rules:
+      - alert: ServiceDown
+        expr: probe_success{job="blackbox-internal"} == 0
+        for: 3m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.service }} is down"
+          description: "Internal probe of {{ $labels.instance }} failing for 3m."
+
+      - alert: EndpointDown
+        expr: probe_success{job="blackbox-external"} == 0 and on(service) probe_success{job="blackbox-internal"} == 1
+        for: 3m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.service }} unreachable via {{ $labels.instance }}"
+          description: "The app is up internally but the public route is failing: DNS, Caddy, Authentik or the router."
+
+      - alert: HostUnreachable
+        expr: probe_success{job="blackbox-icmp"} == 0
+        for: 3m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.instance }} not answering ping"
+          description: "Router / NAS / internet reachability probe failing."
+
+      - alert: TlsCertExpiringSoon
+        expr: (probe_ssl_earliest_cert_expiry{job="blackbox-external"} - time()) / 86400 < 14
+        for: 1h
+        labels: { severity: warning }
+        annotations:
+          summary: "TLS cert for {{ $labels.service }} expires in {{ $value | printf \"%.0f\" }} days"
+          description: "Caddy should renew automatically; check `docker logs caddy` for ACME errors."
+
+      - alert: SlowEndpoint
+        expr: probe_duration_seconds{job=~"blackbox-.*"} > 5
+        for: 10m
+        labels: { severity: info }
+        annotations:
+          summary: "{{ $labels.instance }} taking over 5s to respond"
+          description: "Probe duration {{ $value | humanizeDuration }}."

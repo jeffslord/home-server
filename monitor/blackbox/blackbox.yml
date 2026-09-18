@@ -1,0 +1,29 @@
+modules:
+  # Internal probe: follow redirects (login pages etc.) and expect a 2xx at the end.
+  http_2xx:
+    prober: http
+    timeout: 10s
+    http:
+      preferred_ip_protocol: ip4
+      follow_redirects: true
+
+  # External probe through Caddy. Don't follow redirects so the TLS handshake
+  # (and cert expiry) is measured against the requested host, and so
+  # Authentik's 302-to-login counts as "up".
+  http_external:
+    prober: http
+    timeout: 10s
+    http:
+      preferred_ip_protocol: ip4
+      follow_redirects: false
+      valid_status_codes: [200, 301, 302, 303, 307, 308]
+
+  icmp:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: ip4
+
+  tcp_connect:
+    prober: tcp
+    timeout: 5s

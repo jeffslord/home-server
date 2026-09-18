@@ -1,0 +1,125 @@
+// Ships every container's stdout/stderr plus the host journal to Loki.
+
+// ---- Docker containers -------------------------------------------------------
+discovery.docker "containers" {
+  host             = "unix:///var/run/docker.sock"
+  refresh_interval = "15s"
+}
+
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    target_label  = "project"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_image"]
+    regex         = "([^@:]+).*" // strip tag / digest
+    target_label  = "image"
+  }
+}
+
+loki.source.docker "containers" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.relabel.containers.output
+  relabel_rules = discovery.relabel.containers.rules
+  labels        = { host = "homeserver", job = "docker" }
+  forward_to    = [loki.process.containers.receiver]
+}
+
+// Best-effort severity label so you can filter {level="error"} across everything.
+loki.process "containers" {
+  stage.regex {
+    expression = `(?i)(?P<level>\b(trace|debug|info|warn(?:ing)?|error|fatal|panic|critical)\b)`
+  }
+  stage.template {
+    source   = "level"
+    template = `{{ if .Value }}{{ .Value | ToLower | regexReplaceAll "warning" "warn" }}{{ end }}`
+  }
+  stage.labels {
+    values = { level = "" }
+  }
+  forward_to = [loki.process.redact.receiver]
+}
+
+// ---- Redaction ---------------------------------------------------------------
+// Some images echo their configuration at startup in cleartext -- binhex's VPN
+// containers print "VPN_PASS defined as '<password>'" on every boot. Without this
+// the credential is indexed in Loki and readable from Grafana for the full 30d
+// retention. Scrub known shapes before anything reaches the sink; both the docker
+// and journal pipelines pass through here.
+loki.process "redact" {
+  // "VPN_PASS defined as 'secret'" (binhex), and the SOCKS/PIA variants
+  stage.replace {
+    expression = `(?i)(?:VPN_PASS|VPN_USER|VPN_PIA_PASS|VPN_PIA_USER|SOCKS_PASS|SOCKS_USER)\s+defined as\s+'([^']*)'`
+    replace    = "<redacted>"
+  }
+
+  // generic key=value / key: value credential shapes
+  stage.replace {
+    expression = `(?i)(?:password|passwd|api[_-]?key|secret|token)"?\s*[:=]\s*"?([^\s"',;}]+)`
+    replace    = "<redacted>"
+  }
+
+  // Cloudflare prefixed API tokens, wherever they appear
+  stage.replace {
+    expression = `(cfat_[A-Za-z0-9_-]{10,})`
+    replace    = "<redacted>"
+  }
+
+  forward_to = [loki.write.local.receiver]
+}
+
+// ---- Host journal (kernel, systemd, NFS, OOM killer, sshd, ...) --------------
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    target_label = "job" // the source would otherwise set job=loki.source.journal.host
+    replacement  = "journal"
+  }
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    regex         = "warning"
+    replacement   = "warn"
+    target_label  = "level"
+  }
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    regex         = "(emerg|alert|crit|err|notice|info|debug)"
+    target_label  = "level"
+  }
+  rule {
+    source_labels = ["__journal__transport"]
+    target_label  = "transport"
+  }
+}
+
+loki.source.journal "host" {
+  path          = "/var/log/journal"
+  max_age       = "12h"
+  labels        = { host = "homeserver", job = "journal" }
+  relabel_rules = loki.relabel.journal.rules
+  forward_to    = [loki.process.redact.receiver]
+}
+
+// ---- Sink --------------------------------------------------------------------
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

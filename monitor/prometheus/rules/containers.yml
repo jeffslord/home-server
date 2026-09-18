@@ -1,0 +1,58 @@
+groups:
+  - name: containers
+    rules:
+      - alert: ContainerRestarting
+        expr: increase(docker_container_restart_count[15m]) > 2
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.name }} is restart-looping"
+          description: "dockerd restarted {{ $labels.name }} {{ $value | printf \"%.0f\" }} times in 15m. Check `docker logs {{ $labels.name }}`."
+
+      - alert: ContainerUnhealthy
+        expr: docker_container_healthy == 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.name }} healthcheck failing"
+          description: "Docker reports {{ $labels.name }} unhealthy for 5m. See `docker inspect {{ $labels.name }}` under State.Health."
+
+      - alert: ContainerNotRunning
+        expr: docker_container_state{state!="running"} == 1
+        for: 15m
+        labels: { severity: info }
+        annotations:
+          summary: "{{ $labels.name }} is {{ $labels.state }}"
+          description: "Fine if you stopped it on purpose. `docker compose down` removes containers and won't trigger this."
+
+      - alert: ContainerOomKilled
+        expr: increase(container_oom_events_total{name!=""}[10m]) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.name }} was OOM-killed"
+          description: "The kernel killed a process in {{ $labels.name }} for exceeding its memory limit."
+
+      - alert: ContainerNearMemoryLimit
+        expr: |
+          container_memory_working_set_bytes{name!=""}
+            / container_spec_memory_limit_bytes{name!=""} > 0.90
+          and container_spec_memory_limit_bytes{name!=""} > 0 # 0 = no limit set
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.name }} above 90% of its memory limit"
+          description: "{{ $value | humanizePercentage }} of the configured limit."
+
+      # Infra containers that everything else depends on. cAdvisor simply stops
+      # reporting a container that is gone, so absent() is the only way to notice.
+      - alert: InfraContainerGone
+        expr: |
+          absent(container_last_seen{name="caddy"})
+            or absent(container_last_seen{name="adguardhome"})
+            or absent(container_last_seen{name="authentik-server"})
+            or absent(container_last_seen{name="authentik-worker"})
+            or absent(container_last_seen{name="home-assistant"})
+        for: 3m
+        labels: { severity: critical }
+        annotations:
+          summary: "An infrastructure container is missing"
+          description: "One of caddy / adguardhome / authentik / home-assistant is not running. `docker ps -a` to see which."
