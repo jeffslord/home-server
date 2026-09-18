@@ -1,0 +1,173 @@
+# Routes for every web-facing service. DOMAIN_NAME and ACME_EMAIL come from the
+# container environment (see docker-compose.yml / .env); CF_API_TOKEN from _secrets/cloudflare_api_token.txt.
+#
+# After editing:  docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+{
+	email {$ACME_EMAIL}
+	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+	log
+}
+
+(forward_auth_authentik) {
+	forward_auth authentik-server:9000 {
+		uri /outpost.goauthentik.io/auth/caddy
+		copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Email X-Authentik-Uid
+		trusted_proxies private_ranges
+	}
+}
+
+auth.{$DOMAIN_NAME} {
+	redir https://authentik.{$DOMAIN_NAME}{uri}
+}
+
+*.{$DOMAIN_NAME} {
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+
+	# Authentik outpost callback - must be reachable without auth on all subdomains
+	@outpost path /outpost.goauthentik.io/*
+	handle @outpost {
+		reverse_proxy authentik-server:9000
+	}
+
+	#
+	# OPEN TO ALL (each has its own login)
+	#
+	@authentik host authentik.{$DOMAIN_NAME}
+	handle @authentik {
+		reverse_proxy authentik-server:9000
+	}
+
+	@jellyfin host jellyfin.{$DOMAIN_NAME}
+	handle @jellyfin {
+		reverse_proxy jellyfin:8096
+	}
+
+	@open-webui host open-webui.{$DOMAIN_NAME}
+	handle @open-webui {
+		reverse_proxy open-webui:8080
+	}
+
+	@ollama host ollama.{$DOMAIN_NAME}
+	handle @ollama {
+		reverse_proxy ollama:11434
+	}
+
+	@home-assistant host ha.{$DOMAIN_NAME}
+	handle @home-assistant {
+		reverse_proxy home-assistant:8123
+	}
+
+	# ntfy uses its own user auth (the phone app can't do an Authentik login flow)
+	@ntfy host ntfy.{$DOMAIN_NAME}
+	handle @ntfy {
+		reverse_proxy ntfy:80
+	}
+
+	#
+	# AUTHENTIK PROTECTED
+	#
+	@actual host actual.{$DOMAIN_NAME}
+	handle @actual {
+		import forward_auth_authentik
+		reverse_proxy actual-budget:5006
+	}
+
+	@grocy host grocy.{$DOMAIN_NAME}
+	handle @grocy {
+		import forward_auth_authentik
+		reverse_proxy grocy
+	}
+
+	@mealie host mealie.{$DOMAIN_NAME}
+	handle @mealie {
+		import forward_auth_authentik
+		reverse_proxy mealie:9000
+	}
+
+	@paperless host paperless.{$DOMAIN_NAME}
+	handle @paperless {
+		import forward_auth_authentik
+		reverse_proxy paperless:8000
+	}
+
+	@sonarr host sonarr.{$DOMAIN_NAME}
+	handle @sonarr {
+		import forward_auth_authentik
+		reverse_proxy sonarr:8989
+	}
+
+	@radarr host radarr.{$DOMAIN_NAME}
+	handle @radarr {
+		import forward_auth_authentik
+		reverse_proxy radarr:7878
+	}
+
+	@bazarr host bazarr.{$DOMAIN_NAME}
+	handle @bazarr {
+		import forward_auth_authentik
+		reverse_proxy bazarr:6767
+	}
+
+	@prowlarr host prowlarr.{$DOMAIN_NAME}
+	handle @prowlarr {
+		import forward_auth_authentik
+		reverse_proxy prowlarr:9696
+	}
+
+	@flaresolverr host flaresolverr.{$DOMAIN_NAME}
+	handle @flaresolverr {
+		import forward_auth_authentik
+		reverse_proxy flaresolverr:8191
+	}
+
+	@seerr host seerr.{$DOMAIN_NAME}
+	handle @seerr {
+		import forward_auth_authentik
+		reverse_proxy seerr:5055
+	}
+
+	@qbittorrent host qbittorrent.{$DOMAIN_NAME}
+	handle @qbittorrent {
+		import forward_auth_authentik
+		reverse_proxy qbittorrentvpn:8080
+	}
+
+	@sabnzbdvpn host sabnzbdvpn.{$DOMAIN_NAME}
+	handle @sabnzbdvpn {
+		import forward_auth_authentik
+		reverse_proxy sabnzbdvpn:8080
+	}
+
+	@grafana host grafana.{$DOMAIN_NAME}
+	handle @grafana {
+		import forward_auth_authentik
+		reverse_proxy grafana:3000
+	}
+
+	@dockhand host dockhand.{$DOMAIN_NAME}
+	handle @dockhand {
+		import forward_auth_authentik
+		reverse_proxy dockhand:3000
+	}
+
+	# Game servers speak their own TCP protocol, not HTTP; these only matter if a
+	# web map / RCON UI is added in front of them.
+	@mc-server host mc-server.{$DOMAIN_NAME}
+	handle @mc-server {
+		import forward_auth_authentik
+		reverse_proxy mc-server:25565
+	}
+
+	@vintagestory host vintagestory.{$DOMAIN_NAME}
+	handle @vintagestory {
+		import forward_auth_authentik
+		reverse_proxy vintagestory:42420
+	}
+
+	# Anything else under *.{$DOMAIN_NAME}: no such service.
+	handle {
+		respond "no such service" 404
+	}
+}
