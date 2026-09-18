@@ -1,66 +1,230 @@
-volumes:
-  prometheus_data: {}
-  grafana_data: {}
-
 networks:
   monitoring:
     driver: bridge
   web:
     external: true
 
+volumes:
+  docker_textfile: {} # docker-state writes, node-exporter reads
+
+secrets:
+  ntfy_alertmanager_password:
+    file: ../_secrets/ntfy_alertmanager_password.txt
+
+# Blackbox targets that need DOMAIN_NAME. Compose interpolates ${DOMAIN_NAME}
+# here (it can't inside a bind-mounted file), so the domain stays out of git.
+configs:
+  blackbox_external_targets:
+    content: |
+      # Probed through Caddy from the outside: DNS -> public IP -> Caddy -> Authentik.
+      # Authentik-protected hosts answer 302; the http_external module accepts that.
+      - labels: { group: public }
+        targets:
+          - https://authentik.${DOMAIN_NAME}
+          - https://jellyfin.${DOMAIN_NAME}
+          - https://open-webui.${DOMAIN_NAME}
+          - https://ollama.${DOMAIN_NAME}
+          - https://ha.${DOMAIN_NAME}
+      - labels: { group: authentik }
+        targets:
+          - https://actual.${DOMAIN_NAME}
+          - https://grocy.${DOMAIN_NAME}
+          - https://sonarr.${DOMAIN_NAME}
+          - https://radarr.${DOMAIN_NAME}
+          - https://prowlarr.${DOMAIN_NAME}
+          - https://bazarr.${DOMAIN_NAME}
+          - https://qbittorrent.${DOMAIN_NAME}
+          - https://sabnzbdvpn.${DOMAIN_NAME}
+          - https://flaresolverr.${DOMAIN_NAME}
+          - https://seerr.${DOMAIN_NAME}
+          - https://paperless.${DOMAIN_NAME}
+          - https://dockhand.${DOMAIN_NAME}
+          - https://grafana.${DOMAIN_NAME}
+
 services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ${SSD_PATH}/monitor/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
       - ${SSD_PATH}/monitor/prometheus/data:/prometheus
+    configs:
+      - source: blackbox_external_targets
+        target: /etc/prometheus/targets/blackbox_external.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      # - '--alertmanager.url=http://alertmanager:9093'
-      # - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      # - '--web.console.templates=/usr/share/prometheus/consoles'
-      # - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.retention.size=15GB'
+      - '--web.enable-lifecycle' # curl -X POST localhost:9092/-/reload after editing config
+      - '--web.external-url=http://${SERVER_LAN_IP}:9092' # makes "Source" links in alerts clickable
     ports:
       - "9092:9090"
     networks:
       - monitoring
+      - web # so it can scrape exporters that live on the app network
     restart: unless-stopped
-    links:
-      - cadvisor:cadvisor
-      - node-exporter:node-exporter
 
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
+    pid: host
     volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
+      - /:/host:ro,rslave # rslave so the NFS automounts under /mnt/nas show up
+      - docker_textfile:/textfile:ro
     command:
+      - '--path.rootfs=/host'
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)'
+      - '--collector.textfile.directory=/textfile'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|run|var/lib/docker/.+|snap/.+)($|/)'
     ports:
-      - "9100:9100"
+      - "127.0.0.1:9100:9100"
     networks:
       - monitoring
+    restart: unless-stopped
+
+  # Restart count / state / health per container. See docker-state/collect.sh.
+  docker-state:
+    image: docker:cli
+    container_name: docker-state
+    entrypoint: /collect.sh
+    volumes:
+      - ./docker-state/collect.sh:/collect.sh:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - docker_textfile:/textfile
+    network_mode: none
     restart: unless-stopped
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:rw
+      - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
+    command:
+      - '--docker_only=true'
+      - '--housekeeping_interval=30s'
+      - '--store_container_labels=false'
     ports:
-      - "8082:8080"
+      - "127.0.0.1:8082:8080"
     networks:
       - monitoring
+    restart: unless-stopped
+
+  nvidia-gpu-exporter:
+    image: utkuozdemir/nvidia_gpu_exporter:latest
+    container_name: nvidia-gpu-exporter
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  blackbox:
+    image: prom/blackbox-exporter:latest
+    container_name: blackbox
+    cap_add:
+      - NET_RAW # icmp probes
+    command:
+      - '--config.file=/etc/blackbox_exporter/config.yml'
+      - '--log.prober=error' # otherwise every 302 from Authentik is logged as a warning, 4x/min/host
+    volumes:
+      - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    networks:
+      - monitoring
+      - web # internal probes hit containers by name on the app network
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    volumes:
+      - ./alertmanager/config.yml:/etc/alertmanager/config.yml:ro
+      - ${SSD_PATH}/monitor/alertmanager/data:/alertmanager
+    secrets:
+      - ntfy_alertmanager_password
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+      - '--data.retention=240h'
+    ports:
+      - "127.0.0.1:9093:9093"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: ntfy
+    command: serve
+    environment:
+      TZ: ${TZ}
+      NTFY_BASE_URL: https://ntfy.${DOMAIN_NAME}
+      NTFY_BEHIND_PROXY: "true"
+      NTFY_CACHE_FILE: /var/cache/ntfy/cache.db
+      NTFY_AUTH_FILE: /var/lib/ntfy/user.db
+      NTFY_AUTH_DEFAULT_ACCESS: deny-all
+      NTFY_ATTACHMENT_CACHE_DIR: /var/cache/ntfy/attachments
+      NTFY_ENABLE_LOGIN: "true"
+      NTFY_LOG_LEVEL: ${NTFY_LOG_LEVEL:-info} # set NTFY_LOG_LEVEL=debug in .env to see every request
+      NTFY_TEMPLATE_DIR: /etc/ntfy/templates
+    volumes:
+      - ./ntfy/templates:/etc/ntfy/templates:ro
+      - ${SSD_PATH}/monitor/ntfy/cache:/var/cache/ntfy
+      - ${SSD_PATH}/monitor/ntfy/data:/var/lib/ntfy
+    networks:
+      - monitoring
+      - web # reached via ntfy.${DOMAIN_NAME} through Caddy (no forward_auth; ntfy has its own users)
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    user: "${PUID}:${PGID}"
+    command: -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml:ro
+      - ${SSD_PATH}/monitor/loki:/loki
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  # Log shipper: tails every container via the docker socket + the host journal.
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    user: root # docker socket + /var/log/journal
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - ${SSD_PATH}/monitor/alloy:/var/lib/alloy/data
+    ports:
+      - "127.0.0.1:12345:12345" # Alloy debug UI: pipeline graph + live target list
+    networks:
+      - monitoring
+    depends_on:
+      - loki
     restart: unless-stopped
 
   grafana:
@@ -68,40 +232,15 @@ services:
     container_name: grafana
     volumes:
       - ${SSD_PATH}/monitor/grafana:/var/lib/grafana
-      - ${SSD_PATH}/monitor/grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD} # only applied on first start; change existing via UI
       - GF_USERS_ALLOW_SIGN_UP=false
-    ports:
-      - "3002:3000"
+      - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN_NAME}
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/dashboards/home.json
     networks:
       - monitoring
+      - web # reached via grafana.${DOMAIN_NAME} through Caddy + Authentik
     restart: unless-stopped
-
-  alertmanager:
-    image: prom/alertmanager:latest
-    container_name: alertmanager
-    volumes:
-      - ${SSD_PATH}/monitor/alertmanager:/etc/alertmanager
-    command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
-    ports:
-      - "9093:9093"
-    networks:
-      - monitoring
-    restart: unless-stopped
-
-  mc-monitor:
-    image: itzg/mc-monitor
-    container_name: mc-monitor
-    command: export-for-prometheus
-    environment:
-      EXPORT_SERVERS: mc
-      DEBUG: "true"
-    ports:
-      - 8012:8080
-    networks:
-      - web
-      - monitoring

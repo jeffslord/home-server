@@ -1,0 +1,33 @@
+# ntfy named template for Alertmanager webhooks. Used via ?template=homeserver
+# Alertmanager groups by alertname, so severity is the same across .alerts.
+title: |
+  {{- $a := first .alerts -}}
+  {{- if eq .status "firing" -}}
+    {{ if eq $a.labels.severity "critical" }}🔴{{ else if eq $a.labels.severity "warning" }}🟠{{ else }}ℹ️{{ end }} {{ $a.labels.alertname }}
+  {{- else -}}
+    ✅ Resolved: {{ $a.labels.alertname }}
+  {{- end -}}
+
+priority: |
+  {{- $a := first .alerts -}}
+  {{- if ne .status "firing" }}2
+  {{- else if eq $a.labels.severity "critical" }}5
+  {{- else if eq $a.labels.severity "warning" }}4
+  {{- else }}2
+  {{- end -}}
+
+message: |
+  {{- range $i, $a := .alerts }}
+  {{- if $i }}
+
+  {{ end -}}
+  {{ $a.annotations.summary | default $a.labels.alertname }}
+  {{- with $a.annotations.description }}
+  {{ . }}{{ end }}
+  {{- with $a.labels.name }}
+  container: {{ . }}{{ end }}
+  {{- with $a.labels.service }}
+  service: {{ . }}{{ end }}
+  {{- with $a.labels.mountpoint }}
+  mount: {{ . }}{{ end }}
+  {{- end }}

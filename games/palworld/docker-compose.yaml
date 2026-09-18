@@ -1,0 +1,42 @@
+x-common-env: &common-env
+  PUID: ${PUID}
+  PGID: ${PGID}
+  TZ: ${TZ}
+
+networks:
+  web:
+    external: true
+
+services:
+  palworld:
+    image: thijsvanloef/palworld-server-docker:latest
+    container_name: palworld
+    restart: unless-stopped
+    stop_grace_period: 30s
+    ports:
+      - 8211:8211/udp
+      - 27015:27015/udp
+      - 8212:8212/tcp # REST API - do not port forward
+    volumes:
+      - ${SSD_PATH}/games/palworld:/palworld/
+    environment:
+      <<: *common-env
+      PORT: 8211
+      PLAYERS: 16
+      MULTITHREADING: "true"
+      COMMUNITY: "false" # set true (and forward 27015) to list in the community server browser
+      SERVER_NAME: "Palord"
+      SERVER_DESCRIPTION: ""
+      SERVER_PASSWORD: ${PALWORLD_SERVER_PASSWORD}
+      ADMIN_PASSWORD: ${PALWORLD_ADMIN_PASSWORD}
+      # REST API (used by the container for graceful shutdown/backups)
+      REST_API_ENABLED: "true"
+      REST_API_PORT: 8212
+      DELETE_OLD_BACKUPS: "true"
+      AUTO_REBOOT_ENABLED: "true"
+      AUTO_PAUSE_ENABLED: "true"
+      DIFFICULTY: "Normal"
+      PAL_EGG_DEFAULT_HATCHING_TIME: 0.5
+      ALLOW_GLOBAL_PALBOX_IMPORT: "true"
+    networks:
+      - web

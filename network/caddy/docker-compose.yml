@@ -20,11 +20,10 @@ services:
       - "443:443"
       - "443:443/udp"
     environment:
-      CF_API_TOKEN: ${CF_API_TOKEN}
       DOMAIN_NAME: ${DOMAIN_NAME}
+      ACME_EMAIL: ${ACME_EMAIL}
     volumes:
-      - ${SSD_PATH}/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ${SSD_PATH}/caddy/site:/srv
+      - ./config:/etc/caddy:ro # directory, not file, so `caddy reload` sees edits
       - ${SSD_PATH}/caddy/data/:/data
       - ${SSD_PATH}/caddy/config:/config
     secrets:

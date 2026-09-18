@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+  - name: repo
+    type: file
+    updateIntervalSeconds: 30
+    allowUiUpdates: false # edit the JSON in git, not the UI (UI edits would be overwritten)
+    options:
+      path: /etc/grafana/dashboards
+      foldersFromFilesStructure: true

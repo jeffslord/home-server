@@ -1,0 +1,14 @@
+networks:
+  web:
+    external: true
+
+services:
+  dockhand:
+    image: fnsys/dockhand:latest
+    container_name: dockhand
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${SSD_PATH}/monitor/dockhand:/app/data
+    networks:
+      - web

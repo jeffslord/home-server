@@ -1,0 +1,73 @@
+groups:
+  - name: host
+    rules:
+      - alert: TargetDown
+        expr: up == 0
+        for: 3m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.job }} scrape target down"
+          description: "Prometheus can't scrape {{ $labels.instance }} ({{ $labels.job }})."
+
+      - alert: HostOutOfMemory
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.10
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Host memory below 10% available"
+          description: "{{ $value | humanizePercentage }} of RAM available."
+
+      - alert: HostHighCpuLoad
+        expr: 1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) > 0.90
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "Host CPU above 90% for 15m"
+          description: "CPU at {{ $value | humanizePercentage }}."
+
+      - alert: HostRootDiskAlmostFull
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.15
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Root filesystem below 15% free"
+          description: "{{ $value | humanizePercentage }} free on /."
+
+      - alert: HostRootDiskFull
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.05
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "Root filesystem below 5% free"
+          description: "{{ $value | humanizePercentage }} free on /."
+
+      - alert: NasShareAlmostFull
+        expr: node_filesystem_avail_bytes{fstype="nfs4"} / node_filesystem_size_bytes{fstype="nfs4"} < 0.05
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "NAS share {{ $labels.mountpoint }} below 5% free"
+          description: "{{ $value | humanizePercentage }} free on {{ $labels.mountpoint }}."
+
+      - alert: NasShareNotMounted
+        expr: count(node_filesystem_size_bytes{fstype="nfs4", mountpoint=~"/mnt/nas/.+"}) < 3 or absent(node_filesystem_size_bytes{fstype="nfs4"})
+        for: 10m
+        labels: { severity: critical }
+        annotations:
+          summary: "One or more NFS shares under /mnt/nas are not mounted"
+          description: "Expected media, stash and backup; jellyfin/*arr will be unhappy."
+
+      - alert: HostDiskWillFillIn24h
+        expr: predict_linear(node_filesystem_avail_bytes{mountpoint="/"}[6h], 24 * 3600) < 0
+        for: 30m
+        labels: { severity: warning }
+        annotations:
+          summary: "Root filesystem predicted to fill within 24h"
+          description: "At the current 6h write rate / runs out of space in under a day."
+
+      - alert: HostRebooted
+        expr: node_time_seconds - node_boot_time_seconds < 600
+        labels: { severity: info }
+        annotations:
+          summary: "Host rebooted"
+          description: "Uptime is {{ $value | humanizeDuration }}."
