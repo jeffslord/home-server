@@ -54,8 +54,10 @@ services:
     depends_on:
       - db
       - broker
-    ports:
-      - "8007:8000"
+    # Not published: reached only via Caddy (paperless.${DOMAIN_NAME}) which
+    # forward_auths to Authentik. A host port would let the LAN bypass that.
+    expose:
+      - "8000"
     volumes:
       - ${HDD_PATH}/paperless/data:/usr/src/paperless/data
       - ${HDD_PATH}/paperless/media:/usr/src/paperless/media

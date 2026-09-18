@@ -101,9 +101,11 @@ services:
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     privileged: true
+    # Web UI (8080/8090) not published: reached only via Caddy -> Authentik.
+    # Privoxy/SOCKS and the incoming torrent port stay on the host for the LAN.
+    expose:
+      - "8080"
     ports:
-      - "8080:8080"
-      - "8090:8090"
       - "8118:8118"
       - "9118:9118"
       - "58946:58946"
@@ -132,7 +134,9 @@ services:
     image: ghcr.io/hotio/qbittorrent:latest
     container_name: qbittorrentvpn
     networks:
-      - web
+      web:
+        aliases:
+          - qbittorrent # sonarr/radarr/prowlarr have the download client configured under this name
     cap_add:
       - NET_ADMIN
     sysctls:
@@ -140,8 +144,9 @@ services:
     dns:
       - 1.1.1.1
       - 1.0.0.1
-    ports:
-      - "8095:8080"
+    # Not published: reached only via Caddy, which forward_auths to Authentik.
+    expose:
+      - "8080"
     environment:
       <<: *common-env
       VPN_ENABLED: "true"
@@ -185,8 +190,9 @@ services:
     environment:
       <<: *common-env
       LOG_LEVEL: debug
-    ports:
-      - 5055:5055
+    # Not published: reached only via Caddy, which forward_auths to Authentik.
+    expose:
+      - "5055"
     volumes:
       - ${SSD_PATH}/media-system/jellyseerr/config:/app/config
     restart: unless-stopped

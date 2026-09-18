@@ -55,9 +55,10 @@ services:
     volumes:
       - ${SSD_PATH}/authentik/media:/media
       - ${SSD_PATH}/authentik/custom-templates:/templates
-    ports:
-      - "${AUTHENTIK_PORT_HTTP:-9000}:9000"
-      - "${AUTHENTIK_PORT_HTTPS:-9443}:9443"
+    # Not published: Caddy proxies authentik.${DOMAIN_NAME} to authentik-server:9000
+    # over the docker network, and every outpost callback goes through Caddy too.
+    expose:
+      - "9000"
     depends_on:
       postgresql:
         condition: service_healthy
