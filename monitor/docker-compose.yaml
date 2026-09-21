@@ -39,6 +39,7 @@ configs:
           - https://paperless.${DOMAIN_NAME}
           - https://dockhand.${DOMAIN_NAME}
           - https://grafana.${DOMAIN_NAME}
+          - https://prometheus.${DOMAIN_NAME}
 
 services:
   prometheus:
@@ -57,9 +58,9 @@ services:
       - '--storage.tsdb.retention.time=30d'
       - '--storage.tsdb.retention.size=15GB'
       - '--web.enable-lifecycle' # curl -X POST localhost:9092/-/reload after editing config
-      - '--web.external-url=http://${SERVER_LAN_IP}:9092' # makes "Source" links in alerts clickable
+      - '--web.external-url=https://prometheus.${DOMAIN_NAME}' # "Source" links in alerts go through Caddy + Authentik
     ports:
-      - "9092:9090"
+      - "127.0.0.1:9092:9090" # host-only, for the reload curl above; the LAN goes through Caddy
     networks:
       - monitoring
       - web # so it can scrape exporters that live on the app network

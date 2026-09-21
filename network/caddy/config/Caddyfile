@@ -164,6 +164,12 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy grafana:3000
 	}
 
+	@prometheus host prometheus.{$DOMAIN_NAME}
+	handle @prometheus {
+		import forward_auth_authentik
+		reverse_proxy prometheus:9090
+	}
+
 	@dockhand host dockhand.{$DOMAIN_NAME}
 	handle @dockhand {
 		import forward_auth_authentik
