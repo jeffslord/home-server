@@ -3,16 +3,24 @@ secrets:
     file: ../../_secrets/ddns_api_key.txt
 
 services:
+  # Keeps the apex A record on the current WAN IP. Every other hostname is a
+  # CNAME to the apex, so this is the only record that needs updating.
+  # Replaced oznu/cloudflare-ddns (archived upstream; image was from 2021).
+  # Token needs Zone:Zone:Read + Zone:DNS:Edit on the zone.
   cloudflare-ddns:
-    image: oznu/cloudflare-ddns:latest
+    image: favonia/cloudflare-ddns:1
     container_name: cloudflare-ddns
-    restart: always
+    restart: unless-stopped
+    user: "${PUID}:${PGID}"
+    read_only: true
+    cap_drop: [all]
+    security_opt: [no-new-privileges:true]
     environment:
-      API_KEY_FILE: /run/secrets/ddns_api_key
-      ZONE: ${DOMAIN_NAME}
-      PROXIED: false
-      PUID: ${PUID}
-      PGID: ${PGID}
+      CLOUDFLARE_API_TOKEN_FILE: /run/secrets/ddns_api_key
+      DOMAINS: ${DOMAIN_NAME}
+      PROXIED: "false"
+      IP6_PROVIDER: none # no IPv6 here; without this it logs a warning every run
+      UPDATE_CRON: "@every 5m"
       TZ: ${TZ}
     secrets:
       - ddns_api_key
