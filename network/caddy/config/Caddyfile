@@ -170,6 +170,14 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy prometheus:9090
 	}
 
+	# dev/opencode: AI coding agent with shell access to ~/development. Authentik
+	# in front, plus its own basic auth (OPENCODE_SERVER_PASSWORD) behind that.
+	@opencode host opencode.{$DOMAIN_NAME}
+	handle @opencode {
+		import forward_auth_authentik
+		reverse_proxy opencode:4096
+	}
+
 	@dockhand host dockhand.{$DOMAIN_NAME}
 	handle @dockhand {
 		import forward_auth_authentik

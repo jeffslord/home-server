@@ -1,0 +1,53 @@
+networks:
+  web:
+    external: true
+
+secrets:
+  opencode_server_password:
+    file: ../../_secrets/opencode_server_password.txt
+
+services:
+  # OpenCode web UI. This is shell access to ~/development by design, so it is
+  # only reachable through Caddy -> Authentik, and the basic-auth password below
+  # is a second gate for anything else on the `web` network.
+  #
+  # Runs as the host user with HOME mounted at the same path, so it shares
+  # ~/.config/opencode (provider config) and ~/.local/share/opencode (auth.json,
+  # sessions) with the native `opencode` binary on the host.
+  opencode:
+    build: ./image
+    image: opencode-web:local
+    container_name: opencode
+    restart: unless-stopped
+    user: "${PUID}:${PGID}"
+    working_dir: /home/jeff/development
+    networks:
+      - web
+    expose:
+      - "4096"
+    environment:
+      HOME: /home/jeff
+      TZ: ${TZ}
+      OLLAMA_BASE_URL: http://ollama:11434/v1 # opencode.json reads {env:OLLAMA_BASE_URL}
+      OPENCODE_SERVER_USERNAME: jeff
+    secrets:
+      - opencode_server_password
+    volumes:
+      - /home/jeff/development:/home/jeff/development
+      - /home/jeff/.config/opencode:/home/jeff/.config/opencode:ro
+      - /home/jeff/.local/share/opencode:/home/jeff/.local/share/opencode
+      - /home/jeff/.local/state/opencode:/home/jeff/.local/state/opencode
+      - /home/jeff/.cache/opencode:/home/jeff/.cache/opencode
+      - /home/jeff/.gitconfig:/home/jeff/.gitconfig:ro
+    # --hostname 0.0.0.0 is container-internal only; nothing publishes the port.
+    command: ["sh", "-c", "export OPENCODE_SERVER_PASSWORD=\"$$(cat /run/secrets/opencode_server_password)\" && exec opencode web --hostname 0.0.0.0 --port 4096"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs -o /dev/null -u \"jeff:$$(cat /run/secrets/opencode_server_password)\" http://127.0.0.1:4096/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
