@@ -19,6 +19,24 @@ services:
       - 8123:8123 #optional
     restart: unless-stopped
 
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: matter-server
+    restart: unless-stopped
+    # Matter commissioning needs mDNS + IPv6 on the LAN, so this one runs on the host network
+    # (listens on 5580; HA reaches it at ws://192.168.1.162:5580/ws). Pairing uses the
+    # companion app's Bluetooth, so no adapter is passed through here.
+    network_mode: host
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - ${SSD_PATH}/home-assistant/matter-server/data:/data
+    command: --storage-path /data --paa-root-cert-dir /data/credentials
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+
   zwavejs2mqtt:
     container_name: zwavejs2mqtt
     networks:

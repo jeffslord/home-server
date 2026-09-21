@@ -23,7 +23,6 @@ configs:
           - https://authentik.${DOMAIN_NAME}
           - https://jellyfin.${DOMAIN_NAME}
           - https://open-webui.${DOMAIN_NAME}
-          - https://ollama.${DOMAIN_NAME}
           - https://ha.${DOMAIN_NAME}
       - labels: { group: authentik }
         targets:

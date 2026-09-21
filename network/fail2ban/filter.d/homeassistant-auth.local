@@ -1,0 +1,4 @@
+# Overlay on the shipped filter: HA logs "from <reverse-dns-name> (<ip>)".
+# Match the IP in parentheses so fail2ban doesn't have to resolve the name.
+[Definition]
+failregex = ^%(__prefix_line)s.*\[homeassistant\.components\.http\.ban\] Login attempt or request with invalid authentication from \S+ \(<HOST>\).*$

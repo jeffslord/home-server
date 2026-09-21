@@ -1,0 +1,9 @@
+# Caddy JSON access log: requests for things that only exist on someone else's
+# server. Reuses the webmail/phpmyadmin/wordpress lists from botsearch-common.
+[INCLUDES]
+before = botsearch-common.conf
+
+[Definition]
+failregex = ^.*"client_ip":"<HOST>".*"uri":"/(?:<webmail>|<phpmyadmin>|<wordpress>|cgi-bin|mysqladmin|\.env|\.git|\.aws|\.svn|\.DS_Store|xmlrpc\.php|phpinfo|vendor/phpunit|owa/|autodiscover|_ignition|actuator|solr/|boaform|HNAP1|\.well-known/(?!acme|openid|matrix|caldav|carddav|webfinger|change-password|host-meta|nodeinfo))[^"]*".*"status":4\d\d,.*$
+ignoreregex =
+datepattern = "ts":{EPOCH}

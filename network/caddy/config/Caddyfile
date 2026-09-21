@@ -25,6 +25,22 @@ auth.{$DOMAIN_NAME} {
 		dns cloudflare {env.CF_API_TOKEN}
 	}
 
+	# Access log. The file copy is what fail2ban reads (network/fail2ban);
+	# the stdout copy is what Alloy ships to Loki.
+	log access-file {
+		output file /var/log/caddy/access.log {
+			roll_size 50MiB
+			roll_keep 5
+			roll_keep_for 720h
+			mode 0644
+		}
+		format json
+	}
+	log access-stdout {
+		output stdout
+		format json
+	}
+
 	# Authentik outpost callback - must be reachable without auth on all subdomains
 	@outpost path /outpost.goauthentik.io/*
 	handle @outpost {
@@ -49,11 +65,6 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy open-webui:8080
 	}
 
-	@ollama host ollama.{$DOMAIN_NAME}
-	handle @ollama {
-		reverse_proxy ollama:11434
-	}
-
 	@home-assistant host ha.{$DOMAIN_NAME}
 	handle @home-assistant {
 		reverse_proxy home-assistant:8123
@@ -68,6 +79,13 @@ auth.{$DOMAIN_NAME} {
 	#
 	# AUTHENTIK PROTECTED
 	#
+	# ~/flightdensity/docker-compose.yml (overflight explorer)
+	@flights host flights.{$DOMAIN_NAME}
+	handle @flights {
+		import forward_auth_authentik
+		reverse_proxy flightdensity-web:8787
+	}
+
 	@actual host actual.{$DOMAIN_NAME}
 	handle @actual {
 		import forward_auth_authentik
@@ -166,8 +184,10 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy vintagestory:42420
 	}
 
-	# Anything else under *.{$DOMAIN_NAME}: no such service.
+	# Anything else under *.{$DOMAIN_NAME}: no such service. The header is a
+	# marker in the access log so fail2ban (caddy-nohost) can ban subdomain scanners.
 	handle {
+		header X-No-Service 1
 		respond "no such service" 404
 	}
 }
