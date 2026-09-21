@@ -82,7 +82,7 @@ services:
       - web
     image: eclipse-mosquitto
     container_name: mosquitto
-    restart: unless-stopped
+    restart: always
     volumes:
       - ${SSD_PATH}/home-assistant/mosquitto/config:/mosquitto/config
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro # pwfile stays in the volume
