@@ -1,0 +1,26 @@
+# Ofelia: cron for containers. Replaces the host crontab -- every scheduled job
+# lives in config.ini next to this file. Job output lands in `docker logs ofelia`.
+#
+#   job-run  + container=<name>  starts an existing (Exited) container that its own
+#            compose project defines with restart: "no". Keep delete = false, or
+#            Ofelia removes that container after the run.
+#   job-exec runs a command inside a running container.
+#
+# Schedules have a leading seconds field. After editing config.ini:
+#   docker compose up -d --force-recreate
+services:
+  ofelia:
+    image: mcuadros/ofelia:0.3.22
+    container_name: ofelia
+    restart: unless-stopped
+    command: daemon --config=/etc/ofelia/config.ini
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
+      - ./config.ini:/etc/ofelia/config.ini:ro
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
