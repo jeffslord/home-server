@@ -1,0 +1,31 @@
+# Nightly offsite copy of the borg repo to Google Drive (sync.sh), scheduled by
+# Ofelia (monitor/ofelia/config.ini) at 03:30, after the 02:00 borgmatic run (monitor/borgmatic).
+# Run-to-completion: `up -d` runs it once and leaves it Exited, as intended.
+#
+# The repo is borg repokey-encrypted, so Drive only ever sees ciphertext --
+# restoring needs the borg passphrase, which must be stored outside this house.
+# Drive login: ~/.config/rclone/rclone.conf remote `gdrive` (rclone's built-in
+# client; re-login with `rclone config reconnect gdrive:`, no auto config).
+# Failures alert on the ntfy `unraid` topic (.env: NTFY_URL, NTFY_TOKEN).
+# Manual run:  docker start -a offsite-backup
+networks:
+  web:
+    external: true
+
+services:
+  offsite-backup:
+    container_name: offsite-backup
+    image: rclone/rclone:1.75
+    entrypoint: ["/bin/sh", "/sync.sh"]
+    restart: "no"
+    user: "1000:1000"
+    env_file: .env
+    environment:
+      - TZ=America/New_York
+      - RCLONE_CONFIG=/config/rclone/rclone.conf
+    networks:
+      - web                                  # reaches ntfy by container name
+    volumes:
+      - ./sync.sh:/sync.sh:ro
+      - /home/jeff/.config/rclone:/config/rclone   # rw: rclone refreshes the token
+      - /mnt/nas/backup/home-server-volumes:/repo:ro

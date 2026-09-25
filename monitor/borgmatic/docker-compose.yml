@@ -1,0 +1,50 @@
+# Nightly borg backup of the home server to the NAS (config.yaml), scheduled by
+# Ofelia (monitor/ofelia/config.ini) at 02:00. Replaced root's host cron job and
+# /etc/borgmatic/config.yaml on 2026-09-25. monitor/offsite-backup copies the
+# repo to Google Drive at 03:30.
+# Run-to-completion: `up -d` runs a backup once and leaves it Exited, as intended;
+# use `docker compose create` to (re)create it without running.
+#
+# Runs as root so it can read every volume; the NAS export squashes all writes
+# to nobody:users anyway. Sources are mounted rw only because sqlite3 needs to
+# touch the -shm file of WAL databases while dumping them; borg never writes there.
+# Failures alert on the ntfy `unraid` topic. The NAS separately alerts if the
+# repo hasn't been written for 30 h (catches this container being deleted).
+#
+# .env: BORG_PASSPHRASE (also store it off-site -- the Drive copy is useless
+# without it), AUTHENTIK_PG_PASS, NTFY_TOKEN.
+#
+# Manual run:     docker start -a borgmatic
+# Other commands: docker compose run --rm borgmatic repo-list
+#                 docker compose run --rm borgmatic restore --archive latest --database authentik
+networks:
+  web:
+    external: true
+
+services:
+  borgmatic:
+    container_name: borgmatic
+    image: ghcr.io/borgmatic-collective/borgmatic:2.1.8
+    entrypoint: ["borgmatic"]
+    command: ["--verbosity", "1", "--stats"]
+    restart: "no"
+    hostname: eris                 # archive names are {hostname}-…; prune only matches this host's
+    env_file: .env
+    environment:
+      - TZ=America/New_York
+    networks:
+      - web                        # reaches authentik-postgresql, paperless-db-1 and ntfy by name
+    volumes:
+      - ./config.yaml:/etc/borgmatic/config.yaml:ro
+      - /home/jeff/volumes/borgmatic/borg-config:/root/.config/borg      # security/nonce state
+      - /home/jeff/volumes/borgmatic/borg-cache:/root/.cache/borg        # chunk cache (excluded)
+      - /home/jeff/volumes/borgmatic/state:/root/.local/state/borgmatic  # check timestamps
+      - /mnt/nas/backup/home-server-volumes:/mnt/nas/backup/home-server-volumes
+      # Sources, at their host paths so archives and restores keep the same paths.
+      - /home/jeff/volumes:/home/jeff/volumes
+      - /home/jeff/flightdensity:/home/jeff/flightdensity
+      - /home/jeff/development/github.com/home-server:/home/jeff/development/github.com/home-server
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"

@@ -1,0 +1,130 @@
+# borgmatic config for the home server (runs in the borgmatic container, see docker-compose.yml)
+# Nightly at 02:00 via Ofelia; copied offsite to Google Drive at 03:30 by monitor/offsite-backup.
+
+source_directories:
+  - /home/jeff/volumes
+  - /home/jeff/flightdensity
+  - /home/jeff/development/github.com/home-server   # includes the gitignored .env files
+
+repositories:
+  - path: /mnt/nas/backup/home-server-volumes
+    label: nas
+
+encryption_passphrase: ${BORG_PASSPHRASE}
+
+compression: zstd
+
+# Borg patterns: first match wins. "-" still descends into the directory,
+# so the "+" lines above it can pull individual save folders back in.
+patterns:
+  # Game servers: saves only, never the multi-GB server installs.
+  # Vintage Story and the 12 GB cobblemon_bcg Minecraft world are deliberately left out.
+  - "+ /home/jeff/volumes/games/palworld/Pal/Saved"
+  - "+ /home/jeff/volumes/games/palworld/backups"
+  - "+ /home/jeff/volumes/games/space-engineers/instances"
+  - "+ sh:/home/jeff/volumes/games/minecraft/cobbleverse*/world_*"
+  - "- /home/jeff/volumes/games"
+
+exclude_patterns:
+  # Re-downloadable or regenerable
+  - /home/jeff/volumes/ollama
+  - /home/jeff/volumes/immich                        # leftover from an Immich install that isn't running
+  - /home/jeff/volumes/borgmatic/borg-cache
+  - /home/jeff/volumes/open-webui                   # chat history not worth keeping
+  - /home/jeff/volumes/actual-helpers/cache
+  - /home/jeff/volumes/actual-networth/cache
+  - /home/jeff/volumes/actual-networth/refresh-cache
+  - /home/jeff/volumes/monitor/prometheus
+  - /home/jeff/volumes/monitor/loki
+
+  # Media apps: keep settings and databases, skip artwork/metadata caches
+  - /home/jeff/volumes/media-system/jellyfin/cache
+  - /home/jeff/volumes/media-system/jellyfin/config/data/metadata
+  - /home/jeff/volumes/media-system/jellyfin/config/data/data/attachments
+  - /home/jeff/volumes/media-system/plex/transcode
+  - /home/jeff/volumes/media-system/plex/config/Library/Application Support/Plex Media Server/Cache
+  - /home/jeff/volumes/media-system/plex/config/Library/Application Support/Plex Media Server/Media
+  - /home/jeff/volumes/media-system/plex/config/Library/Application Support/Plex Media Server/Metadata
+  - /home/jeff/volumes/media-system/stash/cache
+  - /home/jeff/volumes/media-system/stash/metadata
+  - sh:/home/jeff/volumes/media-system/*/config/MediaCover
+  - sh:/home/jeff/volumes/media-system/*/config/logs
+  - sh:/home/jeff/volumes/media-system/*/config/logs.db*
+
+  # Live databases that are dumped consistently below instead of copied mid-write
+  - /home/jeff/volumes/authentik/pgdata
+  - sh:/home/jeff/volumes/home-assistant/data/home-assistant_v2.db*
+  - sh:/home/jeff/volumes/media-system/sonarr/config/sonarr.db*
+  - sh:/home/jeff/volumes/media-system/radarr/config/radarr.db*
+  - sh:/home/jeff/volumes/media-system/jellyfin/config/data/data/jellyfin.db*
+  - sh:/home/jeff/volumes/media-system/stash/config/stash-go.sqlite*   # also skips 7 old 1.3 GB copies
+  - sh:/home/jeff/flightdensity/data/flights.db*
+
+  # Flight project: skip the virtualenv, generated output and the 94 MB OpenSky download
+  - /home/jeff/flightdensity/.venv
+  - /home/jeff/flightdensity/out
+  - /home/jeff/flightdensity/ref/aircraftDatabase.csv
+  - sh:/home/jeff/flightdensity/**/__pycache__
+
+  # home-server repo: downloaded test mods
+  - /home/jeff/development/github.com/home-server/games/vintage-story/mod-updater/test
+  - /home/jeff/development/github.com/home-server/games/vintage-story/mod-updater/test-mods
+
+exclude_caches: true
+
+keep_daily: 7
+keep_weekly: 4
+keep_monthly: 6
+
+# SQLite: borgmatic streams a consistent dump of each database into the archive.
+# Restore with: borgmatic restore --archive latest --database <name>
+sqlite_databases:
+  - name: home-assistant
+    path: /home/jeff/volumes/home-assistant/data/home-assistant_v2.db
+  - name: zigbee
+    path: /home/jeff/volumes/home-assistant/data/zigbee.db
+  - name: flights
+    path: /home/jeff/flightdensity/data/flights.db
+  - name: grafana
+    path: /home/jeff/volumes/monitor/grafana/grafana.db
+  - name: actual-account
+    path: /home/jeff/volumes/actual-data/server-files/account.sqlite
+  - name: actual-budget-1dfbbbd6
+    path: /home/jeff/volumes/actual-data/user-files/group-1dfbbbd6-e2ee-4c26-9062-b90c4f059c97.sqlite
+  - name: actual-budget-6223ea3f
+    path: /home/jeff/volumes/actual-data/user-files/group-6223ea3f-165d-4801-b793-e96ab3137d00.sqlite
+  - name: actual-budget-c6ee2246
+    path: /home/jeff/volumes/actual-data/user-files/group-c6ee2246-f337-4815-8a5d-9c5d97f9b105.sqlite
+  - name: sonarr
+    path: /home/jeff/volumes/media-system/sonarr/config/sonarr.db
+  - name: radarr
+    path: /home/jeff/volumes/media-system/radarr/config/radarr.db
+  - name: jellyfin
+    path: /home/jeff/volumes/media-system/jellyfin/config/data/data/jellyfin.db
+  - name: stash
+    path: /home/jeff/volumes/media-system/stash/config/stash-go.sqlite
+
+# PostgreSQL: dumped over the web network (pg_dump ships in the image).
+postgresql_databases:
+  - name: authentik
+    hostname: authentik-postgresql
+    username: authentik
+    password: ${AUTHENTIK_PG_PASS}
+    format: custom
+  - name: paperless
+    hostname: paperless-db-1
+    username: paperless
+    password: paperless            # same literal as household/paperless/docker-compose.yml
+    format: custom
+
+ntfy:
+  topic: unraid
+  server: http://ntfy
+  access_token: ${NTFY_TOKEN}
+  states:
+    - fail
+  fail:
+    title: Home server backup failed
+    message: borgmatic failed on eris; see docker logs borgmatic
+    priority: high
+    tags: floppy_disk
