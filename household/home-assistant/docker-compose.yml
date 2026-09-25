@@ -41,7 +41,7 @@ services:
     container_name: zwavejs2mqtt
     networks:
       - web
-    image: zwavejs/zwavejs2mqtt:latest
+    image: zwavejs/zwave-js-ui:latest
     restart: always
     tty: true
     stop_signal: SIGINT
