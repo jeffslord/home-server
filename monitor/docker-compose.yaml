@@ -235,7 +235,9 @@ services:
       - ${SSD_PATH}/monitor/grafana:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/etc/grafana/dashboards:ro
+      - ${SSD_PATH}/actual-networth/out:/var/lib/actual-networth:ro # finance/helpers networth-export.js
     environment:
+      - GF_PLUGINS_PREINSTALL=frser-sqlite-datasource # SQLite datasource for the Net worth dashboard
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD} # only applied on first start; change existing via UI
       - GF_USERS_ALLOW_SIGN_UP=false

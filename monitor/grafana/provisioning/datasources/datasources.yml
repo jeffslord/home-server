@@ -29,3 +29,14 @@ datasources:
     editable: false
     jsonData:
       maxLines: 1000
+
+  # Actual Budget balances by account type, exported nightly by
+  # finance/helpers/networth-export.js (Ofelia job actual-networth).
+  - name: Actual net worth
+    uid: actual-networth
+    type: frser-sqlite-datasource
+    editable: false
+    jsonData:
+      path: /var/lib/actual-networth/networth.sqlite
+      pathPrefix: "file:"
+      pathOptions: "?mode=ro"

@@ -1,3 +1,10 @@
+# Run-to-completion jobs, scheduled by Ofelia (monitor/ofelia/config.ini), which
+# starts these stopped containers -- so `up -d` runs each once and leaves it
+# Exited, as intended.
+#   actual-helpers   syncs investment/401k balances from SimpleFIN into Actual
+#   actual-networth  exports balances by account type to SQLite for Grafana's
+#                    "Net worth" dashboard (networth-export.js)
+# Manual run:  docker compose run --rm <service>
 networks:
   web:
     external: true
@@ -6,6 +13,9 @@ services:
   actual-helpers:
     container_name: actual-helpers
     image: ghcr.io/psybers/actual-helpers:latest
+    entrypoint: ["node"]            # image default is `tail -f /dev/null`
+    command: ["track-investments.js"]
+    restart: "no"
     env_file: .env
     networks:
       - web
@@ -14,3 +24,44 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+
+  actual-networth:
+    container_name: actual-networth
+    image: ghcr.io/psybers/actual-helpers:latest
+    entrypoint: ["node"]
+    command: ["networth-export.js"]
+    restart: "no"
+    user: "1000:1000"
+    env_file: .env
+    environment:
+      - ACTUAL_CACHE_DIR=/cache      # own cache: never races the 06:15 sync
+      - HOME=/tmp
+      - TZ=America/New_York
+    networks:
+      - web
+    volumes:
+      - ./networth-export.js:/usr/src/app/networth-export.js:ro
+      - ${SSD_PATH}/actual-networth/cache:/cache
+      - ${SSD_PATH}/actual-networth/out:/out   # read by grafana (monitor/)
+
+  # Long-running: serves the dashboard's "Refresh now" link (networth-refresh.js),
+  # reached as grafana.${DOMAIN_NAME}/actual-refresh via Caddy + Authentik.
+  actual-networth-refresh:
+    container_name: actual-networth-refresh
+    image: ghcr.io/psybers/actual-helpers:latest
+    entrypoint: ["node"]
+    command: ["networth-refresh.js"]
+    restart: unless-stopped
+    user: "1000:1000"
+    env_file: .env
+    environment:
+      - ACTUAL_CACHE_DIR=/cache      # separate from actual-networth's cache
+      - HOME=/tmp
+      - TZ=America/New_York
+    networks:
+      - web
+    volumes:
+      - ./networth-export.js:/usr/src/app/networth-export.js:ro
+      - ./networth-refresh.js:/usr/src/app/networth-refresh.js:ro
+      - ${SSD_PATH}/actual-networth/refresh-cache:/cache
+      - ${SSD_PATH}/actual-networth/out:/out

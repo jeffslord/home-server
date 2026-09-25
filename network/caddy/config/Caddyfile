@@ -161,7 +161,13 @@ auth.{$DOMAIN_NAME} {
 	@grafana host grafana.{$DOMAIN_NAME}
 	handle @grafana {
 		import forward_auth_authentik
-		reverse_proxy grafana:3000
+		# Net worth dashboard's "Refresh now" (finance/helpers networth-refresh.js)
+		handle /actual-refresh {
+			reverse_proxy actual-networth-refresh:8080
+		}
+		handle {
+			reverse_proxy grafana:3000
+		}
 	}
 
 	@prometheus host prometheus.{$DOMAIN_NAME}
