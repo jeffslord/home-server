@@ -1,0 +1,153 @@
+# Dawarich: self-hosted Google Timeline replacement (location history, visits, trips).
+# https://dawarich.app  -- based on upstream docker/docker-compose.yml at 1.15.3.
+# Web UI: https://dawarich.${DOMAIN_NAME} (Authentik, then Dawarich's own login).
+# Phone apps (OwnTracks/Overland) post to /api/* with the per-user API key; Caddy
+# skips Authentik for /api/* because the apps can't do an Authentik login.
+# .env: DAWARICH_DB_PASSWORD (also in monitor/borgmatic/.env), DAWARICH_SECRET_KEY_BASE.
+# Upgrades: read the release notes first (breaking changes happen), bump DAWARICH_VERSION.
+x-dawarich-env: &dawarich-env
+  RAILS_ENV: production
+  REDIS_URL: redis://dawarich-redis:6379
+  DATABASE_HOST: dawarich-db
+  DATABASE_PORT: 5432
+  DATABASE_USERNAME: dawarich
+  DATABASE_PASSWORD: ${DAWARICH_DB_PASSWORD}
+  DATABASE_NAME: dawarich
+  APPLICATION_HOSTS: dawarich.${DOMAIN_NAME},localhost,127.0.0.1
+  APPLICATION_PROTOCOL: http # TLS ends at Caddy
+  TIME_ZONE: America/New_York
+  SECRET_KEY_BASE: ${DAWARICH_SECRET_KEY_BASE}
+  RAILS_LOG_TO_STDOUT: "true"
+  SELF_HOSTED: "true"
+  STORE_GEODATA: "true"
+  PROMETHEUS_EXPORTER_ENABLED: "false"
+  # Reverse geocoding (countries/cities/visits) via our own Photon (planet DB, below).
+  # The public photon.komoot.io throttled the 2026-10 backfill (ECONNREFUSED).
+  PHOTON_API_HOST: photon:2322
+  PHOTON_API_USE_HTTPS: "false"
+
+x-dawarich-image: &dawarich-image freikin/dawarich:${DAWARICH_VERSION:-1.15.3}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 50m
+    max-file: "3"
+
+networks:
+  dawarich:
+  web:
+    external: true
+
+services:
+  dawarich-redis:
+    image: redis:7.4-alpine
+    container_name: dawarich-redis
+    command: redis-server --save 900 1 --save 300 10 --appendonly no
+    volumes:
+      - ${SSD_PATH}/dawarich/redis:/data
+    networks:
+      - dawarich
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  dawarich-db:
+    image: postgis/postgis:17-3.5-alpine
+    container_name: dawarich-db
+    shm_size: 1g
+    environment:
+      POSTGRES_USER: dawarich
+      POSTGRES_PASSWORD: ${DAWARICH_DB_PASSWORD}
+      POSTGRES_DB: dawarich
+    volumes:
+      - ${SSD_PATH}/dawarich/db:/var/lib/postgresql/data # dumped by borgmatic, raw dir excluded
+    networks:
+      - dawarich
+      - web # borgmatic pg_dump
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dawarich -d dawarich"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Photon reverse geocoder with the whole-planet DB from download1.graphhopper.com
+  # (photon-db-planet-1.0-latest.tar.bz2, extracted to ${SSD_PATH}/photon/photon_data).
+  # Re-downloadable, so not backed up. Refresh: re-download, swap the dir, restart.
+  photon:
+    build:
+      context: ./photon
+      args:
+        PHOTON_VERSION: 1.3.0
+    image: local/photon:1.3.0
+    container_name: photon
+    environment:
+      JAVA_OPTS: -Xmx6g
+    volumes:
+      - ${SSD_PATH}/photon:/data
+    networks:
+      - dawarich
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf 'http://127.0.0.1:2322/reverse?lat=39.95&lon=-75.16' | grep -q Feature"]
+      interval: 30s
+      retries: 10
+      start_period: 5m
+    restart: unless-stopped
+
+  dawarich:
+    image: *dawarich-image
+    container_name: dawarich
+    entrypoint: web-entrypoint.sh
+    command: ["bin/rails", "server", "-p", "3000", "-b", "::"]
+    environment:
+      <<: *dawarich-env
+      WEB_CONCURRENCY: 1
+    volumes:
+      - ${SSD_PATH}/dawarich/public:/var/app/public
+      - ${SSD_PATH}/dawarich/watched:/var/app/tmp/imports/watched
+      - ${SSD_PATH}/dawarich/storage:/var/app/storage
+      - ${SSD_PATH}/dawarich/db:/dawarich_db_data:ro # upstream mounts it for disk-usage stats
+    networks:
+      - dawarich
+      - web # Caddy
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"]
+      interval: 10s
+      retries: 30
+      start_period: 30s
+    depends_on:
+      dawarich-db: { condition: service_healthy, restart: true }
+      dawarich-redis: { condition: service_healthy, restart: true }
+    restart: unless-stopped
+
+  dawarich-sidekiq:
+    image: *dawarich-image
+    container_name: dawarich-sidekiq
+    entrypoint: sidekiq-entrypoint.sh
+    command: ["sidekiq"]
+    environment:
+      <<: *dawarich-env
+      BACKGROUND_PROCESSING_CONCURRENCY: 3 # raise temporarily for big imports
+    volumes:
+      - ${SSD_PATH}/dawarich/public:/var/app/public
+      - ${SSD_PATH}/dawarich/watched:/var/app/tmp/imports/watched
+      - ${SSD_PATH}/dawarich/storage:/var/app/storage
+    networks:
+      - dawarich
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f sidekiq"]
+      interval: 10s
+      retries: 30
+      start_period: 30s
+    depends_on:
+      dawarich-db: { condition: service_healthy, restart: true }
+      dawarich-redis: { condition: service_healthy, restart: true }
+      dawarich: { condition: service_healthy, restart: true }
+    restart: unless-stopped

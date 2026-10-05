@@ -28,6 +28,8 @@ patterns:
 exclude_patterns:
   # Re-downloadable or regenerable
   - /home/jeff/volumes/ollama
+  - /home/jeff/volumes/photon                        # Photon planet geocoder DB (~100 GB, re-downloadable)
+  - /home/jeff/volumes/photon-dl                      # its download parts while fetching
   - /home/jeff/volumes/immich                        # leftover from an Immich install that isn't running
   - /home/jeff/volumes/borgmatic/borg-cache
   - /home/jeff/volumes/open-webui                   # chat history not worth keeping
@@ -53,6 +55,8 @@ exclude_patterns:
 
   # Live databases that are dumped consistently below instead of copied mid-write
   - /home/jeff/volumes/authentik/pgdata
+  - /home/jeff/volumes/dawarich/db
+  - /home/jeff/volumes/dawarich/redis                # job queue only
   - sh:/home/jeff/volumes/home-assistant/data/home-assistant_v2.db*
   - sh:/home/jeff/volumes/media-system/sonarr/config/sonarr.db*
   - sh:/home/jeff/volumes/media-system/radarr/config/radarr.db*
@@ -115,6 +119,11 @@ postgresql_databases:
     hostname: paperless-db-1
     username: paperless
     password: paperless            # same literal as household/paperless/docker-compose.yml
+    format: custom
+  - name: dawarich
+    hostname: dawarich-db
+    username: dawarich
+    password: ${DAWARICH_DB_PASSWORD}
     format: custom
 
 ntfy:

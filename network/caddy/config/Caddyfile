@@ -86,6 +86,20 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy flightdensity-web:8787
 	}
 
+	# household/dawarich: location history. The UI is behind Authentik (plus
+	# Dawarich's own login); /api/* skips Authentik so the phone apps (OwnTracks,
+	# Overland) can post points -- every API call needs the per-user api_key.
+	@dawarich host dawarich.{$DOMAIN_NAME}
+	handle @dawarich {
+		handle /api/* {
+			reverse_proxy dawarich:3000
+		}
+		handle {
+			import forward_auth_authentik
+			reverse_proxy dawarich:3000
+		}
+	}
+
 	@actual host actual.{$DOMAIN_NAME}
 	handle @actual {
 		import forward_auth_authentik
