@@ -361,7 +361,13 @@ def stop(gid, reason):
             try:
                 game["before_stop"]()
             except Exception as e:
-                log.warning("%s: pre-stop save failed: %s", gid, e)
+                # Stopping now would lose everything since the last save (SE is
+                # SIGKILLed under Wine), so leave it up and retry after another
+                # idle period.
+                log.error("%s: pre-stop save failed, leaving it running: %s", gid, e)
+                with lock:
+                    st["idle_since"] = time.time()
+                return
         docker("POST", f"/containers/{game['container']}/stop?t={game['stop_timeout']}")
         log.info("%s: stopped", gid)
     finally:

@@ -1,9 +1,11 @@
 [Unit]
 Description=Remount NAS shares and recover containers that depend on them
 After=docker.service
-Requires=docker.service
+# No Requires=/Wants=: those would start Docker every 2 minutes, undoing a
+# deliberate `systemctl stop docker`. Skip the run while Docker is down instead.
 
 [Service]
 Type=oneshot
+ExecCondition=/usr/bin/systemctl is-active --quiet docker.service
 ExecStart=/usr/local/sbin/nas-watchdog
 TimeoutStartSec=10min
