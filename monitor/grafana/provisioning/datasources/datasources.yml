@@ -40,3 +40,15 @@ datasources:
       path: /var/lib/actual-networth/networth.sqlite
       pathPrefix: "file:"
       pathOptions: "?mode=ro"
+
+  # Garmin Connect health data, fetched by health/garmin (garmin-grafana).
+  # uid matches the upstream dashboard after its ${DS_GARMIN_STATS} substitution.
+  - name: Garmin InfluxDB
+    uid: garmin_influxdb
+    type: influxdb
+    access: proxy
+    url: http://garmin-influxdb:8086
+    database: GarminStats
+    editable: false
+    jsonData:
+      httpMode: GET
