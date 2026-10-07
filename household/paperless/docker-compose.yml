@@ -27,6 +27,9 @@
 networks:
   web:
     external: true
+secrets:
+  paperless_oidc_providers:
+    file: ../../_secrets/paperless_oidc_providers.json # allauth config incl. client secret (Authentik provider "Paperless")
 services:
   broker:
     image: docker.io/library/redis:8
@@ -54,8 +57,10 @@ services:
     depends_on:
       - db
       - broker
-    ports:
-      - "8007:8000"
+    # Not published: reached only via Caddy (paperless.${DOMAIN_NAME}) which
+    # forward_auths to Authentik. A host port would let the LAN bypass that.
+    expose:
+      - "8000"
     volumes:
       - ${HDD_PATH}/paperless/data:/usr/src/paperless/data
       - ${HDD_PATH}/paperless/media:/usr/src/paperless/media
@@ -66,3 +71,26 @@ services:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
       PAPERLESS_URL: https://paperless.${DOMAIN_NAME}
+      # SSO via Authentik OIDC (application "paperless"). Regular login stays on for
+      # the mobile apps. Membership in Authentik group "Paperless Admins" -> superuser.
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS_FILE: /run/secrets/paperless_oidc_providers
+      PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+      PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS: "true"
+      PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP: Paperless Admins
+      # Built-in AI (suggestions, "Apply AI suggestions" workflow action, document
+      # chat) via the local Ollama in ~/llm. Context matches Ollama's
+      # OLLAMA_CONTEXT_LENGTH so switching between Paperless and OpenCode doesn't
+      # force a model reload.
+      PAPERLESS_AI_ENABLED: "true"
+      PAPERLESS_AI_LLM_BACKEND: ollama
+      PAPERLESS_AI_LLM_ENDPOINT: http://ollama:11434
+      PAPERLESS_AI_LLM_MODEL: qwen3:8b
+      PAPERLESS_AI_LLM_CONTEXT_SIZE: "16384"
+      PAPERLESS_AI_LLM_OUTPUT_LANGUAGE: English
+      # Embeddings on CPU (all-MiniLM-L6-v2, cached under data/hf_cache). Loading an
+      # Ollama embedding model next to qwen3:8b + whisper overflowed the 1080's 8 GB,
+      # spilled qwen3 partly to CPU and made every suggestion ~50 s instead of seconds.
+      PAPERLESS_AI_LLM_EMBEDDING_BACKEND: huggingface
+    secrets:
+      - paperless_oidc_providers

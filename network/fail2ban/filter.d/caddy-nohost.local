@@ -1,0 +1,6 @@
+# Caddy JSON access log: the fallback handler for unknown *.domain hosts sets
+# X-No-Service, which Caddy echoes in resp_headers.
+[Definition]
+failregex = ^.*"client_ip":"<HOST>".*"X-No-Service".*$
+ignoreregex =
+datepattern = "ts":{EPOCH}

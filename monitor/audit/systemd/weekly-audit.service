@@ -1,0 +1,11 @@
+# Weekly server audit (monitor/audit). Installed as a systemd *user* unit:
+#   ln -s $PWD/weekly-audit.{service,timer} ~/.config/systemd/user/ && systemctl --user enable --now weekly-audit.timer
+[Unit]
+Description=Weekly home-server audit (read-only snapshot + Claude report -> ntfy)
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/jeff/development/github.com/home-server/monitor/audit/weekly-audit.sh
+TimeoutStartSec=30min
+Nice=10

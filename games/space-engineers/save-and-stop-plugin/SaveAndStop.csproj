@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>SaveAndStop</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <!-- Mounted from ${SSD_PATH}/games/space-engineers/SpaceEngineersDedicated/DedicatedServer64 -->
+    <SeBin>/se</SeBin>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="$(SeBin)/Sandbox.Game.dll" Private="false" />
+    <Reference Include="$(SeBin)/Sandbox.Common.dll" Private="false" />
+    <Reference Include="$(SeBin)/VRage.dll" Private="false" />
+    <Reference Include="$(SeBin)/VRage.Library.dll" Private="false" />
+    <Reference Include="$(SeBin)/VRage.Game.dll" Private="false" />
+    <Reference Include="$(SeBin)/VRage.Math.dll" Private="false" />
+  </ItemGroup>
+</Project>

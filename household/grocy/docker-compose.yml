@@ -15,6 +15,7 @@ services:
       TZ: ${TZ}
     volumes:
       - ${SSD_PATH}/grocy/config:/config
-    ports:
-      - 9283:80
+    # Not published: reached only via Caddy, which forward_auths to Authentik.
+    expose:
+      - "80"
     restart: unless-stopped

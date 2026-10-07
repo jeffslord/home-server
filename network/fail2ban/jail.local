@@ -1,0 +1,65 @@
+# Site jails. Defaults for everything else come from jail.conf; ignoreip is
+# generated into jail.d/zz-ignoreip.local by docker-compose.yml.
+
+[DEFAULT]
+bantime  = 1h
+findtime = 10m
+maxretry = 5
+# Repeat offenders get longer bans, up to a week.
+bantime.increment = true
+bantime.maxtime   = 1w
+# allports: in DOCKER-USER the packet has already been DNAT'd to the container
+# port, so a multiport rule keyed on the public port would not match.
+banaction = iptables-allports
+banaction_allports = iptables-allports
+chain     = DOCKER-USER
+# Caddy also serves HTTP/3 on 443/udp; the default (tcp) would leave QUIC open.
+protocol  = all
+
+# --- host -------------------------------------------------------------------
+[sshd]
+enabled = true
+chain   = INPUT
+logpath = /var/log/auth.log
+backend = polling
+
+# --- caddy (everything web-facing) ------------------------------------------
+# Repeated 401/403 from the apps behind Caddy (Jellyfin API, HA API, ntfy, Open WebUI).
+[caddy-auth]
+enabled  = true
+logpath  = /remotelogs/caddy/access.log
+maxretry = 15
+
+# Probing for wp-login.php, /.env, phpmyadmin etc. Nothing here serves those.
+[caddy-botsearch]
+enabled  = true
+logpath  = /remotelogs/caddy/access.log
+maxretry = 2
+bantime  = 1d
+
+# Hits on subdomains that don't exist (Caddy's fallback tags them X-No-Service).
+[caddy-nohost]
+enabled  = true
+logpath  = /remotelogs/caddy/access.log
+maxretry = 3
+
+# --- apps with their own login ----------------------------------------------
+[homeassistant-auth]
+enabled  = true
+logpath  = /remotelogs/homeassistant/home-assistant.log
+maxretry = 5
+
+# Jellyfin rolls to a new log_YYYYMMDD.log daily and fail2ban only expands the
+# glob at start, so the host crontab reloads this jail just after midnight.
+[jellyfin-auth]
+enabled  = true
+logpath  = /remotelogs/jellyfin/log_*.log
+maxretry = 5
+
+# Anyone banned 3 times in a day by any jail gets a week.
+[recidive]
+enabled  = true
+logpath  = /config/log/fail2ban/fail2ban.log
+bantime  = 1w
+findtime = 1d
+maxretry = 3

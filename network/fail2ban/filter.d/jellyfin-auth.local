@@ -1,0 +1,6 @@
+# Jellyfin log_YYYYMMDD.log. The IP is only the real client once Jellyfin's
+# KnownProxies includes Caddy's network (network.xml), otherwise it's Caddy.
+[Definition]
+failregex = ^.*Authentication request for "[^"]*" has been denied \(IP: "<HOST>"\)\.\s*$
+ignoreregex =
+datepattern = ^\[%%Y-%%m-%%d %%H:%%M:%%S\.%%f %%z\]

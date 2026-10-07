@@ -1,0 +1,47 @@
+# Garmin Connect -> InfluxDB 1.11 -> Grafana ("Garmin Stats" dashboard, folder health).
+# https://github.com/arpanghosh8453/garmin-grafana
+#   garmin-fetch-data  polls Garmin Connect every 5 min (unofficial API, OAuth tokens
+#                      in ${SSD_PATH}/garmin/tokens, valid ~1 year)
+#   garmin-influxdb    reached only by Grafana over monitor_monitoring; no host ports
+# First login (asks email/password/MFA, saves tokens, exits):
+#   docker compose run --rm garmin-fetch-data
+# Backfill history (newest first, 5 s per day; intraday data older than ~6 months
+# is in Garmin cold storage, daily averages are still returned):
+#   docker compose run --rm -e MANUAL_START_DATE=YYYY-MM-DD -e MANUAL_END_DATE=YYYY-MM-DD garmin-fetch-data
+networks:
+  monitoring:
+    name: monitor_monitoring
+    external: true
+
+services:
+  garmin-fetch-data:
+    image: thisisarpanghosh/garmin-fetch-data:latest
+    container_name: garmin-fetch-data
+    depends_on:
+      - garmin-influxdb
+    volumes:
+      - ${SSD_PATH}/garmin/tokens:/home/appuser/.garminconnect # owned by 1000:1000
+    environment:
+      - INFLUXDB_HOST=garmin-influxdb
+      - INFLUXDB_PORT=8086
+      - INFLUXDB_USERNAME=garmin
+      - INFLUXDB_PASSWORD=garmin # unauthenticated DB on an internal network; value unused
+      - INFLUXDB_DATABASE=GarminStats
+      - GARMINCONNECT_IS_CN=False
+      - USER_TIMEZONE=America/New_York
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  garmin-influxdb:
+    image: influxdb:1.11
+    container_name: garmin-influxdb
+    environment:
+      - INFLUXDB_DB=GarminStats
+      - INFLUXDB_DATA_INDEX_VERSION=tsi1
+      - INFLUXDB_REPORTING_DISABLED=true
+    volumes:
+      - ${SSD_PATH}/garmin/influxdb:/var/lib/influxdb # owned by 1500:1500
+    networks:
+      - monitoring
+    restart: unless-stopped

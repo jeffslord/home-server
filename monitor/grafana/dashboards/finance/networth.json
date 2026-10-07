@@ -1,0 +1,1626 @@
+{
+  "uid": "actual-networth",
+  "title": "Net worth",
+  "tags": [
+    "finance",
+    "actual"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 41,
+  "time": {
+    "from": "2023-02-01T00:00:00.000Z",
+    "to": "now"
+  },
+  "refresh": "",
+  "templating": {
+    "list": [
+      {
+        "name": "exclude",
+        "label": "Exclude",
+        "type": "custom",
+        "multi": false,
+        "includeAll": false,
+        "query": "None : __none, Cash : Cash, Investments : Investments, Retirement : Retirement, Home equity : Real estate, Credit cards : Credit cards, Home equity + Retirement : Real estate|Retirement",
+        "current": {
+          "text": "None",
+          "value": "__none"
+        }
+      },
+      {
+        "name": "scenario",
+        "label": "Scenario",
+        "type": "custom",
+        "multi": false,
+        "includeAll": false,
+        "query": "Conservative, Base, Optimistic",
+        "current": {
+          "text": "Base",
+          "value": "Base"
+        }
+      },
+      {
+        "name": "horizon",
+        "label": "Horizon (years)",
+        "type": "custom",
+        "multi": false,
+        "includeAll": false,
+        "query": "5, 10, 20, 30",
+        "current": {
+          "text": "20",
+          "value": "20"
+        }
+      },
+      {
+        "name": "retire",
+        "label": "Retirement $/mo",
+        "type": "textbox",
+        "query": "2450",
+        "current": {
+          "text": "2450",
+          "value": "2450"
+        }
+      },
+      {
+        "name": "extra",
+        "label": "Brokerage $/mo",
+        "type": "textbox",
+        "query": "0",
+        "current": {
+          "text": "0",
+          "value": "0"
+        }
+      },
+      {
+        "name": "dollars",
+        "label": "Dollars",
+        "type": "custom",
+        "multi": false,
+        "includeAll": false,
+        "query": "Nominal : 1, Today's : 0.9979443979338495",
+        "current": {
+          "text": "Nominal",
+          "value": "1"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Net worth",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 9,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY time ORDER BY time",
+          "rawQueryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY time ORDER BY time",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "min": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#c3c2b7"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "center",
+        "text": {
+          "valueSize": 40
+        }
+      },
+      "description": "Sum of every account in Actual (on and off budget) at the end of the range.",
+      "id": 1
+    },
+    {
+      "type": "stat",
+      "title": "Cash",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 0,
+        "w": 3,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Cash' GROUP BY time ORDER BY time",
+          "rawQueryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Cash' GROUP BY time ORDER BY time",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "center",
+        "text": {
+          "valueSize": 26
+        }
+      },
+      "id": 2
+    },
+    {
+      "type": "stat",
+      "title": "Investments",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 3,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Investments' GROUP BY time ORDER BY time",
+          "rawQueryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Investments' GROUP BY time ORDER BY time",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#d95926"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "center",
+        "text": {
+          "valueSize": 26
+        }
+      },
+      "id": 3
+    },
+    {
+      "type": "stat",
+      "title": "Retirement",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 0,
+        "w": 3,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Retirement' GROUP BY time ORDER BY time",
+          "rawQueryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Retirement' GROUP BY time ORDER BY time",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#199e70"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "center",
+        "text": {
+          "valueSize": 26
+        }
+      },
+      "id": 4
+    },
+    {
+      "type": "stat",
+      "title": "Home equity",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 3,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Real estate' GROUP BY time ORDER BY time",
+          "rawQueryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Real estate' GROUP BY time ORDER BY time",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#d55181"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "center",
+        "text": {
+          "valueSize": 26
+        }
+      },
+      "description": "House value minus mortgage.",
+      "id": 5
+    },
+    {
+      "type": "stat",
+      "title": "Credit cards",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 0,
+        "w": 3,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Credit cards' GROUP BY time ORDER BY time",
+          "rawQueryText": "SELECT time, SUM(balance) AS value FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND type = 'Credit cards' GROUP BY time ORDER BY time",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#9085e9"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "text": {
+          "valueSize": 26
+        }
+      },
+      "id": 6
+    },
+    {
+      "type": "stat",
+      "title": "Net worth change",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 14,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH nw AS (SELECT date, time, SUM(balance) AS v FROM balances WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date) SELECT (SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-30 days') ORDER BY date DESC LIMIT 1) AS \"30 days\", (SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-90 days') ORDER BY date DESC LIMIT 1) AS \"90 days\", (SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), 'start of year', '-1 day') ORDER BY date DESC LIMIT 1) AS \"YTD\", (SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-1 year') ORDER BY date DESC LIMIT 1) AS \"12 months\"",
+          "rawQueryText": "WITH nw AS (SELECT date, time, SUM(balance) AS v FROM balances WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date) SELECT (SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-30 days') ORDER BY date DESC LIMIT 1) AS \"30 days\", (SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-90 days') ORDER BY date DESC LIMIT 1) AS \"90 days\", (SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), 'start of year', '-1 day') ORDER BY date DESC LIMIT 1) AS \"YTD\", (SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-1 year') ORDER BY date DESC LIMIT 1) AS \"12 months\"",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#e66767",
+                "value": null
+              },
+              {
+                "color": "#3987e5",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "justifyMode": "center",
+        "text": {
+          "titleSize": 13,
+          "valueSize": 24
+        }
+      },
+      "description": "Change up to the latest exported day. YTD compares with Dec 31. Ignores the time picker.",
+      "id": 7
+    },
+    {
+      "type": "stat",
+      "title": "Net worth change %",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 5,
+        "w": 10,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH nw AS (SELECT date, time, SUM(balance) AS v FROM balances WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date) SELECT ((SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-30 days') ORDER BY date DESC LIMIT 1)) / ABS((SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-30 days') ORDER BY date DESC LIMIT 1)) AS \"30 days\", ((SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-90 days') ORDER BY date DESC LIMIT 1)) / ABS((SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-90 days') ORDER BY date DESC LIMIT 1)) AS \"90 days\", ((SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), 'start of year', '-1 day') ORDER BY date DESC LIMIT 1)) / ABS((SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), 'start of year', '-1 day') ORDER BY date DESC LIMIT 1)) AS \"YTD\", ((SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-1 year') ORDER BY date DESC LIMIT 1)) / ABS((SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-1 year') ORDER BY date DESC LIMIT 1)) AS \"12 months\"",
+          "rawQueryText": "WITH nw AS (SELECT date, time, SUM(balance) AS v FROM balances WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date) SELECT ((SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-30 days') ORDER BY date DESC LIMIT 1)) / ABS((SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-30 days') ORDER BY date DESC LIMIT 1)) AS \"30 days\", ((SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-90 days') ORDER BY date DESC LIMIT 1)) / ABS((SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-90 days') ORDER BY date DESC LIMIT 1)) AS \"90 days\", ((SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), 'start of year', '-1 day') ORDER BY date DESC LIMIT 1)) / ABS((SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), 'start of year', '-1 day') ORDER BY date DESC LIMIT 1)) AS \"YTD\", ((SELECT v FROM nw ORDER BY date DESC LIMIT 1) - (SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-1 year') ORDER BY date DESC LIMIT 1)) / ABS((SELECT v FROM nw WHERE date <= date((SELECT MAX(date) FROM nw), '-1 year') ORDER BY date DESC LIMIT 1)) AS \"12 months\"",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#e66767",
+                "value": null
+              },
+              {
+                "color": "#3987e5",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "justifyMode": "center",
+        "text": {
+          "titleSize": 13,
+          "valueSize": 24
+        }
+      },
+      "description": "Same periods as a share of net worth at the start of each period.",
+      "id": 8
+    },
+    {
+      "type": "barchart",
+      "title": "Monthly change",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH nw AS (SELECT date, time, SUM(balance) AS v FROM balances WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date), ends AS (SELECT MAX(date) AS d FROM nw GROUP BY strftime('%Y-%m', date)), m AS (SELECT nw.date AS day, nw.time, nw.v - LAG(nw.v) OVER (ORDER BY nw.date) AS delta FROM ends JOIN nw ON nw.date = ends.d) SELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(strftime('%m', day) AS INTEGER) * 3 - 2, 3) || CASE strftime('%m', day) WHEN '01' THEN ' \u2019' || substr(strftime('%Y', day), 3) ELSE '' END AS \"Month\", delta AS \"Change\" FROM m WHERE delta IS NOT NULL AND time >= $__from / 1000 AND time < $__to / 1000 ORDER BY day",
+          "rawQueryText": "WITH nw AS (SELECT date, time, SUM(balance) AS v FROM balances WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date), ends AS (SELECT MAX(date) AS d FROM nw GROUP BY strftime('%Y-%m', date)), m AS (SELECT nw.date AS day, nw.time, nw.v - LAG(nw.v) OVER (ORDER BY nw.date) AS delta FROM ends JOIN nw ON nw.date = ends.d) SELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(strftime('%m', day) AS INTEGER) * 3 - 2, 3) || CASE strftime('%m', day) WHEN '01' THEN ' \u2019' || substr(strftime('%Y', day), 3) ELSE '' END AS \"Month\", delta AS \"Change\" FROM m WHERE delta IS NOT NULL AND time >= $__from / 1000 AND time < $__to / 1000 ORDER BY day",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#e66767",
+                "value": null
+              },
+              {
+                "color": "#3987e5",
+                "value": 0
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 90,
+            "lineWidth": 0,
+            "axisSoftMin": 0,
+            "axisCenteredZero": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "xField": "Month",
+        "orientation": "vertical",
+        "showValue": "never",
+        "barWidth": 0.8,
+        "groupWidth": 0.7,
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 40
+      },
+      "description": "Month-end net worth minus the previous month-end (the current month is month-to-date). Last 12 months: earlier history has accounts that were only added to Actual later.",
+      "timeFrom": "11M",
+      "hideTimeOverride": true,
+      "id": 9
+    },
+    {
+      "type": "timeseries",
+      "title": "Asset mix",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 20,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT time, \"Cash\" / (\"Cash\" + \"Investments\" + \"Retirement\" + \"Home equity\") AS \"Cash\", \"Investments\" / (\"Cash\" + \"Investments\" + \"Retirement\" + \"Home equity\") AS \"Investments\", \"Retirement\" / (\"Cash\" + \"Investments\" + \"Retirement\" + \"Home equity\") AS \"Retirement\", \"Home equity\" / (\"Cash\" + \"Investments\" + \"Retirement\" + \"Home equity\") AS \"Home equity\" FROM (SELECT time, SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS \"Cash\", SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS \"Investments\", SUM(CASE WHEN type = 'Retirement' THEN balance ELSE 0 END) AS \"Retirement\", SUM(CASE WHEN type = 'Real estate' THEN balance ELSE 0 END) AS \"Home equity\" FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY time) ORDER BY time",
+          "rawQueryText": "SELECT time, \"Cash\" / (\"Cash\" + \"Investments\" + \"Retirement\" + \"Home equity\") AS \"Cash\", \"Investments\" / (\"Cash\" + \"Investments\" + \"Retirement\" + \"Home equity\") AS \"Investments\", \"Retirement\" / (\"Cash\" + \"Investments\" + \"Retirement\" + \"Home equity\") AS \"Retirement\", \"Home equity\" / (\"Cash\" + \"Investments\" + \"Retirement\" + \"Home equity\") AS \"Home equity\" FROM (SELECT time, SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS \"Cash\", SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS \"Investments\", SUM(CASE WHEN type = 'Retirement' THEN balance ELSE 0 END) AS \"Retirement\", SUM(CASE WHEN type = 'Real estate' THEN balance ELSE 0 END) AS \"Home equity\" FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY time) ORDER BY time",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 0,
+          "min": 0,
+          "max": 1,
+          "custom": {
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cash"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Investments"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Retirement"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Home equity"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d55181"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "description": "Share of each asset type over the last 12 months (credit cards and vehicles left out).",
+      "timeFrom": "1y",
+      "id": 10
+    },
+    {
+      "type": "piechart",
+      "title": "Assets by type",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 10,
+        "h": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS \"Cash\", SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS \"Investments\", SUM(CASE WHEN type = 'Retirement' THEN balance ELSE 0 END) AS \"Retirement\", SUM(CASE WHEN type = 'Real estate' THEN balance ELSE 0 END) AS \"Home equity\" FROM accounts WHERE closed = 0 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0",
+          "rawQueryText": "SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS \"Cash\", SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS \"Investments\", SUM(CASE WHEN type = 'Retirement' THEN balance ELSE 0 END) AS \"Retirement\", SUM(CASE WHEN type = 'Real estate' THEN balance ELSE 0 END) AS \"Home equity\" FROM accounts WHERE closed = 0 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cash"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Investments"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Retirement"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Home equity"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d55181"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "displayLabels": [
+          "percent"
+        ],
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "description": "Current balances of open accounts. Credit-card debt is left out of the donut (it is in net worth).",
+      "id": 11
+    },
+    {
+      "type": "table",
+      "title": "Accounts",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 10,
+        "y": 9,
+        "w": 14,
+        "h": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT CASE type WHEN 'Cash' THEN 'Cash' WHEN 'Investments' THEN 'Investments' WHEN 'Retirement' THEN 'Retirement' WHEN 'HSA' THEN 'HSA' WHEN 'Real estate' THEN 'Home equity' WHEN 'Vehicles' THEN 'Vehicles' WHEN 'Credit cards' THEN 'Credit cards' ELSE type END AS \"Type\", name AS \"Account\", balance AS \"Balance\", balance AS \"Share\" FROM accounts WHERE closed = 0 AND ABS(balance) >= 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 ORDER BY CASE type WHEN 'Cash' THEN 0 WHEN 'Investments' THEN 1 WHEN 'Retirement' THEN 2 WHEN 'HSA' THEN 3 WHEN 'Real estate' THEN 4 WHEN 'Vehicles' THEN 5 WHEN 'Credit cards' THEN 6 ELSE 99 END, balance DESC",
+          "rawQueryText": "SELECT CASE type WHEN 'Cash' THEN 'Cash' WHEN 'Investments' THEN 'Investments' WHEN 'Retirement' THEN 'Retirement' WHEN 'HSA' THEN 'HSA' WHEN 'Real estate' THEN 'Home equity' WHEN 'Vehicles' THEN 'Vehicles' WHEN 'Credit cards' THEN 'Credit cards' ELSE type END AS \"Type\", name AS \"Account\", balance AS \"Balance\", balance AS \"Share\" FROM accounts WHERE closed = 0 AND ABS(balance) >= 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 ORDER BY CASE type WHEN 'Cash' THEN 0 WHEN 'Investments' THEN 1 WHEN 'Retirement' THEN 2 WHEN 'HSA' THEN 3 WHEN 'Real estate' THEN 4 WHEN 'Vehicles' THEN 5 WHEN 'Credit cards' THEN 6 ELSE 99 END, balance DESC",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 0,
+          "custom": {
+            "filterable": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balance"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "right"
+              },
+              {
+                "id": "custom.width",
+                "value": 95
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Share"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": " "
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 40
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c3c2b7"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "basic",
+                  "valueDisplayMode": "hidden"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "id": 12
+    },
+    {
+      "type": "timeseries",
+      "title": "Balance by type over time",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 24,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT time, SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS \"Cash\", SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS \"Investments\", SUM(CASE WHEN type = 'Retirement' THEN balance ELSE 0 END) AS \"Retirement\", SUM(CASE WHEN type = 'HSA' THEN balance ELSE 0 END) AS \"HSA\", SUM(CASE WHEN type = 'Real estate' THEN balance ELSE 0 END) AS \"Home equity\", SUM(CASE WHEN type = 'Vehicles' THEN balance ELSE 0 END) AS \"Vehicles\", SUM(CASE WHEN type = 'Credit cards' THEN balance ELSE 0 END) AS \"Credit cards\", SUM(balance) AS \"Net worth\" FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY time ORDER BY time",
+          "rawQueryText": "SELECT time, SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS \"Cash\", SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS \"Investments\", SUM(CASE WHEN type = 'Retirement' THEN balance ELSE 0 END) AS \"Retirement\", SUM(CASE WHEN type = 'HSA' THEN balance ELSE 0 END) AS \"HSA\", SUM(CASE WHEN type = 'Real estate' THEN balance ELSE 0 END) AS \"Home equity\", SUM(CASE WHEN type = 'Vehicles' THEN balance ELSE 0 END) AS \"Vehicles\", SUM(CASE WHEN type = 'Credit cards' THEN balance ELSE 0 END) AS \"Credit cards\", SUM(balance) AS \"Net worth\" FROM balances WHERE time >= $__from / 1000 AND time < $__to / 1000 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY time ORDER BY time",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cash"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Investments"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Retirement"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HSA"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c98500"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Home equity"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d55181"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Vehicles"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#008300"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Credit cards"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#9085e9"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Net worth"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c3c2b7"
+                }
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "mode": "none",
+                  "group": "nw"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Stacked daily balances per type (negative types stack below zero); the line is net worth. Investment history moves in steps: Actual only records the daily balance adjustments.",
+      "id": 13
+    },
+    {
+      "type": "row",
+      "title": "Projection",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 44,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 14
+    },
+    {
+      "type": "stat",
+      "title": "Projected net worth \u00b7 ${scenario}",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj) SELECT MAX(CASE WHEN m = 60 THEN nw END) AS \"In 5 years\", MAX(CASE WHEN m = 120 THEN nw END) AS \"In 10 years\", MAX(CASE WHEN m = 240 THEN nw END) AS \"In 20 years\", MAX(CASE WHEN m = 360 THEN nw END) AS \"In 30 years\" FROM pt WHERE scen = '${scenario}'",
+          "rawQueryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj) SELECT MAX(CASE WHEN m = 60 THEN nw END) AS \"In 5 years\", MAX(CASE WHEN m = 120 THEN nw END) AS \"In 10 years\", MAX(CASE WHEN m = 240 THEN nw END) AS \"In 20 years\", MAX(CASE WHEN m = 360 THEN nw END) AS \"In 30 years\" FROM pt WHERE scen = '${scenario}'",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#c3c2b7"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "justifyMode": "center",
+        "text": {
+          "titleSize": 13,
+          "valueSize": 24
+        }
+      },
+      "description": "Net worth at each horizon for the scenario picked in the Scenario dropdown.",
+      "id": 15
+    },
+    {
+      "type": "trend",
+      "title": "Net worth projection",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 49,
+        "w": 14,
+        "h": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj), hist AS (SELECT time * 1000 AS t, SUM(balance) AS v FROM balances WHERE date >= '2025-10-01' AND strftime('%d', date) = '01' AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date) SELECT t AS time, v AS \"Actual\", NULL AS \"Conservative\", NULL AS \"Base\", NULL AS \"Optimistic\" FROM hist UNION ALL SELECT t, NULL, MAX(CASE WHEN scen = 'Conservative' THEN nw END), MAX(CASE WHEN scen = 'Base' THEN nw END), MAX(CASE WHEN scen = 'Optimistic' THEN nw END) FROM pt WHERE m <= ${horizon} * 12 GROUP BY m ORDER BY time",
+          "rawQueryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj), hist AS (SELECT time * 1000 AS t, SUM(balance) AS v FROM balances WHERE date >= '2025-10-01' AND strftime('%d', date) = '01' AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date) SELECT t AS time, v AS \"Actual\", NULL AS \"Conservative\", NULL AS \"Base\", NULL AS \"Optimistic\" FROM hist UNION ALL SELECT t, NULL, MAX(CASE WHEN scen = 'Conservative' THEN nw END), MAX(CASE WHEN scen = 'Base' THEN nw END), MAX(CASE WHEN scen = 'Optimistic' THEN nw END) FROM pt WHERE m <= ${horizon} * 12 GROUP BY m ORDER BY time",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:YYYY"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "^(?!time$).*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Actual"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c3c2b7"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Conservative"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#e66767"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    6
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Base"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c3c2b7"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    6
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Optimistic"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    6
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "time",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "description": "Monthly net worth since October 2025 (the house value was added to Actual in mid-September), then all three scenarios out to the Horizon. Annual nominal returns: Conservative 5% stocks, 2% cash, 2% home; Base 7% stocks, 3% cash, 3% home; Optimistic 9% stocks, 4% cash, 4% home. Contributions rise 2.5%/yr. Retirement $/mo goes to retirement accounts, Brokerage $/mo to investments. Mortgage, credit cards and vehicles stay at today's balance.",
+      "id": 16
+    },
+    {
+      "type": "trend",
+      "title": "Projection by type \u00b7 ${scenario}",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 49,
+        "w": 10,
+        "h": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj) SELECT t AS time, (cash) * dfl AS \"Cash\", (inv) * dfl AS \"Investments\", (ret) * dfl AS \"Retirement\", (house + fixed) * dfl AS \"Home equity\" FROM pt WHERE scen = '${scenario}' AND m <= ${horizon} * 12 ORDER BY m",
+          "rawQueryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj) SELECT t AS time, (cash) * dfl AS \"Cash\", (inv) * dfl AS \"Investments\", (ret) * dfl AS \"Retirement\", (house + fixed) * dfl AS \"Home equity\" FROM pt WHERE scen = '${scenario}' AND m <= ${horizon} * 12 ORDER BY m",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 70,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:YYYY"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "^(?!time$).*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cash"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Investments"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Retirement"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Home equity"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d55181"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "time",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "The picked scenario stacked by type. Annual nominal returns: Conservative 5% stocks, 2% cash, 2% home; Base 7% stocks, 3% cash, 3% home; Optimistic 9% stocks, 4% cash, 4% home. Contributions rise 2.5%/yr. Retirement $/mo goes to retirement accounts, Brokerage $/mo to investments. Mortgage, credit cards and vehicles stay at today's balance.",
+      "id": 17
+    },
+    {
+      "type": "stat",
+      "title": "Exported",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 41,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "SELECT CAST(value AS INTEGER) * 1000 AS \"Exported\" FROM meta WHERE key = 'updated_at'",
+          "rawQueryText": "SELECT CAST(value AS INTEGER) * 1000 AS \"Exported\" FROM meta WHERE key = 'updated_at'",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeFromNow",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#c3c2b7"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "text": {
+          "valueSize": 18
+        }
+      },
+      "description": "When networth-export.js last ran (hourly Ofelia job actual-networth, or Refresh now).",
+      "id": 18
+    },
+    {
+      "type": "text",
+      "title": "",
+      "transparent": true,
+      "gridPos": {
+        "x": 6,
+        "y": 41,
+        "w": 4,
+        "h": 3
+      },
+      "options": {
+        "mode": "html",
+        "content": "<div style=\"display:flex;height:100%;align-items:center\"><a href=\"/actual-refresh\" target=\"_self\" title=\"Re-read Actual now (takes a few seconds)\" style=\"padding:6px 14px;border:1px solid currentColor;border-radius:4px;text-decoration:none;font-weight:500\">&#x21bb; Refresh now</a></div>"
+      },
+      "id": 19
+    }
+  ]
+}

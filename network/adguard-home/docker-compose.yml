@@ -1,19 +1,16 @@
-networks:
-  web:
-    external: true
-
 services:
   adguardhome:
     image: adguard/adguardhome
     container_name: adguardhome
     restart: unless-stopped
-    networks:
-      - web
+    # Deliberately NOT on `web`: containers point their DNS at 192.168.1.162
+    # (/etc/docker/daemon.json), and a container on the same bridge as AdGuard
+    # can't reach it through the host IP (hairpin NAT), so every lookup from
+    # `web` would time out before falling back to 1.1.1.1.
     ports:
       - 53:53/tcp # plain dns over tcp
       - 53:53/udp # plain dns over udp
-      - 80:80/tcp # http web interface
-      - 3000:3000/tcp # initial setup web interface
+      - 80:80/tcp # http web interface (LAN only, AdGuard's own login)
     volumes:
       - ${SSD_PATH}/network/adguardhome/config:/opt/adguardhome/conf # app configuration
       - ${SSD_PATH}/network/adguardhome/work:/opt/adguardhome/work # app working directory

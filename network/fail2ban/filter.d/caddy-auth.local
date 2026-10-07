@@ -1,0 +1,5 @@
+# Caddy JSON access log: 401/403 responses from the upstream app.
+[Definition]
+failregex = ^.*"client_ip":"<HOST>".*"status":(?:401|403),.*$
+ignoreregex =
+datepattern = "ts":{EPOCH}

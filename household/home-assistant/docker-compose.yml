@@ -19,11 +19,71 @@ services:
       - 8123:8123 #optional
     restart: unless-stopped
 
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: matter-server
+    restart: unless-stopped
+    # Matter commissioning needs mDNS + IPv6 on the LAN, so this one runs on the host network
+    # (listens on 5580; HA reaches it at ws://192.168.1.162:5580/ws). Pairing uses the
+    # companion app's Bluetooth, so no adapter is passed through here.
+    network_mode: host
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - ${SSD_PATH}/home-assistant/matter-server/data:/data
+    command: --storage-path /data --paa-root-cert-dir /data/credentials
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  # Local voice: Assist pipeline speech-to-text (Whisper, on the GPU) and text-to-speech
+  # (Piper, CPU). HA reaches them over the `web` network via the Wyoming integration at
+  # whisper:10300 and piper:10200; no host ports, nothing else needs them.
+  whisper:
+    image: lscr.io/linuxserver/faster-whisper:gpu
+    container_name: whisper
+    networks:
+      - web
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      WHISPER_MODEL: medium-int8
+      WHISPER_LANG: en
+      WHISPER_BEAM: 1
+      WHISPER_COMPUTE_TYPE: int8 # read by the patched run script below; Pascal can't do float16
+    volumes:
+      - ${SSD_PATH}/home-assistant/whisper:/config
+      - ./whisper/svc-whisper-run:/etc/s6-overlay/s6-rc.d/svc-whisper/run:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  piper:
+    image: lscr.io/linuxserver/piper:latest
+    container_name: piper
+    networks:
+      - web
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      PIPER_VOICE: en_US-hfc_female-medium
+    volumes:
+      - ${SSD_PATH}/home-assistant/piper:/config
+    restart: unless-stopped
+
   zwavejs2mqtt:
     container_name: zwavejs2mqtt
     networks:
       - web
-    image: zwavejs/zwavejs2mqtt:latest
+    image: zwavejs/zwave-js-ui:latest
     restart: always
     tty: true
     stop_signal: SIGINT
@@ -39,9 +99,9 @@ services:
       - '/dev/serial/by-id/usb-Zooz_800_Z-Wave_Stick_533D004242-if00:/dev/zwave'
     volumes:
       - ${SSD_PATH}/home-assistant/zwave2js2mqtt/data:/usr/src/app/store
-    ports:
-      - "8091:8091" # port for web interface
-      - "3001:3000" # port for Z-Wave JS websocket server
+    # No host ports. The UI (8091) has no login of its own, so it's reached only
+    # via Caddy + Authentik (zwave.<domain>); HA uses the Z-Wave JS websocket at
+    # ws://zwavejs2mqtt:3001 over `web` (the server port is 3001, set in the UI).
 
   ring-mqtt:
     networks:
@@ -64,7 +124,7 @@ services:
       - web
     image: eclipse-mosquitto
     container_name: mosquitto
-    restart: unless-stopped
+    restart: always
     volumes:
       - ${SSD_PATH}/home-assistant/mosquitto/config:/mosquitto/config
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro # pwfile stays in the volume

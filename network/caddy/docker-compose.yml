@@ -26,6 +26,7 @@ services:
       - ./config:/etc/caddy:ro # directory, not file, so `caddy reload` sees edits
       - ${SSD_PATH}/caddy/data/:/data
       - ${SSD_PATH}/caddy/config:/config
+      - ${SSD_PATH}/caddy/logs:/var/log/caddy # access log, read by fail2ban
     secrets:
       - cf_api_token
     command: sh -c 'export CF_API_TOKEN=$$(cat /run/secrets/cf_api_token) && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile'

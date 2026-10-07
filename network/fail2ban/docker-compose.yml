@@ -1,3 +1,29 @@
+# fail2ban for the services Caddy exposes to the internet. Everything web-facing
+# goes through Caddy, so bans land in the DOCKER-USER chain (host-network
+# container with NET_ADMIN, same nf_tables backend as the host).
+#
+# Jails/filters live next to this file and are bind-mounted as *.local, which
+# the linuxserver image never overwrites (it re-copies its own *.conf on start).
+#
+# Useful:  docker exec fail2ban fail2ban-client status [<jail>]
+#          docker exec fail2ban fail2ban-client set <jail> unbanip <ip>
+#          docker exec fail2ban fail2ban-regex /remotelogs/caddy/access.log /config/fail2ban/filter.d/caddy-auth.local
+
+# ignoreip needs DOMAIN_NAME / LAN_NETWORK, which fail2ban can't read from the
+# environment, so compose interpolates it here (same trick as monitor/blackbox).
+configs:
+  ignoreip:
+    content: |
+      # Generated from docker-compose.yml -- edit there.
+      # LAN clients that use *.${DOMAIN_NAME} hairpin through the router and show up
+      # with the WAN address (so do the blackbox probes), hence the domain entry:
+      # fail2ban resolves it at jail start. After a WAN IP change: docker restart fail2ban
+      [DEFAULT]
+      ignoreip = 127.0.0.1/8 ::1 fe80::/10
+                 ${LAN_NETWORK}
+                 172.16.0.0/12
+                 ${DOMAIN_NAME}
+
 services:
   fail2ban:
     image: lscr.io/linuxserver/fail2ban:latest
@@ -11,33 +37,25 @@ services:
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
-      VERBOSITY: -vv #optional
     volumes:
-      - /var/log:/var/log:ro
       - ${SSD_PATH}/fail2ban/config:/config
-      - ${SSD_PATH}/media-system/sonarr/config/logs:/remotelogs/sonarr:ro
-      - ${SSD_PATH}/media-system/radarr/config/logs:/remotelogs/radarr:ro
-      - ${SSD_PATH}/media-system/plex/config/Library/Application Support/Plex Media Server/Logs:/remotelogs/plex:ro
-      - ${SSD_PATH}/media-system/jellyfin/config/log:/remotelogs/jellyfin:ro
-      - ${SSD_PATH}/media-system/prowlarr/config/logs:/remotelogs/prowlarr:ro
-      # - ${SSD_PATH}/media-system/:/remotelogs/flaresolverr:ro
-      - ${SSD_PATH}/media-system/qbittorrent/config/data/logs:/remotelogs/qbittorrent:ro
-      - ${SSD_PATH}/media-system/ombi/config/Logs:/remotelogs/ombi:ro
-      - ${SSD_PATH}/media-system/filebrowswer/config:/remotelogs/filebrowser:ro
-      # - /path/to/airsonic/log:/remotelogs/airsonic:ro #optional
-      # - /path/to/apache2/log:/remotelogs/apache2:ro #optional
-      # - /path/to/authelia/log:/remotelogs/authelia:ro #optional
-      # - /path/to/emby/log:/remotelogs/emby:ro #optional
-      # - /path/to/filebrowser/log:/remotelogs/filebrowser:ro #optional
-      # - /path/to/homeassistant/log:/remotelogs/homeassistant:ro #optional
-      # - /path/to/lighttpd/log:/remotelogs/lighttpd:ro #optional
-      # - /path/to/nextcloud/log:/remotelogs/nextcloud:ro #optional
-      # - /path/to/nginx/log:/remotelogs/nginx:ro #optional
-      # - /path/to/nzbget/log:/remotelogs/nzbget:ro #optional
-      # - /path/to/overseerr/log:/remotelogs/overseerr:ro #optional
-      # - /path/to/prowlarr/log:/remotelogs/prowlarr:ro #optional
-      # - /path/to/radarr/log:/remotelogs/radarr:ro #optional
-      # - /path/to/sabnzbd/log:/remotelogs/sabnzbd:ro #optional
-      # - /path/to/sonarr/log:/remotelogs/sonarr:ro #optional
-      # - /path/to/unificontroller/log:/remotelogs/unificontroller:ro #optional
-      # - /path/to/vaultwarden/log:/remotelogs/vaultwarden:ro #optional
+      - ./jail.local:/config/fail2ban/jail.local:ro
+      - ./filter.d/caddy-auth.local:/config/fail2ban/filter.d/caddy-auth.local:ro
+      - ./filter.d/caddy-botsearch.local:/config/fail2ban/filter.d/caddy-botsearch.local:ro
+      - ./filter.d/caddy-nohost.local:/config/fail2ban/filter.d/caddy-nohost.local:ro
+      - ./filter.d/homeassistant-auth.local:/config/fail2ban/filter.d/homeassistant-auth.local:ro
+      - ./filter.d/jellyfin-auth.local:/config/fail2ban/filter.d/jellyfin-auth.local:ro
+      # Logs. Host auth.log for sshd; the rest are the apps with their own login
+      # page. Authentik-protected apps never see an unauthenticated request, and
+      # Authentik itself rate-limits logins via its reputation policy.
+      - /var/log:/var/log:ro
+      - ${SSD_PATH}/caddy/logs:/remotelogs/caddy:ro
+      - ${SSD_PATH}/home-assistant/data:/remotelogs/homeassistant:ro # needs http.use_x_forwarded_for in HA
+      - ${SSD_PATH}/media-system/jellyfin/config/log:/remotelogs/jellyfin:ro # needs KnownProxies in Jellyfin
+    configs:
+      - source: ignoreip
+        target: /config/fail2ban/jail.d/zz-ignoreip.local
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"

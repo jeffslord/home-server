@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game Servers</title>
+<style>
+  :root {
+    --bg: #f5f5f4; --card: #fff; --text: #1c1917; --muted: #78716c; --border: #e7e5e4; --track: #e7e5e4;
+    --accent: #2563eb; --on: #16a34a; --wait: #d97706; --off: #a8a29e; --err: #dc2626;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1917; --card: #292524; --text: #f5f5f4; --muted: #a8a29e; --border: #44403c; --track: #44403c;
+      --accent: #3b82f6; --off: #57534e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.4 system-ui, sans-serif; }
+  main { max-width: 600px; margin: 0 auto; padding: 32px 16px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: .9rem; margin: 0 0 24px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .card.just-ready { border-color: var(--on); }
+  .head { display: flex; align-items: center; gap: 12px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; background: var(--off); }
+  .running .dot { background: var(--on); }
+  .starting .dot, .stopping .dot { background: var(--wait); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+  .info { flex: 1; min-width: 0; }
+  .name { font-weight: 600; }
+  .meta { color: var(--muted); font-size: .85rem; }
+  .bar { height: 4px; background: var(--track); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+  .bar > div { height: 100%; background: var(--wait); transition: width 1s linear; }
+  .howto { font-size: .85rem; color: var(--muted); margin: 12px 0 0; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px 0 0; font-size: .9rem; }
+  dt { color: var(--muted); }
+  dd { margin: 0; display: flex; gap: 8px; align-items: center; min-width: 0; }
+  dd code { font: .9rem ui-monospace, monospace; overflow-wrap: anywhere; }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 8px; padding: 8px 16px; cursor: pointer;
+           background: var(--accent); color: #fff; }
+  button:disabled { opacity: .5; cursor: default; }
+  button.copy { font-size: .75rem; font-weight: 500; padding: 2px 8px; border-radius: 6px;
+                background: transparent; color: var(--accent); border: 1px solid var(--border); }
+  details { margin-top: 12px; font-size: .9rem; }
+  summary { cursor: pointer; color: var(--accent); }
+  .mods { margin: 8px 0 0; padding: 0; list-style: none; max-height: 320px; overflow-y: auto;
+          border: 1px solid var(--border); border-radius: 8px; }
+  .mods li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .mods li:last-child { border-bottom: 0; }
+  .mods .ver { color: var(--muted); font-family: ui-monospace, monospace; font-size: .8rem; white-space: nowrap; }
+  .dl { display: inline-block; margin-top: 8px; color: var(--accent); font-weight: 600; }
+  form { display: flex; gap: 8px; }
+  input { flex: 1; font: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+          background: var(--card); color: var(--text); min-width: 0; }
+  .err { color: var(--err); font-size: .9rem; min-height: 1.4em; margin-top: 8px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Game Servers</h1>
+  <p class="sub" id="sub">Start a server if it's off. It shuts itself down when nobody's playing.</p>
+
+  <section id="login" hidden>
+    <form id="login-form">
+      <input id="pw" type="password" placeholder="Password" autocomplete="current-password" required>
+      <button>Log in</button>
+    </form>
+    <div class="err" id="login-err"></div>
+  </section>
+
+  <section id="games"></section>
+  <div class="err" id="err"></div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const headers = { 'X-Launcher': '1', 'Content-Type': 'application/json' };
+const cards = {};      // id -> card element
+const lastState = {};  // id -> state from the previous poll
+let timer = null;
+
+function showLogin() {
+  clearTimeout(timer);  // stop polling: repeated 401s would trip fail2ban
+  $('games').innerHTML = '';
+  for (const k in cards) delete cards[k];
+  $('login').hidden = false;
+  $('pw').focus();
+}
+
+const mins = s => Math.max(1, Math.round(s / 60));
+
+function statusLine(g) {
+  switch (g.state) {
+    case 'running': {
+      let s = `Ready to join · ${g.players} playing`;
+      if (g.stops_in != null) s += ` · shuts down in ${mins(g.stops_in)} min if nobody joins`;
+      return s;
+    }
+    case 'starting': {
+      if (g.boot_estimate == null) return 'Starting up… this can take a few minutes';
+      const left = g.boot_estimate - (g.boot_elapsed || 0);
+      if (left > 30) return `Starting up… ready in about ${mins(left)} min`;
+      if (left > -60) return 'Starting up… almost ready';
+      return `Starting up… taking longer than usual (usually ~${mins(g.boot_estimate)} min)`;
+    }
+    case 'stopping': return 'Shutting down…';
+    case 'stopped': return 'Offline';
+    default: return 'Checking…';
+  }
+}
+
+function copyButton(text) {
+  const b = document.createElement('button');
+  b.className = 'copy';
+  b.textContent = 'Copy';
+  b.onclick = async () => {
+    try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; }
+    catch { b.textContent = 'Select it'; }
+    setTimeout(() => b.textContent = 'Copy', 1500);
+  };
+  return b;
+}
+
+function buildCard(g) {
+  const card = document.createElement('div');
+  card.innerHTML = `
+    <div class="head">
+      <div class="dot"></div>
+      <div class="info"><div class="name"></div><div class="meta"></div></div>
+      <button class="start">Start</button>
+    </div>
+    <div class="bar" hidden><div></div></div>
+    <p class="howto"></p>
+    <dl></dl>`;
+  card.querySelector('.name').textContent = g.name;
+  card.querySelector('.howto').textContent = g.howto;
+  card.querySelector('.start').onclick = e => start(g.id, e.target);
+  if (g.has_mods) {
+    const d = document.createElement('details');
+    d.innerHTML = `<summary>Mods you need</summary>
+      <a class="dl" href="/download/${g.id}-mods.zip">Download all mods (.zip)</a>
+      <ul class="mods"><li>Loading…</li></ul>`;
+    d.addEventListener('toggle', () => { if (d.open && !d.dataset.loaded) loadMods(g.id, d); });
+    card.append(d);
+  }
+  $('games').append(card);
+  return card;
+}
+
+async function loadMods(id, d) {
+  const r = await fetch(`/api/mods/${id}`, { headers });
+  if (r.status === 401) return showLogin();
+  const mods = await r.json();
+  const ul = d.querySelector('.mods');
+  ul.innerHTML = '';
+  for (const m of mods) {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.textContent = m.name + (m.optional ? ' (optional)' : '');
+    const ver = document.createElement('span');
+    ver.className = 'ver';
+    ver.textContent = m.version || '';
+    li.append(name, ver);
+    ul.append(li);
+  }
+  d.querySelector('summary').textContent = `Mods you need (${mods.filter(m => !m.optional).length})`;
+  d.querySelector('.dl').textContent = 'Download all mods (.zip) — unzip into your VintagestoryData/Mods folder';
+  d.dataset.loaded = '1';
+}
+
+function renderDetails(card, g) {
+  const rows = [];
+  if (g.address) rows.push({ label: 'Address', value: g.address, copy: true });
+  rows.push(...g.details);
+  const key = JSON.stringify(rows);
+  if (card.dataset.details === key) return;  // unchanged: don't disturb selection
+  card.dataset.details = key;
+  const dl = card.querySelector('dl');
+  dl.innerHTML = '';
+  for (const row of rows) {
+    const dt = document.createElement('dt');
+    dt.textContent = row.label;
+    const dd = document.createElement('dd');
+    const code = document.createElement('code');
+    code.textContent = row.value;
+    dd.append(code);
+    if (row.copy) dd.append(copyButton(row.value));
+    dl.append(dt, dd);
+  }
+}
+
+function render(data) {
+  $('sub').textContent = `Start a server if it's off. It shuts itself down after ${data.idle_minutes} minutes with nobody on.`;
+  const ready = [];
+  for (const g of data.games) {
+    const card = cards[g.id] ||= buildCard(g);
+    const justReady = lastState[g.id] === 'starting' && g.state === 'running';
+    if (justReady) ready.push(g.name);
+    card.className = `card ${g.state}` + (justReady || (card.classList.contains('just-ready') && g.state === 'running') ? ' just-ready' : '');
+    card.querySelector('.meta').textContent = statusLine(g);
+    const btn = card.querySelector('.start');
+    btn.hidden = g.state !== 'stopped';
+    if (g.state === 'stopped') { btn.disabled = false; btn.textContent = 'Start'; }
+    const bar = card.querySelector('.bar');
+    bar.hidden = g.state !== 'starting';
+    if (g.state === 'starting') {
+      const pct = g.boot_estimate ? Math.min(95, 100 * (g.boot_elapsed || 0) / g.boot_estimate) : 10;
+      bar.firstElementChild.style.width = pct + '%';
+    }
+    renderDetails(card, g);
+    lastState[g.id] = g.state;
+  }
+  if (ready.length) document.title = `✓ ${ready.join(', ')} ready`;
+}
+
+async function poll() {
+  clearTimeout(timer);
+  try {
+    const r = await fetch('/api/status', { headers });
+    if (r.status === 401) return showLogin();
+    render(await r.json());
+    $('err').textContent = '';
+  } catch (e) {
+    $('err').textContent = 'Lost connection, retrying…';
+  }
+  timer = setTimeout(poll, 5000);
+}
+
+async function start(id, button) {
+  button.disabled = true;
+  button.textContent = 'Starting…';
+  document.title = 'Game Servers';
+  const r = await fetch(`/api/start/${id}`, { method: 'POST', headers });
+  if (r.status === 401) return showLogin();
+  setTimeout(poll, 1500);
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) setTimeout(() => document.title = 'Game Servers', 3000);
+});
+
+$('login-form').onsubmit = async e => {
+  e.preventDefault();
+  const r = await fetch('/api/login', { method: 'POST', headers, body: JSON.stringify({ password: $('pw').value }) });
+  if (!r.ok) { $('login-err').textContent = 'Wrong password'; return; }
+  $('login').hidden = true;
+  $('login-err').textContent = '';
+  poll();
+};
+
+poll();
+</script>
+</body>
+</html>

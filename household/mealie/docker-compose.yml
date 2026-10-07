@@ -11,8 +11,9 @@ services:
     restart: unless-stopped
     depends_on:
       - "postgres"
-    ports:
-      - 9091:9000
+    # Not published: reached only via Caddy, which forward_auths to Authentik.
+    expose:
+      - "9000"
     environment:
       PUID: ${PUID}
       PGID: ${PGID}

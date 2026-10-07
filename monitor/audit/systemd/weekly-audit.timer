@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the home-server audit every Sunday morning
+
+[Timer]
+OnCalendar=Sun *-*-* 08:30:00
+Persistent=true
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

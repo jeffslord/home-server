@@ -10,6 +10,8 @@ volumes:
 secrets:
   ntfy_alertmanager_password:
     file: ../_secrets/ntfy_alertmanager_password.txt
+  grafana_oidc_client_secret:
+    file: ../_secrets/grafana_oidc_client_secret.txt # Authentik provider "Grafana"
 
 # Blackbox targets that need DOMAIN_NAME. Compose interpolates ${DOMAIN_NAME}
 # here (it can't inside a bind-mounted file), so the domain stays out of git.
@@ -23,8 +25,11 @@ configs:
           - https://authentik.${DOMAIN_NAME}
           - https://jellyfin.${DOMAIN_NAME}
           - https://open-webui.${DOMAIN_NAME}
-          - https://ollama.${DOMAIN_NAME}
           - https://ha.${DOMAIN_NAME}
+      # A site not under DOMAIN_NAME; its URL lives only in .env (ANON_SITE_URL).
+      - labels: { group: public }
+        targets:
+          - ${ANON_SITE_URL}
       - labels: { group: authentik }
         targets:
           - https://actual.${DOMAIN_NAME}
@@ -40,6 +45,8 @@ configs:
           - https://paperless.${DOMAIN_NAME}
           - https://dockhand.${DOMAIN_NAME}
           - https://grafana.${DOMAIN_NAME}
+          - https://prometheus.${DOMAIN_NAME}
+          - https://opencode.${DOMAIN_NAME}
 
 services:
   prometheus:
@@ -58,9 +65,9 @@ services:
       - '--storage.tsdb.retention.time=30d'
       - '--storage.tsdb.retention.size=15GB'
       - '--web.enable-lifecycle' # curl -X POST localhost:9092/-/reload after editing config
-      - '--web.external-url=http://${SERVER_LAN_IP}:9092' # makes "Source" links in alerts clickable
+      - '--web.external-url=https://prometheus.${DOMAIN_NAME}' # "Source" links in alerts go through Caddy + Authentik
     ports:
-      - "9092:9090"
+      - "127.0.0.1:9092:9090" # host-only, for the reload curl above; the LAN goes through Caddy
     networks:
       - monitoring
       - web # so it can scrape exporters that live on the app network
@@ -234,12 +241,32 @@ services:
       - ${SSD_PATH}/monitor/grafana:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/etc/grafana/dashboards:ro
+      - ${SSD_PATH}/actual-networth/out:/var/lib/actual-networth:ro # finance/helpers networth-export.js
     environment:
+      - GF_PLUGINS_PREINSTALL=frser-sqlite-datasource,marcusolsson-hourly-heatmap-panel # SQLite: Net worth dashboard; hourly heatmap: Garmin dashboard
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD} # only applied on first start; change existing via UI
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN_NAME}
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/dashboards/home.json
+      # SSO via Authentik OIDC (application "grafana"). The browser hits the public
+      # authorize URL; token/userinfo go straight to authentik-server over the web network.
+      # Local admin login is still at /login?disableAutoLogin
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_AUTH_GENERIC_OAUTH_NAME=Authentik
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=grafana
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET__FILE=/run/secrets/grafana_oidc_client_secret
+      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid email profile
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://authentik.${DOMAIN_NAME}/application/o/authorize/
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=http://authentik-server:9000/application/o/token/
+      - GF_AUTH_GENERIC_OAUTH_API_URL=http://authentik-server:9000/application/o/userinfo/
+      - GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH=preferred_username
+      - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(groups, 'Grafana Admins') && 'Admin' || 'Viewer'
+      - GF_AUTH_GENERIC_OAUTH_USE_PKCE=true
+      - GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN=true
+      - GF_AUTH_SIGNOUT_REDIRECT_URL=https://authentik.${DOMAIN_NAME}/application/o/grafana/end-session/
+    secrets:
+      - grafana_oidc_client_secret
     networks:
       - monitoring
       - web # reached via grafana.${DOMAIN_NAME} through Caddy + Authentik
