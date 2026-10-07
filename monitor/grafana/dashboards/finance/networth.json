@@ -25,6 +25,62 @@
           "text": "None",
           "value": "__none"
         }
+      },
+      {
+        "name": "scenario",
+        "label": "Scenario",
+        "type": "custom",
+        "multi": false,
+        "includeAll": false,
+        "query": "Conservative, Base, Optimistic",
+        "current": {
+          "text": "Base",
+          "value": "Base"
+        }
+      },
+      {
+        "name": "horizon",
+        "label": "Horizon (years)",
+        "type": "custom",
+        "multi": false,
+        "includeAll": false,
+        "query": "5, 10, 20, 30",
+        "current": {
+          "text": "20",
+          "value": "20"
+        }
+      },
+      {
+        "name": "retire",
+        "label": "Retirement $/mo",
+        "type": "textbox",
+        "query": "2450",
+        "current": {
+          "text": "2450",
+          "value": "2450"
+        }
+      },
+      {
+        "name": "extra",
+        "label": "Brokerage $/mo",
+        "type": "textbox",
+        "query": "0",
+        "current": {
+          "text": "0",
+          "value": "0"
+        }
+      },
+      {
+        "name": "dollars",
+        "label": "Dollars",
+        "type": "custom",
+        "multi": false,
+        "includeAll": false,
+        "query": "Nominal : 1, Today's : 0.9979443979338495",
+        "current": {
+          "text": "Nominal",
+          "value": "1"
+        }
       }
     ]
   },
@@ -1123,6 +1179,382 @@
       "id": 13
     },
     {
+      "type": "row",
+      "title": "Projection",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 44,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 14
+    },
+    {
+      "type": "stat",
+      "title": "Projected net worth \u00b7 ${scenario}",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj) SELECT MAX(CASE WHEN m = 60 THEN nw END) AS \"In 5 years\", MAX(CASE WHEN m = 120 THEN nw END) AS \"In 10 years\", MAX(CASE WHEN m = 240 THEN nw END) AS \"In 20 years\", MAX(CASE WHEN m = 360 THEN nw END) AS \"In 30 years\" FROM pt WHERE scen = '${scenario}'",
+          "rawQueryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj) SELECT MAX(CASE WHEN m = 60 THEN nw END) AS \"In 5 years\", MAX(CASE WHEN m = 120 THEN nw END) AS \"In 10 years\", MAX(CASE WHEN m = 240 THEN nw END) AS \"In 20 years\", MAX(CASE WHEN m = 360 THEN nw END) AS \"In 30 years\" FROM pt WHERE scen = '${scenario}'",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#c3c2b7"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "justifyMode": "center",
+        "text": {
+          "titleSize": 13,
+          "valueSize": 24
+        }
+      },
+      "description": "Net worth at each horizon for the scenario picked in the Scenario dropdown.",
+      "id": 15
+    },
+    {
+      "type": "trend",
+      "title": "Net worth projection",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 49,
+        "w": 14,
+        "h": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj), hist AS (SELECT time * 1000 AS t, SUM(balance) AS v FROM balances WHERE date >= '2025-10-01' AND strftime('%d', date) = '01' AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date) SELECT t AS time, v AS \"Actual\", NULL AS \"Conservative\", NULL AS \"Base\", NULL AS \"Optimistic\" FROM hist UNION ALL SELECT t, NULL, MAX(CASE WHEN scen = 'Conservative' THEN nw END), MAX(CASE WHEN scen = 'Base' THEN nw END), MAX(CASE WHEN scen = 'Optimistic' THEN nw END) FROM pt WHERE m <= ${horizon} * 12 GROUP BY m ORDER BY time",
+          "rawQueryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj), hist AS (SELECT time * 1000 AS t, SUM(balance) AS v FROM balances WHERE date >= '2025-10-01' AND strftime('%d', date) = '01' AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0 GROUP BY date) SELECT t AS time, v AS \"Actual\", NULL AS \"Conservative\", NULL AS \"Base\", NULL AS \"Optimistic\" FROM hist UNION ALL SELECT t, NULL, MAX(CASE WHEN scen = 'Conservative' THEN nw END), MAX(CASE WHEN scen = 'Base' THEN nw END), MAX(CASE WHEN scen = 'Optimistic' THEN nw END) FROM pt WHERE m <= ${horizon} * 12 GROUP BY m ORDER BY time",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:YYYY"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "^(?!time$).*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Actual"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c3c2b7"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Conservative"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#e66767"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    6
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Base"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c3c2b7"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    6
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Optimistic"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    6
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "time",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "description": "Monthly net worth since October 2025 (the house value was added to Actual in mid-September), then all three scenarios out to the Horizon. Annual nominal returns: Conservative 5% stocks, 2% cash, 2% home; Base 7% stocks, 3% cash, 3% home; Optimistic 9% stocks, 4% cash, 4% home. Contributions rise 2.5%/yr. Retirement $/mo goes to retirement accounts, Brokerage $/mo to investments. Mortgage, credit cards and vehicles stay at today's balance.",
+      "id": 16
+    },
+    {
+      "type": "trend",
+      "title": "Projection by type \u00b7 ${scenario}",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "actual-networth"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 49,
+        "w": 10,
+        "h": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "actual-networth"
+          },
+          "queryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj) SELECT t AS time, (cash) * dfl AS \"Cash\", (inv) * dfl AS \"Investments\", (ret) * dfl AS \"Retirement\", (house + fixed) * dfl AS \"Home equity\" FROM pt WHERE scen = '${scenario}' AND m <= ${horizon} * 12 ORDER BY m",
+          "rawQueryText": "WITH p(scen, r, c, h) AS (VALUES ('Conservative', 0.0040741237836483535, 0.0016515813019202241, 0.0016515813019202241), ('Base', 0.005654145387405274, 0.0024662697723036864, 0.0024662697723036864), ('Optimistic', 0.007207323316136716, 0.0032737397821989145, 0.0032737397821989145)), s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, SUM(balance) AS total FROM accounts WHERE 1 = 1 AND instr('|' || '${exclude}' || '|', '|' || type || '|') = 0), f AS (SELECT CAST('${extra}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Investments|') = 0) AS extra, CAST('${retire}' AS REAL) * (instr('|' || '${exclude}' || '|', '|Retirement|') = 0) AS retc, CAST('${dollars}' AS REAL) AS defl, 1.0020598362698427 AS infl, julianday((SELECT MAX(date) FROM balances)) AS start), proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS (SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < 360), pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') - 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj) SELECT t AS time, (cash) * dfl AS \"Cash\", (inv) * dfl AS \"Investments\", (ret) * dfl AS \"Retirement\", (house + fixed) * dfl AS \"Home equity\" FROM pt WHERE scen = '${scenario}' AND m <= ${horizon} * 12 ORDER BY m",
+          "queryType": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 70,
+            "showPoints": "never",
+            "spanNulls": true,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:YYYY"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "^(?!time$).*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cash"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Investments"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Retirement"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Home equity"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d55181"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "time",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "The picked scenario stacked by type. Annual nominal returns: Conservative 5% stocks, 2% cash, 2% home; Base 7% stocks, 3% cash, 3% home; Optimistic 9% stocks, 4% cash, 4% home. Contributions rise 2.5%/yr. Retirement $/mo goes to retirement accounts, Brokerage $/mo to investments. Mortgage, credit cards and vehicles stay at today's balance.",
+      "id": 17
+    },
+    {
       "type": "stat",
       "title": "Exported",
       "datasource": {
@@ -1172,7 +1604,7 @@
         }
       },
       "description": "When networth-export.js last ran (hourly Ofelia job actual-networth, or Refresh now).",
-      "id": 14
+      "id": 18
     },
     {
       "type": "text",
@@ -1188,7 +1620,7 @@
         "mode": "html",
         "content": "<div style=\"display:flex;height:100%;align-items:center\"><a href=\"/actual-refresh\" target=\"_self\" title=\"Re-read Actual now (takes a few seconds)\" style=\"padding:6px 14px;border:1px solid currentColor;border-radius:4px;text-decoration:none;font-weight:500\">&#x21bb; Refresh now</a></div>"
       },
-      "id": 15
+      "id": 19
     }
   ]
 }

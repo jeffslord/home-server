@@ -207,6 +207,115 @@ panels.append(panel(
     desc="Stacked daily balances per type (negative types stack below zero); the line is net worth. "
          "Investment history moves in steps: Actual only records the daily balance adjustments."))
 
+
+# --- Projection -------------------------------------------------------------------
+# Month-by-month compounding from today's balances, in SQL (recursive CTE), driven by
+# dashboard variables. Annual nominal rates per scenario; the fan chart draws all three.
+SCENARIOS = [  # (name, stocks, cash, home)
+    ("Conservative", 0.05, 0.02, 0.02),
+    ("Base", 0.07, 0.03, 0.03),
+    ("Optimistic", 0.09, 0.04, 0.04),
+]
+SCEN_COLOR = {"Conservative": "#e66767", "Base": NET_WORTH_INK, "Optimistic": "#3987e5"}
+INFLATION = 0.025   # contributions rise with it; "Today's dollars" divides it back out
+# 401(k) ~$950 + match ~$500 + Roth IRA $7,500/yr + HSA $4,400/yr (2026 self-only limit)
+RETIRE_MONTHLY = 2450
+PROJ_MONTHS = 30 * 12
+mo = lambda annual: (1 + annual) ** (1 / 12) - 1
+
+
+def included(t):  # 1 unless the Exclude dropdown drops export type t
+    return f"(instr('|' || '${{exclude}}' || '|', '|{t}|') = 0)"
+
+
+# Mortgage, credit cards and vehicles stay at today's balance ("fixed"): Actual does
+# not track mortgage paydown. HSA counts as retirement money.
+PROJ = (
+    "p(scen, r, c, h) AS (VALUES "
+    + ", ".join(f"('{n}', {mo(s)!r}, {mo(c)!r}, {mo(h)!r})" for n, s, c, h in SCENARIOS) + "), "
+    "s AS (SELECT SUM(CASE WHEN type = 'Cash' THEN balance ELSE 0 END) AS cash, "
+    "SUM(CASE WHEN type = 'Investments' THEN balance ELSE 0 END) AS inv, "
+    "SUM(CASE WHEN type IN ('Retirement', 'HSA') THEN balance ELSE 0 END) AS ret, "
+    "SUM(CASE WHEN type = 'Real estate' AND balance > 0 THEN balance ELSE 0 END) AS house, "
+    "SUM(balance) AS total FROM accounts WHERE 1 = 1" + TF + "), "
+    "f AS (SELECT CAST('${extra}' AS REAL) * " + included("Investments") + " AS extra, "
+    "CAST('${retire}' AS REAL) * " + included("Retirement") + " AS retc, "
+    f"CAST('${{dollars}}' AS REAL) AS defl, {1 + mo(INFLATION)!r} AS infl, "
+    "julianday((SELECT MAX(date) FROM balances)) AS start), "
+    "proj(scen, m, cash, inv, ret, house, fixed, grow, dfl) AS ("
+    "SELECT scen, 0, cash, inv, ret, house, total - cash - inv - ret - house, 1.0, 1.0 FROM p, s "
+    "UNION ALL SELECT proj.scen, m + 1, cash * (1 + c), inv * (1 + r) + extra * grow, "
+    "ret * (1 + r) + retc * grow, house * (1 + h), fixed, grow * infl, dfl * defl "
+    f"FROM proj JOIN p ON p.scen = proj.scen, f WHERE m < {PROJ_MONTHS}), "
+    # month m as epoch ms, anchored on the latest exported day
+    "pt AS (SELECT proj.*, (julianday((SELECT MAX(date) FROM balances), '+' || m || ' months') "
+    "- 2440587.5) * 86400000 AS t, (cash + inv + ret + house + fixed) * dfl AS nw FROM proj)"
+)
+
+panels.append({"type": "row", "title": "Projection", "collapsed": False,
+               "gridPos": {"x": 0, "y": 44, "w": 24, "h": 1}, "panels": []})
+
+YEARS = [5, 10, 20, 30]
+panels.append(panel(
+    "stat", "Projected net worth · ${scenario}", 0, 45, 24, 4,
+    f"WITH {PROJ} SELECT "
+    + ", ".join(f"MAX(CASE WHEN m = {y * 12} THEN nw END) AS \"In {y} years\"" for y in YEARS)
+    + " FROM pt WHERE scen = '${scenario}'", fmt="table",
+    defaults={**MONEY, "decimals": 2, "color": {"mode": "fixed", "fixedColor": NET_WORTH_INK}},
+    options={"reduceOptions": {"calcs": ["lastNotNull"], "fields": ""}, "colorMode": "none",
+             "graphMode": "none", "textMode": "value_and_name", "justifyMode": "center",
+             "text": {"titleSize": 13, "valueSize": 24}},
+    desc="Net worth at each horizon for the scenario picked in the Scenario dropdown."))
+
+rates = "; ".join(f"{n} {s:.0%} stocks, {c:.0%} cash, {h:.0%} home" for n, s, c, h in SCENARIOS)
+ASSUMPTIONS = (f"Annual nominal returns: {rates}. Contributions rise {INFLATION:.1%}/yr. "
+               "Retirement $/mo goes to retirement accounts, Brokerage $/mo to investments. "
+               "Mortgage, credit cards and vehicles stay at today's balance.")
+TREND = {"unit": "currencyUSD",
+         "custom": {"lineWidth": 2, "fillOpacity": 0, "showPoints": "never", "spanNulls": True,
+                    "lineInterpolation": "linear"}}
+# x is epoch ms shown as years; the $ axes start at 0 (a y-only override, since
+# field defaults would also pin the x axis to 1970)
+X_AXIS = {"matcher": {"id": "byName", "options": "time"},
+          "properties": [{"id": "unit", "value": "time:YYYY"}]}
+Y_ZERO = {"matcher": {"id": "byRegexp", "options": "^(?!time$).*"},
+          "properties": [{"id": "custom.axisSoftMin", "value": 0}]}
+HORIZON = "m <= ${horizon} * 12"
+
+# Trend panel (numeric x) rather than timeseries: a time series is clipped to the
+# dashboard's time range, which ends at now.
+panels.append(panel(
+    "trend", "Net worth projection", 0, 49, 14, 11,
+    f"WITH {PROJ}, hist AS (SELECT time * 1000 AS t, SUM(balance) AS v FROM balances "
+    f"WHERE date >= '2025-10-01' AND strftime('%d', date) = '01'{TF} GROUP BY date) "
+    "SELECT t AS time, v AS \"Actual\", NULL AS \"Conservative\", NULL AS \"Base\", NULL AS \"Optimistic\" "
+    "FROM hist UNION ALL SELECT t, NULL, "
+    + ", ".join(f"MAX(CASE WHEN scen = '{n}' THEN nw END)" for n, *_ in SCENARIOS)
+    + f" FROM pt WHERE {HORIZON} GROUP BY m ORDER BY time", fmt="table",
+    defaults=TREND,
+    overrides=[X_AXIS, Y_ZERO, color_override("Actual")]
+    + [{"matcher": {"id": "byName", "options": n},
+        "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": SCEN_COLOR[n]}},
+                       {"id": "custom.lineStyle", "value": {"fill": "dash", "dash": [10, 6]}}]}
+       for n, *_ in SCENARIOS],
+    options={"xField": "time", "legend": {"displayMode": "list", "placement": "bottom"},
+             "tooltip": {"mode": "multi", "sort": "desc"}},
+    desc="Monthly net worth since October 2025 (the house value was added to Actual in mid-September), then all three scenarios out to the Horizon. " + ASSUMPTIONS))
+
+PROJ_TYPES = [("Cash", "cash"), ("Investments", "inv"), ("Retirement", "ret"),
+              ("Home equity", "house + fixed")]   # fixed (mortgage, cards) nets against the house
+panels.append(panel(
+    "trend", "Projection by type · ${scenario}", 14, 49, 10, 11,
+    f"WITH {PROJ} SELECT t AS time, "
+    + ", ".join(f"({e}) * dfl AS \"{a}\"" for a, e in PROJ_TYPES)
+    + f" FROM pt WHERE scen = '${{scenario}}' AND {HORIZON} ORDER BY m", fmt="table",
+    defaults={**TREND, "custom": {**TREND["custom"], "lineWidth": 0, "fillOpacity": 70,
+                                  "stacking": {"mode": "normal", "group": "A"}}},
+    overrides=[X_AXIS, Y_ZERO] + [color_override(a) for a, _ in PROJ_TYPES],
+    options={"xField": "time", "legend": {"displayMode": "list", "placement": "bottom"},
+             "tooltip": {"mode": "multi", "sort": "none"}},
+    desc="The picked scenario stacked by type. " + ASSUMPTIONS))
+
 panels.append(panel(
     "stat", "Exported", 0, 41, 6, 3,
     "SELECT CAST(value AS INTEGER) * 1000 AS \"Exported\" FROM meta WHERE key = 'updated_at'", fmt="table",
@@ -242,7 +351,20 @@ dash = {
     "templating": {"list": [{
         "name": "exclude", "label": "Exclude", "type": "custom", "multi": False, "includeAll": False,
         "query": ", ".join(f"{a} : {v}" for a, v in EXCLUDE),  # "label : value" pairs
-        "current": {"text": "None", "value": "__none"}}]},
+        "current": {"text": "None", "value": "__none"}},
+        # Projection inputs (only the Projection row uses them)
+        {"name": "scenario", "label": "Scenario", "type": "custom", "multi": False, "includeAll": False,
+         "query": ", ".join(n for n, *_ in SCENARIOS), "current": {"text": "Base", "value": "Base"}},
+        {"name": "horizon", "label": "Horizon (years)", "type": "custom", "multi": False, "includeAll": False,
+         "query": ", ".join(map(str, YEARS)), "current": {"text": "20", "value": "20"}},
+        {"name": "retire", "label": "Retirement $/mo", "type": "textbox", "query": str(RETIRE_MONTHLY),
+         "current": {"text": str(RETIRE_MONTHLY), "value": str(RETIRE_MONTHLY)}},
+        {"name": "extra", "label": "Brokerage $/mo", "type": "textbox", "query": "0",
+         "current": {"text": "0", "value": "0"}},
+        {"name": "dollars", "label": "Dollars", "type": "custom", "multi": False, "includeAll": False,
+         # value = monthly deflator applied to every projected month
+         "query": f"Nominal : 1, Today's : {1 / (1 + mo(INFLATION))!r}",
+         "current": {"text": "Nominal", "value": "1"}}]},
     "panels": panels,
 }
 
