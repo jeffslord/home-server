@@ -76,6 +76,14 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy ntfy:80
 	}
 
+	# games/launcher: players start stopped game servers. Shared password
+	# (not Authentik) so friends don't need accounts; bad logins return 401,
+	# which fail2ban's caddy-auth jail counts.
+	@games host games.{$DOMAIN_NAME}
+	handle @games {
+		reverse_proxy games-launcher:8080
+	}
+
 	#
 	# AUTHENTIK PROTECTED
 	#

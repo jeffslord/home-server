@@ -34,7 +34,7 @@ services:
       REST_API_PORT: 8212
       DELETE_OLD_BACKUPS: "true"
       AUTO_REBOOT_ENABLED: "true"
-      AUTO_PAUSE_ENABLED: "true"
+      AUTO_PAUSE_ENABLED: "false" # games/launcher stops the server when empty instead; a paused server can't answer its player-count query
       DIFFICULTY: "Normal"
       PAL_EGG_DEFAULT_HATCHING_TIME: 0.5
       ALLOW_GLOBAL_PALBOX_IMPORT: "true"

@@ -1,0 +1,71 @@
+# Web page at games.${DOMAIN_NAME} where players start stopped game servers,
+# plus an idle watcher that stops a server after IDLE_MINUTES with 0 players.
+# Shared player password: _secrets/games_launcher_password.txt
+#
+# Adding a game: add an entry to GAMES in app.py, and put this service on the
+# game's network if it isn't on `web`.
+
+networks:
+  web:
+    external: true
+  vintage-story_default:
+    external: true
+  space-engineers_default:
+    external: true
+  docker-api:
+    internal: true
+
+secrets:
+  launcher_password:
+    file: ../../_secrets/games_launcher_password.txt
+
+services:
+  launcher:
+    image: python:3.12-slim
+    container_name: games-launcher
+    restart: unless-stopped
+    user: ${PUID}:${PGID}
+    command: python -u /app/app.py
+    working_dir: /app
+    volumes:
+      - ./app.py:/app/app.py:ro
+      - ./index.html:/app/index.html:ro
+      - ${SSD_PATH}/games/launcher:/data # boot times, last known versions
+      - ${SSD_PATH}/games/vintagestory/data:/vintagestory:ro # RCON password, server password, mods, version
+      - ${SSD_PATH}/games/space-engineers/instances/${SE_INSTANCE_NAME}/launcher:/se-control # SaveAndStop plugin requests
+    secrets:
+      - launcher_password
+    environment:
+      TZ: ${TZ}
+      IDLE_MINUTES: 30
+      CONNECT_HOST: ${DOMAIN_NAME}
+      PALWORLD_ADMIN_PASSWORD: ${PALWORLD_ADMIN_PASSWORD}
+      PALWORLD_SERVER_PASSWORD: ${PALWORLD_SERVER_PASSWORD} # shown to players
+    networks:
+      - web                     # Caddy, palworld REST API
+      - vintage-story_default   # RCON
+      - space-engineers_default # Steam A2S query
+      - docker-api
+    depends_on:
+      - socket-proxy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
+      interval: 60s
+
+  # The launcher only gets list/inspect + start/stop, not the raw socket.
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: games-launcher-docker-proxy
+    restart: unless-stopped
+    environment:
+      CONTAINERS: 1
+      ALLOW_START: 1
+      ALLOW_STOP: 1
+      POST: 0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    read_only: true
+    tmpfs:
+      - /run
+    networks:
+      - docker-api
