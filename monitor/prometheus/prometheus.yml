@@ -46,6 +46,12 @@ scrape_configs:
     static_configs:
       - targets: ["grafana:3000"]
 
+  # The public flight site (~/flightdensity, flightdensity-public): usage counts and timings.
+  # Its metrics port is only on the `web` network; the public tunnel only reaches the site port.
+  - job_name: flight-site
+    static_configs:
+      - targets: ["flightdensity-public:9102"]
+
   - job_name: blackbox
     static_configs:
       - targets: ["blackbox:9115"]
@@ -74,7 +80,7 @@ scrape_configs:
           - http://seerr:5055/api/v1/status
           - http://paperless:8000/
           - http://dockhand:3000/
-          - http://adguardhome:80/
+          - http://192.168.1.162:80/   # adguardhome, via the host port (it's not on `web`)
           - http://ntfy/v1/health
           - http://grafana:3000/api/health
     relabel_configs:
@@ -83,6 +89,10 @@ scrape_configs:
       - source_labels: [__address__]
         regex: 'https?://([^:/]+).*'
         target_label: service
+      - source_labels: [__param_target]
+        regex: 'http://192\.168\.1\.162:80/'
+        target_label: service
+        replacement: adguardhome
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
