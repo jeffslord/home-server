@@ -65,3 +65,28 @@ services:
       - ./networth-refresh.js:/usr/src/app/networth-refresh.js:ro
       - ${SSD_PATH}/actual-networth/refresh-cache:/cache
       - ${SSD_PATH}/actual-networth/out:/out
+
+  # Long-running: the Money Ladder page (money-ladder.js), an interactive
+  # r/personalfinance flowchart fed from Actual. Reached as
+  # grafana.${DOMAIN_NAME}/money-ladder via Caddy + Authentik. Settings the page
+  # saves live in ${SSD_PATH}/money-ladder/data/config.json.
+  money-ladder:
+    container_name: money-ladder
+    image: ghcr.io/psybers/actual-helpers:latest
+    entrypoint: ["node"]
+    command: ["money-ladder.js"]
+    restart: unless-stopped
+    user: "1000:1000"
+    env_file: .env
+    environment:
+      - ACTUAL_CACHE_DIR=/cache      # own cache: never races the other jobs
+      - HOME=/tmp
+      - TZ=America/New_York
+    networks:
+      - web
+    volumes:
+      - ./money-ladder.js:/usr/src/app/money-ladder.js:ro
+      - ./money-ladder-export.js:/usr/src/app/money-ladder-export.js:ro
+      - ./money-ladder.html:/usr/src/app/money-ladder.html:ro
+      - ${SSD_PATH}/money-ladder/cache:/cache
+      - ${SSD_PATH}/money-ladder/data:/data

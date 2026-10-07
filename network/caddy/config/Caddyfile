@@ -179,6 +179,10 @@ auth.{$DOMAIN_NAME} {
 		handle /actual-refresh {
 			reverse_proxy actual-networth-refresh:8080
 		}
+		# Money Ladder page (finance/helpers money-ladder.js)
+		handle /money-ladder* {
+			reverse_proxy money-ladder:8080
+		}
 		handle {
 			reverse_proxy grafana:3000
 		}

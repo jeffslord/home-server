@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Money Ladder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: two-column workbench — your numbers on the left, the step ladder (a vertical route line with stations) on the right. Stacks on phones. */
+:root{
+  --bg:#f3f5f4; --panel:#ffffff; --ink:#15211d; --muted:#5b6b65; --line:#d6dedb;
+  --accent:#1f6f5c; --accent-soft:#dcefe8; --gold:#c98a12; --gold-soft:#fbf0d9;
+  --warn:#b4541f; --warn-soft:#fbe7dc; --track:#e3e9e7;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1513; --panel:#16201d; --ink:#e4ece9; --muted:#93a39d; --line:#2a3833;
+  --accent:#4fbf9f; --accent-soft:#183a31; --gold:#e8b14a; --gold-soft:#3a2f17;
+  --warn:#ef8a55; --warn-soft:#3d2216; --track:#24302c; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0f1513; --panel:#16201d; --ink:#e4ece9; --muted:#93a39d; --line:#2a3833;
+  --accent:#4fbf9f; --accent-soft:#183a31; --gold:#e8b14a; --gold-soft:#3a2f17;
+  --warn:#ef8a55; --warn-soft:#3d2216; --track:#24302c; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 60px}
+header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px;margin-bottom:22px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.9rem,4vw,2.6rem);letter-spacing:-.02em;line-height:1.05;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:.35rem 0 0;max-width:62ch}
+.sub a{color:var(--accent)}
+.btn{font:inherit;font-size:.85rem;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:.45rem .8rem;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* summary */
+.summary{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-bottom:22px}
+.now{background:var(--ink);color:var(--bg);border-radius:14px;padding:22px 24px;display:grid;gap:10px}
+.now .eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.now h2{font-family:var(--f-display);font-weight:700;font-size:1.6rem;line-height:1.15;margin:0;text-wrap:balance}
+.now p{margin:0;opacity:.88;max-width:60ch}
+.now .do{font-weight:600;opacity:1}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.stat .k{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stat .v{font-family:var(--f-mono);font-size:1.25rem;font-weight:500;font-variant-numeric:tabular-nums;margin-top:2px}
+.stat .v.neg{color:var(--warn)}
+.overall{grid-column:1/-1}
+.bar{height:8px;background:var(--track);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s ease}
+
+.grid{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:22px;align-items:start}
+
+/* inputs */
+.inputs{display:grid;gap:12px}
+fieldset{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:14px 16px 16px;margin:0;display:grid;gap:10px;min-width:0}
+legend{font-family:var(--f-display);font-weight:700;font-size:1rem;padding:0 6px;margin-left:-6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.f{display:grid;gap:3px;font-size:.8rem;color:var(--muted);font-weight:500;min-width:0}
+input[type=number],input[type=text],select{font:inherit;font-family:var(--f-mono);font-size:.92rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:.42rem .55rem;width:100%;min-width:0}
+input[type=text]{font-family:var(--f-body)}
+label.chk{display:flex;gap:8px;align-items:flex-start;font-size:.88rem;cursor:pointer}
+label.chk input{margin-top:.25rem;accent-color:var(--accent)}
+.hint{font-size:.76rem;color:var(--muted);margin:0}
+.debts{display:grid;gap:8px}
+.debt{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.7fr) minmax(0,.8fr) auto;gap:6px;align-items:center}
+.debt input{padding:.35rem .4rem;font-size:.85rem}
+.debt-h{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:0 4px;line-height:1}
+.x:hover{color:var(--warn)}
+.example{background:var(--gold-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:.84rem;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* ladder */
+.ladder{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 8px}
+.ladder h3{font-family:var(--f-display);font-weight:700;font-size:1.15rem;margin:0 0 12px}
+ol.steps{list-style:none;margin:0;padding:0}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;position:relative;padding-bottom:16px}
+.step::before{content:"";position:absolute;left:16px;top:30px;bottom:0;width:2px;background:var(--line)}
+.step:last-child::before{display:none}
+.step.done::before{background:var(--accent)}
+.dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:.8rem;font-weight:500;border:2px solid var(--line);background:var(--panel);color:var(--muted);position:relative;z-index:1}
+.done .dot{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.current .dot{border-color:var(--gold);color:var(--ink);background:var(--gold-soft);box-shadow:0 0 0 5px var(--gold-soft)}
+.na .dot{border-style:dashed}
+.body{min-width:0;padding-top:4px}
+.t{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.t b{font-weight:600;font-size:.98rem}
+.pill{font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--track);color:var(--muted)}
+.done .pill{background:var(--accent-soft);color:var(--accent)}
+.current .pill{background:var(--gold);color:#1b1404}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.status{font-size:.86rem;color:var(--muted);margin:2px 0 0;font-variant-numeric:tabular-nums}
+.step .bar{height:6px;max-width:340px}
+.current .bar>i{background:var(--gold)}
+.detail{margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:.88rem;display:grid;gap:6px}
+.detail p{margin:0}
+.detail ul{margin:0;padding-left:1.1rem}
+.upcoming .t b{color:var(--muted)}
+.foot{color:var(--muted);font-size:.78rem;margin-top:18px;max-width:80ch}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+@media (max-width:860px){
+  .summary,.grid{grid-template-columns:1fr}
+}
+@media (max-width:440px){
+  .wrap{padding-inline:16px}
+  .row{grid-template-columns:1fr}
+  .debt{grid-template-columns:1fr 1fr auto}
+  .debt .dn{grid-column:1/-1}
+  .debt-h{display:none}
+}
+@media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
+body{margin:0}
+.sync{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn:disabled{opacity:.6;cursor:progress}
+.src{font-family:var(--f-mono);font-size:.62rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:2px 6px;border-radius:99px;vertical-align:middle;margin-left:4px}
+.ro-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ro-grid>div{display:grid;gap:2px;background:var(--bg);border-radius:8px;padding:8px 10px;min-width:0}
+.ro-grid .k{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.ro-grid .v{font-size:.95rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-size:.86rem;font-weight:600}
+.picks{display:grid;gap:4px;margin-top:8px}
+.pick{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;font-size:.84rem}
+.pv{color:var(--muted);font-size:.8rem}
+.debt .dname{font-size:.84rem;overflow-wrap:anywhere}
+.debt>.mono{font-size:.84rem}
+.debt input[type=checkbox]{justify-self:center;accent-color:var(--accent);width:18px;height:18px}
+.errbox{background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:.88rem}
+.errbox pre{white-space:pre-wrap;font-family:var(--f-mono);font-size:.75rem;margin:6px 0 0;max-height:12rem;overflow:auto}
+@media (max-width:440px){.ro-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Money Ladder</h1>
+      <p class="sub">Your Actual budget checked against the r/personalfinance <a href="https://imgur.com/personal-income-spending-flowchart-united-states-lSoUQr2" target="_blank" rel="noopener">US income &amp; spending flowchart</a>. Balances, income and spending come from Actual; the rest you set once below.</p>
+    </div>
+    <div class="sync">
+      <span id="syncMsg" class="hint">Loading from Actual…</span>
+      <button class="btn" id="refreshBtn" type="button">Refresh from Actual</button>
+    </div>
+  </header>
+
+  <div class="errbox" id="errBox" hidden></div>
+
+  <section class="summary" aria-live="polite">
+    <div class="now" id="now"><span class="eyebrow">Loading</span><h2>Reading your budget…</h2></div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <div class="grid">
+    <form class="inputs" id="form" autocomplete="off">
+      <fieldset>
+        <legend>From Actual <span class="src">live</span></legend>
+        <label class="f">Average over the last<select id="avgMonths"><option value="3">3 full months</option><option value="6">6 full months</option><option value="12">12 full months</option></select></label>
+        <div class="ro-grid" id="actualFigures"></div>
+        <details>
+          <summary>Income categories counted</summary>
+          <div class="picks" id="incomePicks"></div>
+        </details>
+        <details>
+          <summary>Spending groups counted</summary>
+          <p class="hint">Transfers between accounts never count. Leave out groups that are really saving, like sinking funds.</p>
+          <div class="picks" id="spendPicks"></div>
+        </details>
+        <details>
+          <summary>Accounts that make up your emergency fund</summary>
+          <div class="picks" id="cashPicks"></div>
+        </details>
+      </fieldset>
+
+      <fieldset>
+        <legend>You</legend>
+        <div class="row">
+          <label class="f">Gross annual salary<input type="number" id="gross" min="0" step="1000"></label>
+          <label class="f">Age<input type="number" id="age" min="16" max="100"></label>
+        </div>
+        <label class="f">Full emergency fund target<select id="efMonths"><option value="3">3 months</option><option value="4">4 months</option><option value="5">5 months</option><option value="6">6 months</option></select></label>
+        <label class="chk"><input type="checkbox" id="essentials"> I can reliably cover housing, utilities, food, transport and essential insurance.</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Debts <span class="src">balances live</span></legend>
+        <div class="debt"><span class="debt-h dn">Account</span><span class="debt-h">Balance</span><span class="debt-h">APR %</span><span class="debt-h">Min / mo</span><span class="debt-h">Paid off monthly</span></div>
+        <div class="debts" id="debts"></div>
+        <p class="hint">Any Actual account with a negative balance shows up here. Credit cards you pay in full each month aren't debt. Mortgages always sit on the last step, as in the flowchart. Minimums are only used for payoff estimates; your spending already includes the payments.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Workplace retirement plan</legend>
+        <label class="chk"><input type="checkbox" id="matchOffered"> My employer offers a 401(k)/403(b) match</label>
+        <div class="row">
+          <label class="f">They match % of your pay…<input type="number" id="matchRate" min="0" max="200" step="5"></label>
+          <label class="f">…on contributions up to<input type="number" id="matchPct" min="0" max="25" step="0.5"></label>
+        </div>
+        <p class="hint">Example: "50% match on the first 6%" → 50 and 6.</p>
+        <label class="f">You contribute (% of gross)<input type="number" id="contribPct" min="0" max="100" step="0.5"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>HSA &amp; IRA (this year)</legend>
+        <label class="chk"><input type="checkbox" id="hdhp"> I'm on an HSA-eligible high-deductible health plan</label>
+        <div class="row">
+          <label class="f">HSA coverage<select id="hsaCov"><option value="self">Self-only</option><option value="family">Family</option></select></label>
+          <label class="f">HSA contributions / yr<input type="number" id="hsaAnnual" min="0" step="100"></label>
+        </div>
+        <label class="f">IRA contributions / yr (Roth or traditional)<input type="number" id="iraAnnual" min="0" step="100"></label>
+        <p class="hint">Actual's retirement accounts mix contributions with market gains, so enter these yourself.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Later goals</legend>
+        <label class="chk"><input type="checkbox" id="goalsFunded"> I'm saving on schedule for near-term goals (car, home, wedding, kids' college/529)</label>
+        <label class="chk"><input type="checkbox" id="investing"> I'm investing extra in a taxable brokerage or prepaying low-interest debt</label>
+      </fieldset>
+      <p class="hint" id="saveMsg">Settings save to the server as you type.</p>
+    </form>
+
+    <section class="ladder">
+      <h3>The ladder</h3>
+      <ol class="steps" id="steps"></ol>
+      <p class="foot">2026 limits used: 401(k) $24,500 (+$8,000 at 50+, +$11,250 at 60–63) · IRA $7,500 (+$1,100 at 50+) · HSA $4,400 self / $8,750 family (+$1,000 at 55+). Payoff times assume all leftover monthly cash goes to the target. This is a planning aid that follows the community flowchart, not individual financial advice.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+const API = "/money-ladder/api";
+const DEFAULTS = {
+  gross: 0, age: 30, efMonths: "6", avgMonths: "12", essentials: true,
+  excludeIncome: ["Starting Balances"], excludeGroups: ["🎯 Goals"], excludeCash: [],
+  debts: {},
+  matchOffered: false, matchRate: 100, matchPct: 0, contribPct: 0,
+  hdhp: false, hsaCov: "self", hsaAnnual: 0, iraAnnual: 0, goalsFunded: false, investing: false
+};
+const fields = ["gross","age","efMonths","avgMonths","essentials","matchOffered","matchRate","matchPct","contribPct","hdhp","hsaCov","hsaAnnual","iraAnnual","goalsFunded","investing"];
+let C = structuredClone(DEFAULTS), D = null;
+
+const $ = id => document.getElementById(id);
+const money = n => (n < 0 ? "−$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const ago = iso => { const m = Math.round((Date.now() - Date.parse(iso)) / 60e3); return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
+
+let saveTimer;
+function save() {
+  clearTimeout(saveTimer);
+  $("saveMsg").textContent = "Saving…";
+  saveTimer = setTimeout(async () => {
+    try {
+      const r = await fetch(`${API}/config`, {method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify(C)});
+      if (!r.ok) throw new Error(r.status);
+      $("saveMsg").textContent = "Settings saved to the server.";
+    } catch (e) { $("saveMsg").textContent = `Couldn't save settings (${e.message}). Your changes still show here; reload to retry.`; }
+  }, 600);
+}
+
+// ---- data from Actual -------------------------------------------------------
+function window_() { return D.months.slice(0, -1).slice(-num(C.avgMonths)); }   // full months only
+function avgOf(series, months) { return months.reduce((s, m) => s + (series?.[m] || 0), 0) / months.length; }
+function actual() {
+  const ms = window_();
+  const incomeCats = Object.keys(D.income).map(k => ({k, avg: avgOf(D.income[k], ms), on: !C.excludeIncome.includes(k)}));
+  const groups = Object.keys(D.spending).map(k => ({k, avg: avgOf(D.spending[k], ms), on: !C.excludeGroups.includes(k)}));
+  const cash = D.accounts.filter(a => a.type === "Cash").map(a => ({k: a.name, avg: a.balance, on: !C.excludeCash.includes(a.name)}));
+  const sum = xs => xs.filter(x => x.on).reduce((s, x) => s + x.avg, 0);
+  const debts = D.accounts.filter(a => a.balance < -0.5).map(a => {
+    const c = C.debts[a.name] || {};
+    return {name: a.name, type: a.type, bal: -a.balance, apr: num(c.apr), min: num(c.min),
+      paidInFull: c.paidInFull ?? a.type === "Credit cards", mortgage: a.type === "Mortgage"};
+  });
+  return {ms, incomeCats, groups, cash, debts, takehome: sum(incomeCats), spending: sum(groups), efund: sum(cash)};
+}
+
+function renderSources(A) {
+  const pick = (list, key, fmt) => list.sort((a, b) => Math.abs(b.avg) - Math.abs(a.avg)).map((x, i) => `
+    <label class="chk pick"><input type="checkbox" data-list="${key}" data-k="${esc(x.k)}" id="${key}${i}" ${x.on ? "checked" : ""}>
+      <span class="pn">${esc(x.k)}</span><span class="mono pv">${fmt(x.avg)}</span></label>`).join("");
+  $("incomePicks").innerHTML = pick(A.incomeCats, "excludeIncome", v => money(v) + "/mo");
+  $("spendPicks").innerHTML = pick(A.groups, "excludeGroups", v => money(v) + "/mo");
+  $("cashPicks").innerHTML = pick(A.cash, "excludeCash", money);
+  $("debts").innerHTML = A.debts.length ? A.debts.map((d, i) => `
+    <div class="debt" data-name="${esc(d.name)}">
+      <span class="dn dname">${esc(d.name)}</span>
+      <span class="mono">${money(d.bal)}</span>
+      <input type="number" id="dapr${i}" data-k="apr" value="${d.apr || ""}" min="0" step="0.1" placeholder="—" aria-label="APR for ${esc(d.name)}">
+      <input type="number" id="dmin${i}" data-k="min" value="${d.min || ""}" min="0" step="5" placeholder="0" aria-label="Minimum payment for ${esc(d.name)}">
+      <input type="checkbox" id="dpif${i}" data-k="paidInFull" ${d.paidInFull ? "checked" : ""} aria-label="${esc(d.name)} is paid in full monthly">
+    </div>`).join("") : `<p class="hint">No accounts with a negative balance.</p>`;
+  const span = A.ms.length ? `${A.ms[0]} to ${A.ms.at(-1)}` : "";
+  $("actualFigures").innerHTML = `
+    <div><span class="k">Take-home</span><span class="v mono">${money(A.takehome)}/mo</span></div>
+    <div><span class="k">Spending</span><span class="v mono">${money(A.spending)}/mo</span></div>
+    <div><span class="k">Emergency cash</span><span class="v mono">${money(A.efund)}</span></div>
+    <p class="hint" style="grid-column:1/-1">Monthly averages for ${span}.</p>`;
+}
+
+function fillForm() {
+  for (const f of fields) { const el = $(f); if (el.type === "checkbox") el.checked = !!C[f]; else el.value = C[f] ?? ""; }
+}
+
+$("form").addEventListener("input", e => {
+  const el = e.target;
+  const row = el.closest(".debt[data-name]");
+  if (row) {
+    const d = C.debts[row.dataset.name] ??= {};
+    d[el.dataset.k] = el.type === "checkbox" ? el.checked : num(el.value);
+  } else if (el.dataset.list) {
+    const set = new Set(C[el.dataset.list]);
+    el.checked ? set.delete(el.dataset.k) : set.add(el.dataset.k);
+    C[el.dataset.list] = [...set];
+  } else if (fields.includes(el.id)) {
+    C[el.id] = el.type === "checkbox" ? el.checked : (el.tagName === "SELECT" ? el.value : num(el.value));
+  } else return;
+  save();
+  if (!D) return;
+  const A = actual();
+  if (el.id === "avgMonths" || el.dataset.list) renderSources(A); else updateFigures(A);
+  render(A);
+});
+$("form").addEventListener("submit", e => e.preventDefault());
+function updateFigures(A) {
+  const v = $("actualFigures").querySelectorAll(".v");
+  if (v.length === 3) { v[0].textContent = money(A.takehome) + "/mo"; v[1].textContent = money(A.spending) + "/mo"; v[2].textContent = money(A.efund); }
+}
+
+// ---- the ladder -------------------------------------------------------------
+// Months to clear a set of debts: minimums on all, extra cash to the highest APR first (avalanche).
+function payoffMonths(debts, extra) {
+  let ds = debts.filter(d => d.bal > 0).map(d => ({...d}));
+  if (!ds.length) return 0;
+  for (let m = 1; m <= 600; m++) {
+    let pool = extra;
+    ds.sort((a, b) => b.apr - a.apr);
+    for (const d of ds) { d.bal *= 1 + d.apr / 1200; const p = Math.min(d.bal, d.min); d.bal -= p; }
+    for (const d of ds) { const p = Math.min(d.bal, pool); d.bal -= p; pool -= p; }
+    ds = ds.filter(d => d.bal > 0.5);
+    if (!ds.length) return m;
+  }
+  return Infinity;
+}
+const dur = m => m === 0 ? "now" : !isFinite(m) ? "never at this rate" : m < 12 ? `${m} month${m > 1 ? "s" : ""}` : `${(m / 12).toFixed(1)} years`;
+
+function compute(A) {
+  const S = {...C, efMonths: num(C.efMonths)};
+  const debts = A.debts.filter(d => !d.paidInFull);
+  const surplus = A.takehome - A.spending;
+  const high = debts.filter(d => !d.mortgage && d.apr >= 10);
+  const mod = debts.filter(d => !d.mortgage && d.apr >= 4 && d.apr < 10);
+  const low = debts.filter(d => d.mortgage || d.apr < 4);
+  const noApr = debts.filter(d => !d.apr && !d.mortgage);
+  const sum = a => a.reduce((s, d) => s + d.bal, 0);
+  const monthly = A.spending, efund = A.efund;
+  const age = S.age;
+  const k401 = 24500 + (age >= 60 && age <= 63 ? 11250 : age >= 50 ? 8000 : 0);
+  const ira = 7500 + (age >= 50 ? 1100 : 0);
+  const hsa = (S.hsaCov === "family" ? 8750 : 4400) + (age >= 55 ? 1000 : 0);
+  const myK = S.gross * S.contribPct / 100;
+  const matchUsed = S.matchOffered ? S.gross * Math.min(S.contribPct, S.matchPct) / 100 * S.matchRate / 100 : 0;
+  const retire = S.gross > 0 ? (Math.min(myK, k401) + matchUsed + S.iraAnnual) / S.gross * 100 : 0;
+  const extra = Math.max(surplus, 0);
+  const fill = need => extra > 0 ? Math.ceil(need / extra) : Infinity;
+  const names = a => a.map(d => esc(d.name)).join(", ");
+  const top = a => esc([...a].sort((x, y) => y.apr - x.apr)[0]?.name || "the highest-rate debt");
+
+  const starter = monthly, full = monthly * S.efMonths;
+  const steps = [];
+  const add = s => steps.push(s);
+
+  add({ title: "Budget and cover the essentials",
+    done: surplus > 0 && S.essentials,
+    pct: S.essentials ? (surplus > 0 ? 1 : .5) : 0,
+    status: surplus > 0 ? `${money(surplus)}/mo left after spending (debt payments included)` : `Short ${money(-surplus)}/mo after spending (debt payments included)`,
+    todo: surplus <= 0
+      ? `<p class="do">Close the ${money(-surplus)}/mo gap.</p><ul><li>Check the spending groups counted: one-off purchases can skew a short average.</li><li>Cut categories you don't value, or look for more income.</li></ul>`
+      : `<p class="do">Make sure housing, utilities, food, transport and essential insurance are covered, then tick the box.</p>`,
+    nextDo: surplus <= 0 ? `Close a ${money(-surplus)}/mo budget gap` : "Confirm your essentials are covered" });
+
+  add({ title: "Starter emergency fund (1 month)",
+    done: efund >= starter, pct: starter ? Math.min(efund / starter, 1) : 1,
+    status: `${money(efund)} of ${money(starter)}`,
+    todo: `<p class="do">Put ${money(extra)}/mo into savings until you have ${money(starter)}. About ${dur(fill(starter - efund))} to go.</p>`,
+    nextDo: `Save ${money(starter - efund)} more into a starter emergency fund` });
+
+  add({ title: "Get the full employer match",
+    na: !S.matchOffered,
+    done: S.matchOffered && S.contribPct >= S.matchPct,
+    pct: S.matchPct ? Math.min(S.contribPct / S.matchPct, 1) : 1,
+    status: !S.matchOffered ? "No match set — skip, or fill in your plan on the left" : `Contributing ${S.contribPct}% of the ${S.matchPct}% needed · ${money(matchUsed)}/yr captured`,
+    todo: `<p class="do">Raise your 401(k) contribution from ${S.contribPct}% to ${S.matchPct}%.</p><p>That earns ${money(S.gross * (S.matchPct - S.contribPct) / 100 * S.matchRate / 100)}/yr more in employer money.</p>`,
+    nextDo: `Raise your 401(k) to ${S.matchPct}% to get the full match` });
+
+  const hm = payoffMonths(high, extra);
+  add({ title: "Pay off high-interest debt (≥ 10%)",
+    done: !high.length, pct: high.length ? 0 : 1, noBar: !!high.length,
+    status: high.length ? `${money(sum(high))} across ${names(high)} · clear in ${dur(hm)}` : noApr.length ? `None known. Set APRs for: ${names(noApr)}` : "None.",
+    todo: `<p class="do">Send every spare dollar (${money(extra)}/mo) to ${top(high)} first. Estimated payoff: ${dur(hm)}.</p>`,
+    nextDo: `Pay down ${money(sum(high))} of high-interest debt` });
+
+  add({ title: `Full emergency fund (${S.efMonths} months)`,
+    done: efund >= full, pct: full ? Math.min(efund / full, 1) : 1,
+    status: `${money(efund)} of ${money(full)} · ${(monthly ? efund / monthly : 0).toFixed(1)} months covered`,
+    todo: `<p class="do">Grow the fund to ${money(full)}: ${money(full - efund)} more, about ${dur(fill(full - efund))} at ${money(extra)}/mo.</p>`,
+    nextDo: `Build the emergency fund to ${S.efMonths} months` });
+
+  const mm = payoffMonths(mod, extra);
+  add({ title: "Pay off moderate-interest debt (4–10%)",
+    done: !mod.length, pct: mod.length ? 0 : 1, noBar: !!mod.length,
+    status: mod.length ? `${money(sum(mod))} across ${names(mod)} · clear in ${dur(mm)}` : "None.",
+    todo: `<p class="do">Pay extra on ${top(mod)}. About ${dur(mm)} at ${money(extra)}/mo.</p><p>4–5% is roughly the break-even with investing, so splitting cash between this and retirement is reasonable.</p>`,
+    nextDo: `Pay down ${money(sum(mod))} of moderate-interest debt` });
+
+  add({ title: "Max out your HSA",
+    na: !S.hdhp, done: S.hdhp && S.hsaAnnual >= hsa, pct: Math.min(S.hsaAnnual / hsa, 1),
+    status: !S.hdhp ? "Not on an HSA-eligible plan — skip" : `${money(S.hsaAnnual)} of ${money(hsa)} this year`,
+    todo: `<p class="do">Add ${money(hsa - S.hsaAnnual)} more this year (${money((hsa - S.hsaAnnual) / 12)}/mo), ideally by payroll deduction, and invest it.</p>`,
+    nextDo: `Fund your HSA to ${money(hsa)}` });
+
+  add({ title: "Max out an IRA",
+    done: S.iraAnnual >= ira, pct: Math.min(S.iraAnnual / ira, 1),
+    status: `${money(S.iraAnnual)} of ${money(ira)} this year`,
+    todo: `<p class="do">Contribute ${money(ira - S.iraAnnual)} more (${money((ira - S.iraAnnual) / 12)}/mo) to a Roth or traditional IRA.</p><p>Above the Roth income limit, use a backdoor Roth.</p>`,
+    nextDo: `Contribute ${money(ira - S.iraAnnual)} more to an IRA` });
+
+  add({ title: "Save 15% of gross for retirement",
+    done: retire >= 15, pct: Math.min(retire / 15, 1),
+    status: S.gross ? `${retire.toFixed(1)}% of gross (401(k) + match + IRA)` : "Set your salary on the left",
+    todo: `<p class="do">Raise your 401(k) contribution to about ${(S.contribPct + (15 - retire)).toFixed(1)}% to reach 15%.</p><p>That's ${money(S.gross * (15 - retire) / 1200)}/mo more going to retirement.</p>`,
+    nextDo: "Reach 15% of income going to retirement" });
+
+  add({ title: "Max out your 401(k)",
+    done: S.gross > 0 && myK >= k401, pct: Math.min(myK / k401, 1),
+    status: `${money(myK)} of ${money(k401)} this year (${S.contribPct}% of gross)`,
+    todo: `<p class="do">Raise your contribution to ${S.gross ? Math.min(100, Math.ceil(k401 / S.gross * 1000) / 10) : "—"}% of pay to hit ${money(k401)}.</p>`,
+    nextDo: "Max out your 401(k)" });
+
+  add({ title: "Save for other goals",
+    done: !!S.goalsFunded, pct: S.goalsFunded ? 1 : 0, noBar: true,
+    status: S.goalsFunded ? "On schedule" : "Car, house, wedding, kids' college (529)",
+    todo: `<p class="do">Give each goal a target and date. Money needed within ~5 years goes in savings, CDs or T-bills; longer goals can be invested.</p>`,
+    nextDo: "Fund your other savings goals" });
+
+  add({ title: "Invest extra or prepay low-interest debt",
+    done: !!S.investing, pct: S.investing ? 1 : 0, noBar: true,
+    status: low.length ? `${money(sum(low))} of low-rate debt and mortgage left (${names(low)})` : "Taxable brokerage, mega backdoor Roth, early retirement",
+    todo: `<p class="do">Invest in a taxable brokerage account with low-cost index funds, or prepay the mortgage if being debt-free matters more to you.</p>`,
+    nextDo: "Invest beyond tax-advantaged accounts" });
+
+  const cur = steps.findIndex(s => !s.done && !s.na);
+  steps.forEach((s, i) => {
+    s.state = s.na ? "na" : s.done ? "done" : i === cur ? "current" : "upcoming";
+    s.ahead = s.done && cur !== -1 && i > cur;
+  });
+  return {steps, cur, surplus, monthly, efund, retire, debtTotal: sum(debts.filter(d => !d.mortgage))};
+}
+
+function render(A) {
+  const r = compute(A);
+  const {steps, cur} = r;
+  const applicable = steps.filter(s => !s.na);
+  const doneCount = applicable.filter(s => s.done).length;
+  const c = steps[cur];
+  $("now").innerHTML = cur === -1
+    ? `<span class="eyebrow">Every rung complete</span><h2>You're at the top of the flowchart.</h2><p>Keep the habits, revisit your allocation once a year, and enjoy the margin you've built.</p>`
+    : `<span class="eyebrow">You're on step ${cur + 1} of ${steps.length}</span><h2>${c.nextDo}</h2>${c.todo}`;
+  $("stats").innerHTML = `
+    <div class="stat"><div class="k">Monthly surplus</div><div class="v ${r.surplus < 0 ? "neg" : ""}">${money(r.surplus)}</div></div>
+    <div class="stat"><div class="k">Emergency fund</div><div class="v">${(r.monthly ? r.efund / r.monthly : 0).toFixed(1)} mo</div></div>
+    <div class="stat"><div class="k">Debt (non-mortgage)</div><div class="v">${money(r.debtTotal)}</div></div>
+    <div class="stat"><div class="k">Retirement rate</div><div class="v">${r.retire.toFixed(1)}%</div></div>
+    <div class="stat overall"><div class="k">Steps complete · ${doneCount} of ${applicable.length}</div><div class="bar"><i style="width:${applicable.length ? doneCount / applicable.length * 100 : 0}%"></i></div></div>`;
+  $("steps").innerHTML = steps.map((s, i) => {
+    const pill = s.state === "done" ? "Done" : s.state === "current" ? "You are here" : s.state === "na" ? "Not applicable" : "Up next";
+    return `<li class="step ${s.state}">
+      <div class="dot" aria-hidden="true">${s.state === "done" ? "✓" : i + 1}</div>
+      <div class="body">
+        <div class="t"><b>${s.title}</b><span class="pill">${pill}</span>${s.ahead ? `<span class="pill warn">Ahead of order</span>` : ""}</div>
+        <p class="status">${s.status}</p>
+        ${!s.na && !s.done && !s.noBar ? `<div class="bar"><i style="width:${(s.pct || 0) * 100}%"></i></div>` : ""}
+        ${s.state === "current" ? `<div class="detail">${s.todo}</div>` : ""}
+      </div></li>`;
+  }).join("");
+}
+
+// ---- loading ----------------------------------------------------------------
+async function loadData(refresh) {
+  $("refreshBtn").disabled = true;
+  $("syncMsg").textContent = refresh ? "Refreshing from Actual…" : "Loading from Actual…";
+  try {
+    const r = await fetch(`${API}/data${refresh ? "?refresh=1" : ""}`);
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || r.status);
+    D = j;
+    $("errBox").hidden = !j.exportError;
+    if (j.exportError) $("errBox").innerHTML = `<b>Couldn't refresh from Actual, showing the last snapshot.</b><pre>${esc(j.exportError)}</pre>`;
+    $("syncMsg").textContent = `Synced from Actual ${ago(j.updatedAt)}`;
+    const A = actual(); renderSources(A); render(A);
+  } catch (e) {
+    $("syncMsg").textContent = "Couldn't load data from Actual.";
+    $("errBox").hidden = false;
+    $("errBox").innerHTML = `<b>Couldn't load data from Actual.</b><pre>${esc(e.message)}</pre>`;
+  } finally { $("refreshBtn").disabled = false; }
+}
+$("refreshBtn").addEventListener("click", () => loadData(true));
+
+(async () => {
+  try { const r = await fetch(`${API}/config`); if (r.ok) C = {...DEFAULTS, ...(await r.json())}; } catch (e) {}
+  fillForm();
+  loadData(false);
+})();
+</script>
+</body>
+</html>
