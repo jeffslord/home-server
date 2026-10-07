@@ -1,12 +1,13 @@
 #!/bin/sh
-# Copy the borg repo (written by monitor/borgmatic at 02:00) to Google Drive.
+# Copy the borg repos (written by monitor/borgmatic: home-server-volumes nightly
+# at 02:00; private weekly on Sunday 00:00) to Google Drive, each mounted
+# at /repos/<name> and synced to gdrive:backups/<name>.
 # Files the sync would delete or overwrite go to _deleted/<date> instead, so a
 # damaged local repo can't wipe out the good offsite copy; those are kept
 # KEEP_DAYS days. Any failure publishes an ntfy alert.
 set -u
 
-REPO=/repo
-DEST=gdrive:backups/home-server-volumes
+REPOS="home-server-volumes private"
 DELETED=gdrive:backups/_deleted
 KEEP_DAYS=30
 TODAY=$(date +%F)
@@ -19,15 +20,19 @@ alert() {
   exit 1
 }
 
-[ -f "$REPO/config" ] || alert "Borg repo not found at $REPO (NAS share not mounted?)"
-# borg holds lock.exclusive / lock.roster while it writes; don't upload a half-written repo.
-if [ -e "$REPO/lock.exclusive" ] || [ -e "$REPO/lock.roster" ]; then
-  alert "Borg repo is locked (borgmatic still running or crashed), skipped tonight's upload"
-fi
+for name in $REPOS; do
+  REPO=/repos/$name
+  DEST=gdrive:backups/$name
+  [ -f "$REPO/config" ] || alert "Borg repo not found at $REPO (NAS share not mounted?)"
+  # borg holds lock.exclusive / lock.roster while it writes; don't upload a half-written repo.
+  if [ -e "$REPO/lock.exclusive" ] || [ -e "$REPO/lock.roster" ]; then
+    alert "Borg repo $name is locked (borgmatic still running or crashed), skipped tonight's upload"
+  fi
 
-rclone sync "$REPO" "$DEST" --backup-dir "$DELETED/$TODAY" \
-  --transfers 4 --stats-one-line --stats 0 -v \
-  || alert "rclone sync to $DEST failed (see docker logs ofelia)"
+  rclone sync "$REPO" "$DEST" --backup-dir "$DELETED/$TODAY/$name" \
+    --transfers 4 --stats-one-line --stats 0 -v \
+    || alert "rclone sync to $DEST failed (see docker logs ofelia)"
+done
 
 # Drop _deleted/<date> folders older than KEEP_DAYS (names sort as dates).
 cutoff=$(date -d "@$(( $(date +%s) - KEEP_DAYS * 86400 ))" +%F)

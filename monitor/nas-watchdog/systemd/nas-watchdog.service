@@ -1,0 +1,9 @@
+[Unit]
+Description=Remount NAS shares and recover containers that depend on them
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/nas-watchdog
+TimeoutStartSec=10min

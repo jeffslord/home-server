@@ -1,4 +1,4 @@
-# Nightly offsite copy of the borg repo to Google Drive (sync.sh), scheduled by
+# Nightly offsite copy of the borg repos to Google Drive (sync.sh), scheduled by
 # Ofelia (monitor/ofelia/config.ini) at 03:30, after the 02:00 borgmatic run (monitor/borgmatic).
 # Run-to-completion: `up -d` runs it once and leaves it Exited, as intended.
 #
@@ -28,4 +28,5 @@ services:
     volumes:
       - ./sync.sh:/sync.sh:ro
       - /home/jeff/.config/rclone:/config/rclone   # rw: rclone refreshes the token
-      - /mnt/nas/backup/home-server-volumes:/repo:ro
+      - /mnt/nas/backup/home-server-volumes:/repos/home-server-volumes:ro
+      - ${PRIVATE_REPO}:/repos/private:ro        # host path in .env (see private/backup)

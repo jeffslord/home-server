@@ -16,6 +16,7 @@ services:
     command: daemon --config=/etc/ofelia/config.ini
     environment:
       TZ: ${TZ}
+      HC_PING_URL: ${HC_PING_URL} # healthchecks.io dead-man switch, pinged by [job-local "healthcheck"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/share/zoneinfo:/usr/share/zoneinfo:ro

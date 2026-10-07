@@ -12,7 +12,7 @@
 # repo hasn't been written for 30 h (catches this container being deleted).
 #
 # .env: BORG_PASSPHRASE (also store it off-site -- the Drive copy is useless
-# without it), AUTHENTIK_PG_PASS, NTFY_TOKEN.
+# without it), AUTHENTIK_PG_PASS, DAWARICH_DB_PASSWORD, NTFY_TOKEN.
 #
 # Manual run:     docker start -a borgmatic
 # Other commands: docker compose run --rm borgmatic repo-list

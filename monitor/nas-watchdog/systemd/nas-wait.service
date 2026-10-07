@@ -1,0 +1,11 @@
+[Unit]
+Description=Wait (up to 5 min) for the NAS NFS shares before starting docker
+Wants=network-online.target
+After=network-online.target remote-fs.target
+Before=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/nas-watchdog wait
+TimeoutStartSec=6min

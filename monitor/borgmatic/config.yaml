@@ -67,6 +67,9 @@ exclude_patterns:
   # Flight project: skip the virtualenv, generated output and the 94 MB OpenSky download
   - /home/jeff/flightdensity/.venv
   - /home/jeff/flightdensity/out
+  - /home/jeff/flightdensity/noise                  # rebuilt by noise.py --all in ~2 min
+  - /home/jeff/flightdensity/cache                  # public site's result cache, rebuilt nightly
+  - /home/jeff/flightdensity/data/public            # 15-minute copy of flights.db (dumped above)
   - /home/jeff/flightdensity/ref/aircraftDatabase.csv
   - sh:/home/jeff/flightdensity/**/__pycache__
 
