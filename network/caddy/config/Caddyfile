@@ -216,6 +216,14 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy dockhand:3000
 	}
 
+	# household/home-assistant: Z-Wave JS UI. No login of its own and it controls
+	# the Z-Wave network, so Authentik is the only gate; no host port either.
+	@zwave host zwave.{$DOMAIN_NAME}
+	handle @zwave {
+		import forward_auth_authentik
+		reverse_proxy zwavejs2mqtt:8091
+	}
+
 	# Game servers speak their own TCP protocol, not HTTP; these only matter if a
 	# web map / RCON UI is added in front of them.
 	@mc-server host mc-server.{$DOMAIN_NAME}
