@@ -135,3 +135,26 @@ services:
       - 9001:9001
     stdin_open: true
     tty: true
+
+  # Wake-on-LAN for HA: host networking so the magic-packet broadcast reaches the
+  # LAN (HA on the `web` bridge can't). Adds MQTT "Wake" buttons + "Online" sensors.
+  wol-relay:
+    build: ./wol-relay
+    image: wol-relay
+    container_name: wol-relay
+    restart: unless-stopped
+    network_mode: host
+    user: "1000:1000"
+    depends_on:
+      - mosquitto
+    volumes:
+      - ./wol-relay/relay.py:/app/relay.py:ro
+    environment:
+      - MQTT_HOST=127.0.0.1                # mosquitto's published port
+      - MQTT_USER=wol
+      - MQTT_PASSWORD=${WOL_MQTT_PASSWORD}
+      - TARGETS=${WOL_TARGETS}             # id|Name|mac|ip;... kept in .env
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
