@@ -84,6 +84,13 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy games-launcher:8080
 	}
 
+	# household/immich: personal photos. No forward_auth (the mobile app calls
+	# the API directly); Immich itself only allows Authentik OIDC login.
+	@photos host photos.{$DOMAIN_NAME}
+	handle @photos {
+		reverse_proxy immich_photos_server:2283
+	}
+
 	#
 	# AUTHENTIK PROTECTED
 	#

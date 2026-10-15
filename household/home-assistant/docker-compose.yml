@@ -15,6 +15,9 @@ services:
       TZ: ${TZ}
     volumes:
       - ${SSD_PATH}/home-assistant/data:/config
+      # Front door AI snapshot automation writes here (shown in notifications as
+      # /media/local/doorbell/...). Mounted so it survives container recreation.
+      - ${SSD_PATH}/home-assistant/media/doorbell:/media/doorbell
     ports:
       - 8123:8123 #optional
     restart: unless-stopped
