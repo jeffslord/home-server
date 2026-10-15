@@ -20,6 +20,12 @@
 networks:
   web:
     external: true
+  immich-photos:
+    external: true
+    name: immich-photos_default
+  immich:
+    external: true
+    name: immich_default
 
 services:
   borgmatic:
@@ -34,6 +40,8 @@ services:
       - TZ=America/New_York
     networks:
       - web                        # reaches authentik-postgresql, paperless-db-1 and ntfy by name
+      - immich-photos              # immich_photos_postgres
+      - immich                     # immich_postgres
     volumes:
       - ./config.yaml:/etc/borgmatic/config.yaml:ro
       - /home/jeff/volumes/borgmatic/borg-config:/root/.config/borg      # security/nonce state

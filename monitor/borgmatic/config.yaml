@@ -30,7 +30,10 @@ exclude_patterns:
   - /home/jeff/volumes/ollama
   - /home/jeff/volumes/photon                        # Photon planet geocoder DB (~100 GB, re-downloadable)
   - /home/jeff/volumes/photon-dl                      # its download parts while fetching
-  - /home/jeff/volumes/immich                        # leftover from an Immich install that isn't running
+  - /home/jeff/volumes/immich/postgres               # Immich DB, dumped below instead
+  - /home/jeff/volumes/immich/model_cache            # ML models, re-downloaded on start
+  - /home/jeff/volumes/immich-photos/postgres        # Immich DB, dumped below instead
+  - /home/jeff/volumes/immich-photos/model_cache
   - /home/jeff/volumes/borgmatic/borg-cache
   - /home/jeff/volumes/open-webui                   # chat history not worth keeping
   - /home/jeff/volumes/actual-helpers/cache
@@ -127,6 +130,20 @@ postgresql_databases:
     hostname: dawarich-db
     username: dawarich
     password: ${DAWARICH_DB_PASSWORD}
+    format: custom
+  # Immich (both stacks). Restore into the same ghcr.io/immich-app/postgres
+  # image (needs the vectorchord/pgvecto.rs extensions). Photo files themselves live on the NAS.
+  - name: immich
+    label: immich-photos
+    hostname: immich_photos_postgres
+    username: postgres
+    password: ${IMMICH_PHOTOS_DB_PASSWORD}
+    format: custom
+  - name: immich
+    label: immich
+    hostname: immich_postgres
+    username: postgres
+    password: ${IMMICH_DB_PASSWORD}
     format: custom
 
 ntfy:
