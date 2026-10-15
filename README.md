@@ -23,6 +23,7 @@ Docker Compose stacks for my home server (`eris`, Ubuntu with a GTX 1080) and th
 | `household/paperless` | Paperless-ngx, Postgres, Redis | Authentik OIDC; AI suggestions on the local Ollama |
 | `household/dawarich` | Dawarich, PostGIS, Redis, Photon | Self-hosted location history with local reverse geocoding |
 | `household/immich` | Immich server, ML (GPU), Postgres, Valkey | Personal photos at `photos.$DOMAIN_NAME`; Authentik OIDC only, originals on the NAS `photos` share |
+| `lora-studio` (own repo) | LoRA Studio (Python) | Local image-model training tools; tailnet only |
 | `household/mealie`, `household/grocy` | Mealie, Grocy | Recipes, pantry |
 | `finance/actual-budget` | Actual Budget | Budget; OpenID via Authentik |
 | `finance/helpers` | actual-helpers jobs, net-worth export, Money Ladder | SimpleFIN investment sync; SQLite export for Grafana's Net worth dashboard; `/money-ladder` page (r/personalfinance flowchart fed from Actual) |
