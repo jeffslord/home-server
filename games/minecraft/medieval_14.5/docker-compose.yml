@@ -21,7 +21,7 @@ services:
       MAX_MEMORY: "16G"
       # RCON
       ENABLE_RCON: "true"
-      RCON_PASSWORD: "testing"
+      RCON_PASSWORD: "${MC_RCON_PASSWORD}"
       RCON_PORT: 28016
       # RCON_CMDS_STARTUP: |-
       #   pregen start 200
@@ -51,7 +51,7 @@ services:
     container_name: mc-backup-medieval-145
     restart: unless-stopped
     environment:
-      RCON_PASSWORD: "testing"
+      RCON_PASSWORD: "${MC_RCON_PASSWORD}"
       BACKUP_INTERVAL: "6h"
       RCON_PORT: 28016
       PRUNE_BACKUPS_DAYS: 4
@@ -77,7 +77,7 @@ services:
   #     # is referring to the hostname of 'mc' compose service below
   #     RWA_RCON_HOST: minecraft-server
   #     # needs to match the password configured for the container, which is 'minecraft' by default
-  #     RWA_RCON_PASSWORD: testing
+  #     RWA_RCON_PASSWORD: ${MC_RCON_PASSWORD}
   #   ports:
   #     - 4326:4326
   #     - 4327:4327

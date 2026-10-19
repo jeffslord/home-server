@@ -38,7 +38,7 @@ services:
 
       # RCON
       ENABLE_RCON: true
-      RCON_PASSWORD: "testing"
+      RCON_PASSWORD: "${MC_RCON_PASSWORD}"
       RCON_PORT: 28016
 
       # Server Properties
@@ -84,7 +84,7 @@ services:
       TZ: America/New_York
       RCON_HOST: mc-server
       RCON_PORT: 28016
-      RCON_PASSWORD: "testing"
+      RCON_PASSWORD: "${MC_RCON_PASSWORD}"
       BACKUP_INTERVAL: "6h"
       PRUNE_BACKUPS_DAYS: 4
       # instead of network_mode below, could declare RCON_HOST
