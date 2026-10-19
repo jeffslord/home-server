@@ -50,7 +50,7 @@ configs:
 
 services:
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3
     container_name: prometheus
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
@@ -74,7 +74,7 @@ services:
     restart: unless-stopped
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:v1
     container_name: node-exporter
     pid: host
     volumes:
@@ -94,18 +94,19 @@ services:
 
   # Restart count / state / health per container. See docker-state/collect.sh.
   docker-state:
-    image: docker:cli
+    image: docker:29-cli
     container_name: docker-state
     entrypoint: /collect.sh
     volumes:
       - ./docker-state/collect.sh:/collect.sh:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - docker_textfile:/textfile
+      - ${SSD_PATH}/monitor/docker-state:/manifest   # running-images.tsv (backed up)
     network_mode: none
     restart: unless-stopped
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
     container_name: cadvisor
     privileged: true
     devices:
@@ -127,7 +128,7 @@ services:
     restart: unless-stopped
 
   nvidia-gpu-exporter:
-    image: utkuozdemir/nvidia_gpu_exporter:latest
+    image: utkuozdemir/nvidia_gpu_exporter:1.15.1
     container_name: nvidia-gpu-exporter
     deploy:
       resources:
@@ -141,7 +142,7 @@ services:
     restart: unless-stopped
 
   blackbox:
-    image: prom/blackbox-exporter:latest
+    image: prom/blackbox-exporter:v0.28.0
     container_name: blackbox
     cap_add:
       - NET_RAW # icmp probes
@@ -156,7 +157,7 @@ services:
     restart: unless-stopped
 
   alertmanager:
-    image: prom/alertmanager:latest
+    image: prom/alertmanager:v0.34.1
     container_name: alertmanager
     # The image defaults to nobody, which can't read the ntfy secret (mode 600, jeff)
     # or write its data dir: every notification failed from Sep 30 to Oct 19 2026.
@@ -177,7 +178,7 @@ services:
     restart: unless-stopped
 
   ntfy:
-    image: binwiederhier/ntfy:latest
+    image: binwiederhier/ntfy:v2
     container_name: ntfy
     command: serve
     environment:
@@ -201,7 +202,7 @@ services:
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:3
     container_name: loki
     user: "${PUID}:${PGID}"
     command: -config.file=/etc/loki/loki.yml
@@ -214,7 +215,7 @@ services:
 
   # Log shipper: tails every container via the docker socket + the host journal.
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:v1.19.2
     container_name: alloy
     user: root # docker socket + /var/log/journal
     command:
@@ -238,7 +239,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.2
     container_name: grafana
     volumes:
       - ${SSD_PATH}/monitor/grafana:/var/lib/grafana
