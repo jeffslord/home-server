@@ -26,6 +26,9 @@ networks:
   immich:
     external: true
     name: immich_default
+  sure:
+    external: true
+    name: sure_default
 
 services:
   borgmatic:
@@ -42,6 +45,7 @@ services:
       - web                        # reaches authentik-postgresql, paperless-db-1 and ntfy by name
       - immich-photos              # immich_photos_postgres
       - immich                     # immich_postgres
+      - sure                       # sure-db
     volumes:
       - ./config.yaml:/etc/borgmatic/config.yaml:ro
       - /home/jeff/volumes/borgmatic/borg-config:/root/.config/borg      # security/nonce state
@@ -52,6 +56,20 @@ services:
       - /home/jeff/volumes:/home/jeff/volumes
       - /home/jeff/flightdensity:/home/jeff/flightdensity
       - /home/jeff/development/github.com/home-server:/home/jeff/development/github.com/home-server
+      - /mnt/nas/paperless/media:/mnt/nas/paperless/media:ro      # Paperless documents (NAS)
+      - /mnt/nas/backup/unraid-flash:/mnt/nas/backup/unraid-flash:ro   # Unraid flash backup (keyfile)
+      # Home-folder items (see config.yaml); read-only
+      - /home/jeff/.claude:/home/jeff/.claude:ro
+      - /home/jeff/.ssh:/home/jeff/.ssh:ro
+      - /home/jeff/.config:/home/jeff/.config:ro
+      - /home/jeff/scratch:/home/jeff/scratch:ro
+      - /home/jeff/llm:/home/jeff/llm:ro
+      - /home/jeff/rezero-audio:/home/jeff/rezero-audio:ro
+      - /home/jeff/regal-empty:/home/jeff/regal-empty:ro
+      - /home/jeff/development/local:/home/jeff/development/local:ro
+      - /home/jeff/development/github.com/boyo-bot:/home/jeff/development/github.com/boyo-bot:ro
+      - /home/jeff/development/github.com/social-media-monitor:/home/jeff/development/github.com/social-media-monitor:ro
+      - /home/jeff/development/github.com/actualbudget:/home/jeff/development/github.com/actualbudget:ro
     logging:
       options:
         max-size: 10m
