@@ -57,7 +57,6 @@ Ports Docker publishes **bypass ufw**, so this list (and the router) is the real
 | 53 tcp/udp | AdGuard DNS | LAN |
 | 80 | AdGuard admin (own login) | LAN |
 | 8123 | Home Assistant (Cast devices fetch media from it) | LAN |
-| 8118 / 9118 | SABnzbd-VPN Privoxy / SOCKS (use unclear) | LAN |
 | 9999 | Stash (its own login; not behind Authentik) | LAN |
 | game ports | Minecraft 25565/25591, Palworld 8211/27015, Space Engineers 27016, Vintage Story 42420 (+42425, purpose unknown: don't forward) | Internet, only while a server runs |
 | 1883 | Mosquitto | localhost only (wol-relay) |
