@@ -121,6 +121,13 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy actual-budget:5006
 	}
 
+	# finance/sure: Authentik in front, and Sure itself logs in via Authentik OIDC.
+	@sure host sure.{$DOMAIN_NAME}
+	handle @sure {
+		import forward_auth_authentik
+		reverse_proxy sure-web:3000
+	}
+
 	@grocy host grocy.{$DOMAIN_NAME}
 	handle @grocy {
 		import forward_auth_authentik

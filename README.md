@@ -6,7 +6,7 @@ Docker Compose stacks for my home server (`eris`, Ubuntu with a GTX 1080) and th
 
 - **One network.** Stacks join the external `web` bridge network and reach each other by container name (`http://grafana:3000`). Create it once with `docker network create web`.
 - **One front door.** Caddy (`network/caddy`) terminates TLS for `*.$DOMAIN_NAME` using Cloudflare DNS challenges. Almost nothing publishes host ports; services are reached as `<name>.$DOMAIN_NAME`.
-- **One login.** Caddy `forward_auth`s most sites to Authentik (`auth/`). Apps that support it (Grafana, Paperless, Actual, Open WebUI) also use Authentik OIDC, so there is no second login. fail2ban (`network/fail2ban`) watches Caddy's access log and bans in `DOCKER-USER`.
+- **One login.** Caddy `forward_auth`s most sites to Authentik (`auth/`). Apps that support it (Grafana, Paperless, Actual, Sure, Open WebUI) also use Authentik OIDC, so there is no second login. fail2ban (`network/fail2ban`) watches Caddy's access log and bans in `DOCKER-USER`.
 - **One scheduler.** Ofelia (`monitor/ofelia/config.ini`) holds every scheduled job: backups, the Actual sync and exports, and flight-site jobs. There is no host crontab. Run-to-completion services show as `Exited` between runs; that's intended.
 - **DNS.** AdGuard Home (`network/adguard-home`) serves the LAN and split DNS for `$DOMAIN_NAME`. It is deliberately not on `web`: containers use the host IP for DNS, which a container on the same bridge can't reach (hairpin NAT).
 
@@ -27,6 +27,7 @@ Docker Compose stacks for my home server (`eris`, Ubuntu with a GTX 1080) and th
 | `household/mealie`, `household/grocy` | Mealie, Grocy | Recipes, pantry |
 | `finance/actual-budget` | Actual Budget | Budget; OpenID via Authentik |
 | `finance/helpers` | actual-helpers jobs, net-worth export, Money Ladder | SimpleFIN investment sync; SQLite export for Grafana's Net worth dashboard; `/money-ladder` page (r/personalfinance flowchart fed from Actual) |
+| `finance/sure` | Sure (Maybe Finance fork) | Personal finance at `sure.`; Authentik OIDC, Postgres dumped by borgmatic |
 | `health/garmin` | garmin-fetch-data, InfluxDB 1.11 | Garmin Connect → Grafana |
 | `media/` | Jellyfin, Sonarr, Radarr, Prowlarr, Bazarr, Seerr, SABnzbd + qBittorrent (VPN), FlareSolverr | Library lives on the NAS |
 | `games/launcher` | Start page + idle watcher, Docker socket proxy | Players start stopped servers; stops them after 30 idle minutes |
