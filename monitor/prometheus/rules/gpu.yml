@@ -8,6 +8,7 @@ groups:
         annotations:
           summary: "GPU at {{ $value }}°C"
           description: "GTX 1080 has been above 85°C for 5m. Check airflow / what Ollama is doing."
+          runbook: "docs/runbooks/host.md"
 
       - alert: GpuMemoryNearlyFull
         expr: nvidia_smi_memory_used_bytes / nvidia_smi_memory_total_bytes > 0.95
@@ -16,3 +17,4 @@ groups:
         annotations:
           summary: "GPU VRAM {{ $value | humanizePercentage }} used for 15m"
           description: "A model is likely pinned in VRAM. Fine if intentional; Ollama's OLLAMA_KEEP_ALIVE controls this."
+          runbook: "docs/runbooks/host.md"

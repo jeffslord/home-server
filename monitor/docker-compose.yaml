@@ -158,6 +158,9 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     container_name: alertmanager
+    # The image defaults to nobody, which can't read the ntfy secret (mode 600, jeff)
+    # or write its data dir: every notification failed from Sep 30 to Oct 19 2026.
+    user: "1000:1000"
     volumes:
       - ./alertmanager/config.yml:/etc/alertmanager/config.yml:ro
       - ${SSD_PATH}/monitor/alertmanager/data:/alertmanager

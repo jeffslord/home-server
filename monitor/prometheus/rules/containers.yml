@@ -7,22 +7,48 @@ groups:
         annotations:
           summary: "{{ $labels.name }} is restart-looping"
           description: "dockerd restarted {{ $labels.name }} {{ $value | printf \"%.0f\" }} times in 15m. Check `docker logs {{ $labels.name }}`."
+          runbook: "docs/runbooks/containers.md"
 
       - alert: ContainerUnhealthy
-        expr: docker_container_healthy == 0
+        # Stopped containers keep their last health status, so only count running ones.
+        expr: docker_container_healthy == 0 and on(name) docker_container_state{state="running"} == 1
         for: 5m
         labels: { severity: warning }
         annotations:
           summary: "{{ $labels.name }} healthcheck failing"
           description: "Docker reports {{ $labels.name }} unhealthy for 5m. See `docker inspect {{ $labels.name }}` under State.Health."
+          runbook: "docs/runbooks/containers.md"
 
+      # Scheduled one-shot jobs (Ofelia) and on-demand game servers are Exited by
+      # design; ScheduledJobFailed covers the jobs. Keep this list in sync with
+      # ONE_SHOT in monitor/audit/collect.sh.
       - alert: ContainerNotRunning
-        expr: docker_container_state{state!="running"} == 1
+        expr: |
+          docker_container_state{state!="running", name!~"borgmatic|borgmatic-private|offsite-backup|actual-helpers|actual-networth|flightdensity-report|palworld|vintagestory|space-engineers|minecraft.*|cobble.*|project-zomboid"} == 1
         for: 15m
         labels: { severity: info }
         annotations:
           summary: "{{ $labels.name }} is {{ $labels.state }}"
           description: "Fine if you stopped it on purpose. `docker compose down` removes containers and won't trigger this."
+          runbook: "docs/runbooks/containers.md"
+
+      - alert: ScheduledJobFailed
+        expr: docker_container_exit_code{name=~"borgmatic|borgmatic-private|offsite-backup|actual-helpers|actual-networth|flightdensity-report"} != 0
+        labels: { severity: warning }
+        annotations:
+          summary: "Scheduled job {{ $labels.name }} exited with code {{ $value }}"
+          description: "Its last run failed. `docker logs --tail 50 {{ $labels.name }}`; re-run with `docker start -a {{ $labels.name }}`."
+          runbook: "docs/runbooks/backups.md"
+
+      - alert: ScheduledJobMissing
+        expr: |
+          absent(docker_container_state{name="borgmatic"}) or absent(docker_container_state{name="offsite-backup"})
+        for: 30m
+        labels: { severity: warning }
+        annotations:
+          summary: "A backup job container is gone"
+          description: "Ofelia can only start containers that exist; a prune deletes them. Recreate with `docker compose create` in monitor/borgmatic or monitor/offsite-backup."
+          runbook: "docs/runbooks/backups.md"
 
       - alert: ContainerOomKilled
         expr: increase(container_oom_events_total{name!=""}[10m]) > 0
@@ -30,6 +56,7 @@ groups:
         annotations:
           summary: "{{ $labels.name }} was OOM-killed"
           description: "The kernel killed a process in {{ $labels.name }} for exceeding its memory limit."
+          runbook: "docs/runbooks/containers.md"
 
       - alert: ContainerNearMemoryLimit
         expr: |
@@ -41,6 +68,7 @@ groups:
         annotations:
           summary: "{{ $labels.name }} above 90% of its memory limit"
           description: "{{ $value | humanizePercentage }} of the configured limit."
+          runbook: "docs/runbooks/containers.md"
 
       # Infra containers that everything else depends on. cAdvisor simply stops
       # reporting a container that is gone, so absent() is the only way to notice.
@@ -56,3 +84,4 @@ groups:
         annotations:
           summary: "An infrastructure container is missing"
           description: "One of caddy / adguardhome / authentik / home-assistant is not running. `docker ps -a` to see which."
+          runbook: "docs/runbooks/containers.md"

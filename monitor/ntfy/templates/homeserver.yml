@@ -30,4 +30,6 @@ message: |
   service: {{ . }}{{ end }}
   {{- with $a.labels.mountpoint }}
   mount: {{ . }}{{ end }}
+  {{- with $a.annotations.runbook }}
+  runbook: https://github.com/jeffslord/docker-compose-projects/blob/refactor/{{ . }}{{ end }}
   {{- end }}

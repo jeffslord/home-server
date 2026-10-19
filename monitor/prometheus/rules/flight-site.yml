@@ -8,6 +8,7 @@ groups:
         annotations:
           summary: "Public flight site is not answering"
           description: "Prometheus can't scrape flightdensity-public:9102 for 5m. `docker logs flightdensity-public`."
+          runbook: "docs/runbooks/containers.md"
 
       - alert: FlightSiteErrors
         expr: |
@@ -18,6 +19,7 @@ groups:
         annotations:
           summary: "Public flight site: {{ $value | humanizePercentage }} of requests failing"
           description: "More than 5% of requests returned 5xx for 10m (503 = too busy). See the Flight site dashboard."
+          runbook: "docs/runbooks/containers.md"
 
       - alert: FlightDataStale
         expr: flightweb_data_age_seconds > 3600
@@ -26,3 +28,4 @@ groups:
         annotations:
           summary: "Flight data is {{ $value | humanizeDuration }} old"
           description: "No new positions on the public site for over an hour: check flightdensity-collector (OpenSky) and the 15-minute snapshot job in Ofelia."
+          runbook: "docs/runbooks/containers.md"
