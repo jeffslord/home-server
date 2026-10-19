@@ -101,9 +101,12 @@ services:
     container_name: sabnzbdvpn
     networks:
       - web
+    # WireGuard needs only NET_ADMIN + this sysctl (+ the host's wireguard module);
+    # binhex's docs suggest privileged, which was dropped 2026-10-19.
+    cap_add:
+      - NET_ADMIN
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-    privileged: true
     # Web UI (8080/8090) not published: reached only via Caddy -> Authentik.
     # Privoxy (8118) / SOCKS (9118) stay on the host so LAN apps can route via the VPN
     # (unclear if anything uses them, 2026-10-19). Usenet needs no incoming port.
