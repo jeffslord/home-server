@@ -49,7 +49,7 @@ x-rails-env: &rails_env
   AUTH_JIT_MODE: link_only
   WEBAUTHN_RP_ID: sure.jeffslord.com
   WEBAUTHN_ALLOWED_ORIGINS: https://sure.jeffslord.com
-  # AI (chat, auto-categorization, merchant detection): local Ollama (~/llm stack)
+  # AI (chat, auto-categorization, merchant detection): local Ollama (ai/ stack)
   # via its OpenAI-compatible API, so transactions stay on the LAN. Ollama has no
   # auth; the token just has to be non-empty. Context matches OLLAMA_CONTEXT_LENGTH.
   OPENAI_ACCESS_TOKEN: ollama

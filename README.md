@@ -39,6 +39,7 @@ Docker Compose stacks for my home server (`eris`, Ubuntu with a GTX 1080) and th
 | `monitor/audit` | systemd user timer + script | Weekly read-only server snapshot, summarized by headless Claude and sent to ntfy |
 | `monitor/ofelia`, `monitor/dockhand` | Ofelia, Dockhand | Scheduler; container management UI |
 | `dev/opencode` | OpenCode web | AI coding agent behind Authentik |
+| `ai/` | Ollama (GPU), Open WebUI | Local LLMs for Paperless, Sure, OpenCode and Home Assistant; chat UI via Authentik OIDC |
 
 ## Configuration and secrets
 
