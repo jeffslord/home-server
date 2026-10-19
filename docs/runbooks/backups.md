@@ -11,6 +11,7 @@ the NAS freshness alert (borg repo not written for 30 h), "offsite backup failed
 | Postgres: authentik, paperless, dawarich, sure, both Immich DBs | `pg_dump` inside the same archive | same |
 | SQLite: Home Assistant, zigbee, Grafana, Actual, *arr, Jellyfin, flights, stash | consistent dump inside the same archive | same |
 | Paperless documents | borgmatic (from the NAS) | same |
+| eris `/etc`, package and unit lists, exact image versions | borgmatic (`host/etc`, `volumes/monitor/host-state`, `volumes/monitor/docker-state`) | same |
 | Unraid flash config + disk keyfile | NAS cron 01:30 → `backup/unraid-flash`, then borgmatic | same |
 | The borg repos | rclone, nightly 03:30 | Google Drive `backups/` (deleted/changed files kept 30 days under `_deleted/`) |
 | Media, photos on the NAS | Unraid parity only | **No offsite copy** |

@@ -58,6 +58,7 @@ services:
       - /home/jeff/development/github.com/home-server:/home/jeff/development/github.com/home-server
       - /mnt/nas/paperless/media:/mnt/nas/paperless/media:ro      # Paperless documents (NAS)
       - /mnt/nas/backup/unraid-flash:/mnt/nas/backup/unraid-flash:ro   # Unraid flash backup (keyfile)
+      - /etc:/host/etc:ro                                           # host config (not at /etc: that's the container's own)
       # Home-folder items (see config.yaml); read-only
       - /home/jeff/.claude:/home/jeff/.claude:ro
       - /home/jeff/.ssh:/home/jeff/.ssh:ro

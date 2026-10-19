@@ -46,12 +46,22 @@ Recovery time is a few hours. Data loss is at most since the last 02:00 backup.
    `volumes/monitor/docker-state/running-images.tsv` if a newer image misbehaves.
    `docker network create web`, then bring stacks up in order: `network/caddy`, `network/adguard-home`,
    `auth`, `monitor`, then everything else (`docker compose up -d` in each).
-7. Host bits that aren't Docker:
-   - `monitor/nas-watchdog/install.sh` (boot wait + watchdog)
-   - `monitor/audit/systemd` (weekly audit, user units)
-   - the image-only prune in `/etc/cron.daily/docker-prune-daily` (**not** `system prune`)
-   - `/etc/docker/daemon.json`: `dns` → `192.168.1.162`, `1.1.1.1`; log-opts `max-size 20m`/`max-file 3`; `live-restore`; nvidia runtime
-   - the systemd user unit for `claude remote-control`, if wanted
+7. Host config. The old `/etc` is in the archive at `/srv/r/host/etc`, and package/unit lists are in
+   `/home/jeff/volumes/monitor/host-state/` (`versions.txt` has the old kernel, Docker and NVIDIA versions).
+   **Copy files selectively, never the whole `/etc`** (disk UUIDs, netplan and machine IDs differ):
+   ```sh
+   E=/srv/r/host/etc; H=/home/jeff/volumes/monitor/host-state
+   xargs -a $H/apt-manual.txt sudo apt install -y     # same packages (ignore any that no longer exist)
+   sudo cp $E/docker/daemon.json /etc/docker/ && sudo systemctl restart docker
+   sudo cp $E/cron.daily/docker-prune-daily /etc/cron.daily/    # image-only prune, NOT system prune
+   sudo cp -a $E/ufw/user.rules $E/ufw/user6.rules /etc/ufw/ && sudo ufw enable
+   sudo cp -a $E/ssh/ssh_host_* /etc/ssh/ && sudo systemctl restart ssh   # clients won't see a new host key
+   diff <(grep nfs $E/fstab) <(grep nfs /etc/fstab)    # NAS lines should match step 3
+   sudo ~/development/github.com/home-server/monitor/nas-watchdog/install.sh   # boot wait + watchdog
+   ```
+   Then re-enable the user units listed in `$H/systemd-user-enabled.txt` (weekly audit:
+   `monitor/audit/systemd`; `claude remote-control`, if wanted) and compare `$H/systemd-enabled.txt`
+   with `systemctl list-unit-files --state=enabled` for anything else that was turned on.
 8. Put the router's DNS back to AdGuard (192.168.1.162). Run `bin/health`.
 
 ## Scenario: NAS dead (hardware), disks fine

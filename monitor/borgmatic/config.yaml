@@ -7,6 +7,7 @@ source_directories:
   - /home/jeff/development/github.com/home-server   # includes the gitignored .env files
   - /mnt/nas/paperless/media                        # Paperless originals + archived PDFs (DB is dumped below)
   - /mnt/nas/backup/unraid-flash                    # Unraid flash config incl. the disk LUKS keyfile (NAS cron 01:30)
+  - /host/etc                                       # eris /etc (fstab, daemon.json, systemd units, ufw, ssh host keys); packages etc. in volumes/monitor/host-state
   # Home-folder items that exist only on eris (not on GitHub, not regenerable)
   - /home/jeff/.claude   # my Claude notes (memory) and past sessions
   - /home/jeff/.ssh   # SSH keys incl. the NAS key; the agent sockets are skipped
