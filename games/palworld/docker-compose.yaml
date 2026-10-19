@@ -17,7 +17,7 @@ services:
     ports:
       - 8211:8211/udp
       - 27015:27015/udp
-      - 8212:8212/tcp # REST API - do not port forward
+      # REST API 8212 not published: the games launcher reaches it over `web`.
     volumes:
       - ${SSD_PATH}/games/palworld:/palworld/
     environment:

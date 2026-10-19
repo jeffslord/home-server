@@ -115,8 +115,7 @@ services:
     container_name: ring-mqtt
     restart: unless-stopped
     image: tsightler/ring-mqtt:5.9.3
-    ports:
-      - 8554:8554 # Enable RTSP port for external media player access
+    # RTSP 8554 not published: Home Assistant pulls the streams over `web`.
     volumes:
       - ${SSD_PATH}/home-assistant/ring-mqtt/data:/data # Mapping of local folder to provide persistent storage
     logging:
@@ -137,9 +136,10 @@ services:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro # pwfile stays in the volume
       - ${SSD_PATH}/home-assistant/mosquitto/data:/mosquitto/data
       - ${SSD_PATH}/home-assistant/mosquitto/log:/mosquitto/log
+    # Containers use mosquitto:1883 on `web`; the host port is for host-network
+    # wol-relay only, so it stays on localhost (websockets 9001 unused, not published).
     ports:
-      - 1883:1883
-      - 9001:9001
+      - 127.0.0.1:1883:1883
     stdin_open: true
     tty: true
 

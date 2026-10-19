@@ -46,3 +46,29 @@ From the LAN:
 docker exec fail2ban fail2ban-client status                 # list jails
 docker exec fail2ban fail2ban-client set <jail> unbanip <ip>
 ```
+
+## What eris exposes (reviewed 2026-10-19)
+
+Ports Docker publishes **bypass ufw**, so this list (and the router) is the real firewall.
+
+| Port | Service | Reachable from |
+|---|---|---|
+| 443 tcp/udp | Caddy | Internet (router forward) |
+| 53 tcp/udp | AdGuard DNS | LAN |
+| 80 | AdGuard admin (own login) | LAN |
+| 8123 | Home Assistant (Cast devices fetch media from it) | LAN |
+| 8118 / 9118 | SABnzbd-VPN Privoxy / SOCKS (use unclear) | LAN |
+| 9999 | Stash (its own login; not behind Authentik) | LAN |
+| game ports | Minecraft 25565/25591, Palworld 8211/27015, Space Engineers 27016, Vintage Story 42420 (+42425, purpose unknown: don't forward) | Internet, only while a server runs |
+| 1883 | Mosquitto | localhost only (wol-relay) |
+
+Everything else is `127.0.0.1` or not published, and is reached through Caddy + Authentik.
+Check the list against reality:
+
+```sh
+docker ps --format '{{.Names}}\t{{.Ports}}' | grep -E '0\.0\.0\.0|\[::\]'
+```
+
+**Router check (do yearly or after router changes):** the router's port-forwarding page should
+forward to 192.168.1.162 only 443 (tcp+udp) and the game ports above. Nothing else, especially
+not 80, 8123, 9999, 53 or 22.
