@@ -9,6 +9,7 @@ networks:
 
 services:
   space-engineers:
+    mem_limit: 6g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     image: devidian/spaceengineers:latest
     container_name: space-engineers
     restart: unless-stopped

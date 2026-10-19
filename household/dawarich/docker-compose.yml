@@ -79,6 +79,7 @@ services:
   # (photon-db-planet-1.0-latest.tar.bz2, extracted to ${SSD_PATH}/photon/photon_data).
   # Re-downloadable, so not backed up. Refresh: re-download, swap the dir, restart.
   photon:
+    mem_limit: 7g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     build:
       context: ./photon
       args:

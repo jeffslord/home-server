@@ -10,6 +10,7 @@ networks:
 
 services:
   ollama:
+    mem_limit: 12g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     networks:
       - web
     volumes:
@@ -45,6 +46,7 @@ services:
                 - gpu
 
   open-webui:
+    mem_limit: 3g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     networks:
       - web
     image: ghcr.io/open-webui/open-webui:0.12

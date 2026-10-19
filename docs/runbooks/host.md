@@ -33,6 +33,23 @@ docker stats --no-stream --format 'table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}'
 Usual suspects: Ollama or Immich ML holding a model, the Immich/Photon importers, a game
 server. `docker restart <name>` frees it.
 
+### Memory limits
+
+Since 2026-10-19 the big, spiky containers have a `mem_limit` well above their observed peak
+(Immich photos 14g, Ollama 12g, Photon 7g, flightdensity-public 7g, Immich private 6g,
+SABnzbd/Immich ML 5g, Jellyfin/Stash/collector 4g, Open WebUI 3g, FlareSolverr 2g,
+games 5–6g, Minecraft 18g). Everything else is unlimited. Core services (Caddy, AdGuard,
+Authentik, Home Assistant, Mosquitto, Z-Wave, Matter) have `oom_score_adj: -500`, so the
+kernel kills something else first.
+
+- `ContainerNearMemoryLimit` (>90% for 5 min) → check whether it's real work (an Immich import,
+  a big model). If so, raise the limit in the compose file and apply it without a restart:
+  `docker update --memory 16g --memory-swap 32g <name>`.
+- `ContainerOomKilled` → the limit was hit and the container restarted. Raise the limit the
+  same way, or find the leak.
+- Peaks to size from: Grafana, or
+  `max_over_time(container_memory_working_set_bytes{name="<name>"}[30d])` in Prometheus.
+
 ## GPU
 
 ```sh

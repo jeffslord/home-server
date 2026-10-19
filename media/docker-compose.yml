@@ -9,6 +9,7 @@ networks:
 
 services:
   jellyfin:
+    mem_limit: 4g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     image: lscr.io/linuxserver/jellyfin:12.1ubu2604-ls50
     container_name: jellyfin
     networks:
@@ -66,6 +67,7 @@ services:
     restart: unless-stopped
 
   flaresolverr:
+    mem_limit: 2g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     image: ghcr.io/flaresolverr/flaresolverr:v3.5.2
     container_name: flaresolverr
     networks:
@@ -94,6 +96,7 @@ services:
     restart: unless-stopped
 
   sabnzbdvpn:
+    mem_limit: 5g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     image: binhex/arch-sabnzbdvpn:5
     container_name: sabnzbdvpn
     networks:

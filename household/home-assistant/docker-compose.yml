@@ -4,6 +4,7 @@ networks:
 
 services:
   home-assistant:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     image: lscr.io/linuxserver/homeassistant:2026.9.2
     container_name: home-assistant
     # network_mode: host
@@ -23,6 +24,7 @@ services:
     restart: unless-stopped
 
   matter-server:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     image: ghcr.io/home-assistant-libs/python-matter-server:8
     container_name: matter-server
     restart: unless-stopped
@@ -83,6 +85,7 @@ services:
     restart: unless-stopped
 
   zwavejs2mqtt:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     container_name: zwavejs2mqtt
     networks:
       - web
@@ -123,6 +126,7 @@ services:
         max-file: "3"
 
   mosquitto:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     networks:
       - web
     image: eclipse-mosquitto:2

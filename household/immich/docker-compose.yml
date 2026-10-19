@@ -25,6 +25,7 @@ networks:
 
 services:
   immich-server:
+    mem_limit: 14g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     container_name: immich_photos_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     volumes:
@@ -44,6 +45,7 @@ services:
       disable: false
 
   immich-machine-learning:
+    mem_limit: 5g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     container_name: immich_photos_machine_learning
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}-cuda
     volumes:
