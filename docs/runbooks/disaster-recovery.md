@@ -8,7 +8,7 @@ Without these, the backups can't be used. Store them in a password manager:
 - [ ] **Unraid flash backup zip**, which includes the disk encryption keyfile ([nas.md](nas.md#encryption-key-read-this-before-you-ever-need-it))
 - [ ] Unraid root password
 - [ ] Google account login (Drive holds the offsite copy)
-- [ ] GitHub login (this repo: `jeffslord/docker-compose-projects`)
+- [ ] GitHub login (this repo: `jeffslord/home-server`)
 - [ ] Cloudflare login (DNS for `jeffslord.com`)
 - [ ] healthchecks.io login
 
