@@ -44,7 +44,7 @@ Docker Compose stacks for my home server (`eris`, Ubuntu with a GTX 1080) and th
 
 Nothing secret is committed.
 
-- **`.env`** at the repo root holds shared settings (`SSD_PATH`, `HDD_PATH`, `DOMAIN_NAME`, `PUID`/`PGID`, `TZ`, passwords). Each stack folder has a `.env` symlink to it (`ln -s ../.env .env`). A few stacks with their own credentials (`finance/helpers`, `monitor/borgmatic`, `monitor/offsite-backup`) keep a separate `.env`. Start from `env_template.env`.
+- **`.env`** at the repo root holds shared settings (`SSD_PATH`, `HDD_PATH`, `DOMAIN_NAME`, `PUID`/`PGID`, `TZ`, passwords). Each stack folder has a `.env` symlink to it (`ln -s ../.env .env`). A few stacks with their own credentials (`finance/helpers`, `finance/sure`, `monitor/borgmatic`, `monitor/offsite-backup`) keep a separate `.env`. Start from `env_template.env`.
 - **`_secrets/`** holds files mounted as Compose secrets (OIDC client secrets, API tokens). Containers that run as a non-root user need the file to be readable by that user.
 - **`private/`** holds stacks and backup definitions that stay out of the public repo.
 - **Data** lives under `$SSD_PATH/<service>` (fast, backed up nightly) or `$HDD_PATH` (bulk media), never in the repo.
@@ -66,3 +66,13 @@ docker exec caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
 ```
 
 Scheduled jobs are edited in `monitor/ofelia/config.ini`; restart the `ofelia` container to pick them up. Their output is in `docker logs ofelia`.
+
+## When something breaks
+
+```sh
+bin/health        # read-only check of alerts, containers, backups, host, NAS mounts and array
+```
+
+Each problem it prints names a page in [`docs/runbooks/`](docs/runbooks/README.md), and every
+phone alert links to its runbook. Restores and the bare-metal rebuild are in
+[`backups.md`](docs/runbooks/backups.md) and [`disaster-recovery.md`](docs/runbooks/disaster-recovery.md).

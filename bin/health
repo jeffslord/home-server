@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# One-shot health check for eris and the NAS. Read-only: it changes nothing.
+#   bin/health          everything
+#   bin/health -q       only print problems
+# Every FAIL/WARN line names the runbook to open (docs/runbooks/).
+set -uo pipefail
+
+REPO=$(cd "$(dirname "$0")/.." && pwd)
+PROM=http://127.0.0.1:9092
+AM=http://127.0.0.1:9093
+NAS_SSH=(ssh -o IdentityAgent="$HOME/.ssh/agent-unraid.sock" -o BatchMode=yes -o ConnectTimeout=5 unraid)
+# Exited by design: Ofelia jobs and on-demand game servers. Keep in sync with
+# monitor/prometheus/rules/containers.yml and monitor/audit/collect.sh.
+JOBS='borgmatic|borgmatic-private|offsite-backup|actual-helpers|actual-networth|flightdensity-report'
+IDLE="^($JOBS|palworld|vintagestory|space-engineers|minecraft.*|cobble.*|project-zomboid)\$"
+
+QUIET=0; [ "${1:-}" = -q ] && QUIET=1
+fails=0 warns=0
+if [ -t 1 ]; then R=$'\e[31m' Y=$'\e[33m' G=$'\e[32m' B=$'\e[1m' N=$'\e[0m'; else R= Y= G= B= N=; fi
+section() { [ $QUIET = 1 ] || printf '\n%s%s%s\n' "$B" "$1" "$N"; }
+ok()   { [ $QUIET = 1 ] || printf '  %sOK%s    %s\n' "$G" "$N" "$1"; }
+warn() { warns=$((warns+1)); printf '  %sWARN%s  %s%s\n' "$Y" "$N" "$1" "${2:+  → docs/runbooks/$2}"; }
+fail() { fails=$((fails+1)); printf '  %sFAIL%s  %s%s\n' "$R" "$N" "$1" "${2:+  → docs/runbooks/$2}"; }
+age_h() { echo $(( ( $(date +%s) - $(date -d "$1" +%s) ) / 3600 )); }
+
+section "Alerts"
+firing=$(curl -s -m 10 "$PROM/api/v1/alerts" | python3 -c '
+import json, sys
+for a in json.load(sys.stdin)["data"]["alerts"]:
+    if a["state"] == "firing":
+        l = a["labels"]; print(l.get("severity", "?"), l["alertname"], l.get("name") or l.get("service") or l.get("mountpoint") or "", a["annotations"].get("runbook", "").split("/")[-1])
+' 2>/dev/null) || firing="__err"
+if [ "$firing" = "__err" ]; then fail "Prometheus not answering on $PROM" monitoring.md
+elif [ -z "$firing" ]; then ok "no alerts firing"
+else while read -r sev name what rb; do
+  [ "$sev" = critical ] && fail "$name $what" "$rb" || warn "$name $what ($sev)" "$rb"
+done <<< "$firing"; fi
+am_err=$(docker logs --since 1h alertmanager 2>&1 | grep -c 'Notify for alerts failed')
+[ "$am_err" -eq 0 ] && ok "alertmanager delivered without errors in the last hour" \
+  || fail "alertmanager failed to notify $am_err times in the last hour (alerts aren't reaching your phone)" monitoring.md
+
+section "Containers"
+down=$(docker ps -a --format '{{.Names}} {{.State}}' | awk -v re="$IDLE" '$2 != "running" && $1 !~ re {print $1 "(" $2 ")"}')
+[ -z "$down" ] && ok "all long-running containers are up" || fail "not running: $(echo $down)" containers.md
+unhealthy=$(docker ps --filter health=unhealthy --format '{{.Names}}')
+[ -z "$unhealthy" ] && ok "no unhealthy containers" || warn "unhealthy: $(echo $unhealthy)" containers.md
+looping=$(docker ps -a --filter status=restarting --format '{{.Names}}')
+[ -z "$looping" ] || fail "restart-looping: $(echo $looping)" containers.md
+
+section "Scheduled jobs and backups"
+for c in ${JOBS//|/ }; do
+  read -r code fin < <(docker inspect -f '{{.State.ExitCode}} {{.State.FinishedAt}}' "$c" 2>/dev/null) \
+    || { fail "$c container is missing (pruned?)" backups.md; continue; }
+  h=$(age_h "$fin")
+  limit=26; [ "$c" = borgmatic-private ] && limit=170; [ "$c" = actual-networth ] && limit=2
+  if [ "$code" != 0 ]; then fail "$c last run exited $code, ${h}h ago" backups.md
+  elif [ "$h" -gt "$limit" ]; then warn "$c last ran ${h}h ago (expected within ${limit}h)" backups.md
+  else ok "$c OK, ${h}h ago"; fi
+done
+last_off=$(docker logs --tail 1 offsite-backup 2>&1)
+[[ $last_off == "offsite backup OK"* ]] && ok "offsite: $last_off" || warn "offsite last line: $last_off" backups.md
+
+section "Host"
+read -r used avail <<< "$(df --output=pcent,avail -BG / | tail -1 | tr -d '%G')"
+[ "$used" -lt 85 ] && ok "root disk ${used}% used (${avail}G free)" || warn "root disk ${used}% used (${avail}G free)" host.md
+mem=$(awk '/MemAvailable/ {a=$2} /MemTotal/ {t=$2} END {printf "%d", a*100/t}' /proc/meminfo)
+[ "$mem" -ge 10 ] && ok "memory ${mem}% available" || warn "memory only ${mem}% available" host.md
+[ -f /var/run/reboot-required ] && warn "reboot required since $(stat -c %y /var/run/reboot-required | cut -d' ' -f1)" host.md
+nvidia-smi -L >/dev/null 2>&1 && ok "GPU visible" || warn "nvidia-smi can't see the GPU (Ollama/Whisper/Immich ML)" host.md
+systemctl is-active -q nas-watchdog.timer && ok "nas-watchdog timer active" || fail "nas-watchdog timer not active" nas.md
+
+section "NAS shares (from eris)"
+for s in $(awk '!/^#/ && $3 ~ /^nfs/ {print $2}' /etc/fstab | sort -u); do
+  if timeout -s KILL 10 stat -t "$s/." >/dev/null 2>&1 && findmnt -n -o FSTYPE --target "$s" | tail -1 | grep -q nfs; then
+    p=$(df --output=pcent "$s" | tail -1 | tr -d ' %'); [ "$p" -lt 95 ] && ok "$s mounted, ${p}% full" || warn "$s ${p}% full" nas.md
+  else fail "$s not mounted or stale" nas.md; fi
+done
+
+newest=$(ls -1t /mnt/nas/backup/unraid-flash/flash-*.tgz 2>/dev/null | head -1)
+if [ -z "$newest" ]; then fail "no Unraid flash backup in /mnt/nas/backup/unraid-flash (disk keyfile!)" nas.md
+else h=$(( ( $(date +%s) - $(stat -c %Y "$newest") ) / 3600 ))
+  [ "$h" -le 48 ] && ok "Unraid flash backup ${h}h old" || warn "Unraid flash backup is ${h}h old (NAS cron 01:30)" nas.md; fi
+
+section "NAS array (needs the unraid ssh agent; see nas.md)"
+if md=$("${NAS_SSH[@]}" 'cat /proc/mdstat' 2>/dev/null); then
+  get() { sed -n "s/^$1=//p" <<< "$md"; }
+  [ "$(get mdState)" = STARTED ] && ok "array started" || fail "array state: $(get mdState)" nas.md
+  for i in 0 1 2 3; do
+    st=$(get "rdevStatus.$i"); dev=$(get "rdevName.$i"); err=$(get "rdevNumErrors.$i")
+    label=$([ $i = 0 ] && echo parity || echo "disk$i")
+    case $st in
+      DISK_OK) [ "${err:-0}" = 0 ] && ok "$label ($dev) OK" || warn "$label ($dev) has $err read/write errors" nas.md ;;
+      DISK_NP|"") [ $i = 0 ] && fail "no parity drive: array unprotected" nas.md ;;
+      DISK_NEW) warn "$label ($dev) is new (clearing or unformatted)" nas.md ;;
+      *) fail "$label ($dev) is $st" nas.md ;;
+    esac
+  done
+  act=$(get mdResyncAction); pos=$(get mdResyncPos); size=$(get mdResyncSize)
+  [ "${pos:-0}" != 0 ] && warn "array operation running: $act $(awk -v p="$pos" -v s="$size" 'BEGIN{printf "%.1f%%", p*100/s}')"
+else
+  warn "can't ssh to the NAS (agent not loaded). Check it in the GUI: https://nas.jeffslord.com" nas.md
+fi
+
+printf '\n%s%d failed, %d warnings%s. Runbooks: %s/docs/runbooks/\n' "$B" "$fails" "$warns" "$N" "$REPO"
+[ $fails -eq 0 ]
