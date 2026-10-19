@@ -63,6 +63,7 @@ services:
       - /home/jeff/.claude:/home/jeff/.claude:ro
       - /home/jeff/.ssh:/home/jeff/.ssh:ro
       - /home/jeff/.config:/home/jeff/.config:ro
+      - /home/jeff/.local/share/opencode:/home/jeff/.local/share/opencode:ro
       - /home/jeff/scratch:/home/jeff/scratch:ro
       - /home/jeff/llm:/home/jeff/llm:ro
       - /home/jeff/rezero-audio:/home/jeff/rezero-audio:ro

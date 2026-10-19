@@ -12,6 +12,7 @@ source_directories:
   - /home/jeff/.claude   # my Claude notes (memory) and past sessions
   - /home/jeff/.ssh   # SSH keys incl. the NAS key; the agent sockets are skipped
   - /home/jeff/.config   # app settings incl. the rclone Drive login
+  - /home/jeff/.local/share/opencode   # OpenCode sessions (~5 MB)
   - /home/jeff/scratch   # Home Assistant helper scripts
   - /home/jeff/llm
   - /home/jeff/rezero-audio
