@@ -252,6 +252,14 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy vintagestory:42420
 	}
 
+	# Unraid web GUI (NAS admin, includes a root web terminal): Authentik, then
+	# Unraid's own login. Unraid itself stays plain HTTP on the LAN.
+	@nas host nas.{$DOMAIN_NAME}
+	handle @nas {
+		import forward_auth_authentik
+		reverse_proxy 192.168.1.172:80
+	}
+
 	# Anything else under *.{$DOMAIN_NAME}: no such service. The header is a
 	# marker in the access log so fail2ban (caddy-nohost) can ban subdomain scanners.
 	handle {
