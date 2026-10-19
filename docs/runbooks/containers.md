@@ -57,11 +57,32 @@ instead → [backups.md](backups.md).
 
 ## Updating a container safely
 
+Image tags are pinned (since 2026-10-19):
+
+- **Major-version tag where the project publishes one** (`paperless-ngx:3.1`, `prometheus:v3`,
+  `zwave-js-ui:11`). `docker compose pull` brings in fixes and features but never a new major.
+- **Exact version where it doesn't** (all linuxserver.io images: Home Assistant, Jellyfin, the
+  *arr apps; also Actual, Sure, Alertmanager, AdGuard…). Updating = edit the tag.
+- `latest` only where upstream has nothing better (actual-helpers, garmin-fetch-data) and for game servers.
+
 ```sh
 cd <stack dir>
+# exact-pinned image: change the tag in docker-compose.yml first (read the release notes)
 docker compose pull && docker compose up -d
 docker logs -f <name>          # watch it come up
 ```
+
+Going to a new major version is a deliberate edit: read the upgrade notes, check last
+night's backup succeeded, then change the tag.
+
+### Rolling back / rebuilding the exact same versions
+
+`~/volumes/monitor/docker-state/running-images.tsv` lists every container's image, version and
+digest. `docker-state` rewrites it when anything changes, and borgmatic keeps the nightly history.
+To go back, set the compose image to the digest from that file
+(`image: ghcr.io/paperless-ngx/paperless-ngx@sha256:…`) and `docker compose up -d`.
+An older copy of the file comes from any borg archive:
+`docker compose run --rm -v /tmp/restore:/restore borgmatic extract --archive <name> --path home/jeff/volumes/monitor/docker-state --destination /restore` (in `monitor/borgmatic`).
 
 If the stack has a database, check that last night's backup succeeded first (`bin/health`).
 Before a major version jump (Immich, Authentik, Paperless, Postgres), take a one-off dump:

@@ -41,7 +41,10 @@ Recovery time is a few hours. Data loss is at most since the last 02:00 backup.
 5. Restore the databases: start each DB container alone (`docker compose up -d <db service>`), then
    the per-database `restore` from [backups.md](backups.md). Postgres data dirs were excluded
    on purpose; only the dumps are in the archive.
-6. `docker network create web`, then bring stacks up in order: `network/caddy`, `network/adguard-home`,
+6. Images: compose files pin versions, so `docker compose up -d` pulls what you ran before.
+   For anything still on `latest`, take the digest from the restored
+   `volumes/monitor/docker-state/running-images.tsv` if a newer image misbehaves.
+   `docker network create web`, then bring stacks up in order: `network/caddy`, `network/adguard-home`,
    `auth`, `monitor`, then everything else (`docker compose up -d` in each).
 7. Host bits that aren't Docker:
    - `monitor/nas-watchdog/install.sh` (boot wait + watchdog)

@@ -15,7 +15,7 @@ networks:
 
 services:
   garmin-fetch-data:
-    image: thisisarpanghosh/garmin-fetch-data:latest
+    image: thisisarpanghosh/garmin-fetch-data:latest   # newest release tag (v0.5.0) is older than latest; exact digest in running-images.tsv
     container_name: garmin-fetch-data
     depends_on:
       - garmin-influxdb

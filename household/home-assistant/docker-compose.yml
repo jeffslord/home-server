@@ -4,7 +4,7 @@ networks:
 
 services:
   home-assistant:
-    image: lscr.io/linuxserver/homeassistant:latest
+    image: lscr.io/linuxserver/homeassistant:2026.9.2
     container_name: home-assistant
     # network_mode: host
     networks:
@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
 
   matter-server:
-    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    image: ghcr.io/home-assistant-libs/python-matter-server:8
     container_name: matter-server
     restart: unless-stopped
     # Matter commissioning needs mDNS + IPv6 on the LAN, so this one runs on the host network
@@ -44,7 +44,7 @@ services:
   # (Piper, CPU). HA reaches them over the `web` network via the Wyoming integration at
   # whisper:10300 and piper:10200; no host ports, nothing else needs them.
   whisper:
-    image: lscr.io/linuxserver/faster-whisper:gpu
+    image: lscr.io/linuxserver/faster-whisper:gpu-v3.8.1-ls68
     container_name: whisper
     networks:
       - web
@@ -69,7 +69,7 @@ services:
     restart: unless-stopped
 
   piper:
-    image: lscr.io/linuxserver/piper:latest
+    image: lscr.io/linuxserver/piper:2.5.2
     container_name: piper
     networks:
       - web
@@ -86,7 +86,7 @@ services:
     container_name: zwavejs2mqtt
     networks:
       - web
-    image: zwavejs/zwave-js-ui:latest
+    image: zwavejs/zwave-js-ui:11
     restart: always
     tty: true
     stop_signal: SIGINT
@@ -111,7 +111,7 @@ services:
       - web
     container_name: ring-mqtt
     restart: unless-stopped
-    image: tsightler/ring-mqtt
+    image: tsightler/ring-mqtt:5.9.3
     ports:
       - 8554:8554 # Enable RTSP port for external media player access
     volumes:
@@ -125,7 +125,7 @@ services:
   mosquitto:
     networks:
       - web
-    image: eclipse-mosquitto
+    image: eclipse-mosquitto:2
     container_name: mosquitto
     restart: always
     volumes:

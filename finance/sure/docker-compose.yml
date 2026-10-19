@@ -62,7 +62,7 @@ x-rails-env: &rails_env
 services:
   web:
     container_name: sure-web
-    image: ghcr.io/we-promise/sure:stable
+    image: ghcr.io/we-promise/sure:0.7.5-hotfix.2
     volumes:
       - ${SSD_PATH:-/home/jeff/volumes}/sure/storage:/rails/storage
     # Not published: reached only via Caddy.
@@ -82,7 +82,7 @@ services:
 
   worker:
     container_name: sure-worker
-    image: ghcr.io/we-promise/sure:stable
+    image: ghcr.io/we-promise/sure:0.7.5-hotfix.2
     command: bundle exec sidekiq
     volumes:
       - ${SSD_PATH:-/home/jeff/volumes}/sure/storage:/rails/storage

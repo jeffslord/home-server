@@ -12,7 +12,7 @@ networks:
 services:
   actual-helpers:
     container_name: actual-helpers
-    image: ghcr.io/psybers/actual-helpers:latest
+    image: ghcr.io/psybers/actual-helpers:latest   # upstream publishes only latest/main; exact digest in running-images.tsv
     entrypoint: ["node"]            # image default is `tail -f /dev/null`
     command: ["track-investments.js"]
     restart: "no"
@@ -27,7 +27,7 @@ services:
 
   actual-networth:
     container_name: actual-networth
-    image: ghcr.io/psybers/actual-helpers:latest
+    image: ghcr.io/psybers/actual-helpers:latest   # upstream publishes only latest/main; exact digest in running-images.tsv
     entrypoint: ["node"]
     command: ["networth-export.js"]
     restart: "no"
@@ -48,7 +48,7 @@ services:
   # reached as grafana.${DOMAIN_NAME}/actual-refresh via Caddy + Authentik.
   actual-networth-refresh:
     container_name: actual-networth-refresh
-    image: ghcr.io/psybers/actual-helpers:latest
+    image: ghcr.io/psybers/actual-helpers:latest   # upstream publishes only latest/main; exact digest in running-images.tsv
     entrypoint: ["node"]
     command: ["networth-refresh.js"]
     restart: unless-stopped
@@ -72,7 +72,7 @@ services:
   # saves live in ${SSD_PATH}/money-ladder/data/config.json.
   money-ladder:
     container_name: money-ladder
-    image: ghcr.io/psybers/actual-helpers:latest
+    image: ghcr.io/psybers/actual-helpers:latest   # upstream publishes only latest/main; exact digest in running-images.tsv
     entrypoint: ["node"]
     command: ["money-ladder.js"]
     restart: unless-stopped

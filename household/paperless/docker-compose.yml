@@ -50,7 +50,7 @@ services:
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
   paperless:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.1
     restart: unless-stopped
     networks:
       - web

@@ -9,7 +9,7 @@ networks:
 
 services:
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
+    image: lscr.io/linuxserver/jellyfin:12.1ubu2604-ls50
     container_name: jellyfin
     networks:
       - web
@@ -32,7 +32,7 @@ services:
 
   # Media Organizers
   sonarr:
-    image: "lscr.io/linuxserver/sonarr:latest"
+    image: "lscr.io/linuxserver/sonarr:4.0.20"
     container_name: sonarr
     networks:
       - web
@@ -49,7 +49,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: "lscr.io/linuxserver/radarr:latest"
+    image: "lscr.io/linuxserver/radarr:6.4.4"
     container_name: radarr
     networks:
       - web
@@ -66,7 +66,7 @@ services:
     restart: unless-stopped
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr:v3.5.2
     container_name: flaresolverr
     networks:
       - web
@@ -81,7 +81,7 @@ services:
     restart: unless-stopped
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
+    image: lscr.io/linuxserver/prowlarr:2.6.5
     container_name: prowlarr
     networks:
       - web
@@ -94,7 +94,7 @@ services:
     restart: unless-stopped
 
   sabnzbdvpn:
-    image: binhex/arch-sabnzbdvpn:latest
+    image: binhex/arch-sabnzbdvpn:5
     container_name: sabnzbdvpn
     networks:
       - web
@@ -131,7 +131,7 @@ services:
     restart: unless-stopped
 
   qbittorrentvpn:
-    image: ghcr.io/hotio/qbittorrent:latest
+    image: ghcr.io/hotio/qbittorrent:release-5.2.3
     container_name: qbittorrentvpn
     networks:
       web:
@@ -163,7 +163,7 @@ services:
 
   # Subtitles
   bazarr:
-    image: "lscr.io/linuxserver/bazarr:latest"
+    image: "lscr.io/linuxserver/bazarr:1.6.1"
     container_name: bazarr
     networks:
       - web
@@ -182,7 +182,7 @@ services:
     restart: unless-stopped
 
   seerr:
-    image: ghcr.io/seerr-team/seerr:latest
+    image: ghcr.io/seerr-team/seerr:v3
     container_name: seerr
     init: true
     networks:

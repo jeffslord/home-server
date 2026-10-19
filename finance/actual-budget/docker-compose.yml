@@ -3,7 +3,7 @@ networks:
     external: true
 services:
   actual_server:
-    image: docker.io/actualbudget/actual-server:latest
+    image: docker.io/actualbudget/actual-server:26.10.0
     container_name: actual-budget
     networks:
       - web
