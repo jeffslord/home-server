@@ -8,7 +8,7 @@ set -uo pipefail
 REPO=/home/jeff/development/github.com/home-server
 PROM=http://127.0.0.1:9092          # Prometheus, host-only port (monitor stack)
 # Containers that run on a schedule and are expected to be "Exited (0)".
-ONE_SHOT='^(borgmatic|borgmatic-private|offsite-backup|actual-helpers|actual-networth|flightdensity-report)$'
+ONE_SHOT='^(borgmatic|borgmatic-private|offsite-backup|actual-sync-banks|actual-helpers|actual-dividend-cleanup|actual-networth|flightdensity-report)$'
 
 section() { printf '\n## %s\n' "$1"; }
 promq() {  # promq <promql> -> "label=value ... => value" lines
@@ -40,7 +40,7 @@ docker ps -aq | xargs docker inspect -f '{{.Name}} health={{if .State.Health}}{{
   | sed 's#^/##' | awk '$2 ~ /unhealthy/ || $3 != "restarts=0" || $4 == "oom=true"' || true
 
 section "Scheduled jobs (last result of each one-shot container)"
-for c in borgmatic borgmatic-private offsite-backup actual-helpers actual-networth flightdensity-report; do
+for c in borgmatic borgmatic-private offsite-backup actual-sync-banks actual-helpers actual-dividend-cleanup actual-networth flightdensity-report; do
   docker inspect -f "$c exit={{.State.ExitCode}} finished={{.State.FinishedAt}}" "$c" 2>&1 | cut -c1-90
 done
 echo "ofelia job failures in the last 7 days:"

@@ -1,12 +1,16 @@
 # Run-to-completion jobs, scheduled by Ofelia (monitor/ofelia/config.ini), which
 # starts these stopped containers -- so `up -d` runs each once and leaves it
 # Exited, as intended.
+#   actual-sync-banks  imports new transactions for all bank-synced accounts
+#                    (upstream sync-banks.js; "Bank Sync" in the UI)
 #   actual-helpers   syncs investment/401k balances from SimpleFIN into Actual
 #   actual-networth  exports balances by account type to SQLite for Grafana's
 #                    "Net worth" dashboard (networth-export.js)
 #   actual-dividend-cleanup  drops the fake money-market reinvestment legs in
 #                    the Vanguard/Fidelity cash accounts (dividend-cleanup.js)
 # Manual run:  docker compose run --rm <service>
+# Every service re-enables TLS verification: the image's Dockerfile sets
+# NODE_TLS_REJECT_UNAUTHORIZED=0, and Actual itself is plain http on `web`.
 networks:
   web:
     external: true
@@ -24,8 +28,27 @@ services:
     volumes:
       - ${SSD_PATH}/actual-helpers/cache:/usr/src/app/cache
     environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=1   # the image sets 0, which skips cert checks on SimpleFIN etc.
       - PUID=1000
       - PGID=1000
+
+  actual-sync-banks:
+    container_name: actual-sync-banks
+    image: ghcr.io/psybers/actual-helpers:latest   # upstream publishes only latest/main; exact digest in running-images.tsv
+    entrypoint: ["node"]
+    command: ["sync-banks.js"]
+    restart: "no"
+    user: "1000:1000"
+    env_file: .env
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=1   # the image sets 0, which skips cert checks on SimpleFIN etc.
+      - ACTUAL_CACHE_DIR=/cache      # own cache, like actual-networth
+      - HOME=/tmp
+      - TZ=America/New_York
+    networks:
+      - web
+    volumes:
+      - ${SSD_PATH}/actual-sync-banks/cache:/cache
 
   actual-networth:
     container_name: actual-networth
@@ -36,6 +59,7 @@ services:
     user: "1000:1000"
     env_file: .env
     environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=1   # the image sets 0, which skips cert checks on SimpleFIN etc.
       - ACTUAL_CACHE_DIR=/cache      # own cache: never races the 06:15 sync
       - HOME=/tmp
       - TZ=America/New_York
@@ -55,6 +79,7 @@ services:
     user: "1000:1000"
     env_file: .env
     environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=1   # the image sets 0, which skips cert checks on SimpleFIN etc.
       - ACTUAL_CACHE_DIR=/cache      # own cache, like actual-networth
       - HOME=/tmp
       - TZ=America/New_York
@@ -75,6 +100,7 @@ services:
     user: "1000:1000"
     env_file: .env
     environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=1   # the image sets 0, which skips cert checks on SimpleFIN etc.
       - ACTUAL_CACHE_DIR=/cache      # separate from actual-networth's cache
       - HOME=/tmp
       - TZ=America/New_York
@@ -99,6 +125,7 @@ services:
     user: "1000:1000"
     env_file: .env
     environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=1   # the image sets 0, which skips cert checks on SimpleFIN etc.
       - ACTUAL_CACHE_DIR=/cache      # own cache: never races the other jobs
       - HOME=/tmp
       - TZ=America/New_York

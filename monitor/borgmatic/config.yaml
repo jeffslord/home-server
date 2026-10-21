@@ -56,6 +56,9 @@ exclude_patterns:
   - /home/jeff/volumes/actual-helpers/cache
   - /home/jeff/volumes/actual-networth/cache
   - /home/jeff/volumes/actual-networth/refresh-cache
+  - /home/jeff/volumes/actual-dividend-cleanup/cache
+  - /home/jeff/volumes/actual-sync-banks/cache
+  - /home/jeff/volumes/money-ladder/cache
   - /home/jeff/volumes/monitor/prometheus
   - /home/jeff/volumes/monitor/loki
 

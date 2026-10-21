@@ -24,7 +24,7 @@ groups:
       # ONE_SHOT in monitor/audit/collect.sh.
       - alert: ContainerNotRunning
         expr: |
-          docker_container_state{state!="running", name!~"borgmatic|borgmatic-private|offsite-backup|actual-helpers|actual-networth|flightdensity-report|palworld|vintagestory|space-engineers|minecraft.*|cobble.*|project-zomboid"} == 1
+          docker_container_state{state!="running", name!~"borgmatic|borgmatic-private|offsite-backup|actual-sync-banks|actual-helpers|actual-dividend-cleanup|actual-networth|flightdensity-report|palworld|vintagestory|space-engineers|minecraft.*|cobble.*|project-zomboid"} == 1
         for: 15m
         labels: { severity: info }
         annotations:
@@ -33,7 +33,7 @@ groups:
           runbook: "docs/runbooks/containers.md"
 
       - alert: ScheduledJobFailed
-        expr: docker_container_exit_code{name=~"borgmatic|borgmatic-private|offsite-backup|actual-helpers|actual-networth|flightdensity-report"} != 0
+        expr: docker_container_exit_code{name=~"borgmatic|borgmatic-private|offsite-backup|actual-sync-banks|actual-helpers|actual-dividend-cleanup|actual-networth|flightdensity-report"} != 0
         labels: { severity: warning }
         annotations:
           summary: "Scheduled job {{ $labels.name }} exited with code {{ $value }}"

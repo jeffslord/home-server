@@ -50,8 +50,8 @@ that's the cAdvisor boot race: `docker restart cadvisor`.
 ### Expected-to-be-stopped containers
 
 These are Exited by design and are ignored by the alerts and `bin/health`:
-Ofelia jobs (`borgmatic`, `borgmatic-private`, `offsite-backup`, `actual-helpers`,
-`actual-networth`, `flightdensity-report`) and on-demand game servers (started from the
+Ofelia jobs (`borgmatic`, `borgmatic-private`, `offsite-backup`, `actual-sync-banks`,
+`actual-helpers`, `actual-dividend-cleanup`, `actual-networth`, `flightdensity-report`) and on-demand game servers (started from the
 games launcher, stopped after 30 idle minutes). A failed job raises `ScheduledJobFailed`
 instead → [backups.md](backups.md).
 

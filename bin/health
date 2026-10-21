@@ -11,7 +11,7 @@ AM=http://127.0.0.1:9093
 NAS_SSH=(ssh -o IdentityAgent="$HOME/.ssh/agent-unraid.sock" -o BatchMode=yes -o ConnectTimeout=5 unraid)
 # Exited by design: Ofelia jobs and on-demand game servers. Keep in sync with
 # monitor/prometheus/rules/containers.yml and monitor/audit/collect.sh.
-JOBS='borgmatic|borgmatic-private|offsite-backup|actual-helpers|actual-networth|flightdensity-report'
+JOBS='borgmatic|borgmatic-private|offsite-backup|actual-sync-banks|actual-helpers|actual-dividend-cleanup|actual-networth|flightdensity-report'
 IDLE="^($JOBS|palworld|vintagestory|space-engineers|minecraft.*|cobble.*|project-zomboid)\$"
 
 QUIET=0; [ "${1:-}" = -q ] && QUIET=1
