@@ -8,6 +8,7 @@ secrets:
 
 services:
   caddy:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     build: ./dns-dockerfile
     container_name: caddy
     networks:

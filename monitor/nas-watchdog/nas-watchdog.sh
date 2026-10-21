@@ -76,6 +76,28 @@ uses() {  # uses <container> <share...>: true if it binds a path under any given
   return 1
 }
 
+# A container keeps the mount it started with. If the NAS reboots and the host
+# remounts the share, the host looks fine but the container still holds the old
+# mount: stale handles, or the empty local dir underneath. Seen 2026-10-06 when
+# Jellyfin's library folders went stale and its movies showed 1 item. Compare
+# the device each bind resolves to inside the container with the host's.
+stale_in() {  # stale_in <container>
+  local pid m src dst host_dev
+  pid=$(docker inspect -f '{{.State.Pid}}' "$1")
+  for m in $(docker inspect -f '{{range .Mounts}}{{if eq .Type "bind"}}{{.Source}}|{{.Destination}} {{end}}{{end}}' "$1"); do
+    src=${m%%|*} dst=${m#*|}
+    uses_path "$src" "${SHARES[@]}" || continue
+    host_dev=$(timeout -s KILL 15 stat -c %d "$src" 2>/dev/null) || continue  # host side handled above
+    [ "$(timeout -s KILL 15 stat -c %d "/proc/$pid/root$dst" 2>/dev/null)" = "$host_dev" ] || return 0
+  done
+  return 1
+}
+uses_path() {  # uses_path <path> <share...>
+  local p=$1 s; shift
+  for s in "$@"; do [[ $p == "$s" || $p == "$s"/* ]] && return 0; done
+  return 1
+}
+
 fixed=()
 for c in $(docker ps -aq); do
   read -r name policy status err < <(docker inspect -f \
@@ -88,6 +110,9 @@ for c in $(docker ps -aq); do
   if [ "$status" = running ]; then
     if [ ${#remounted[@]} -gt 0 ] && uses "$c" "${remounted[@]}"; then
       echo "restarting $name (share remounted under it)"
+      docker restart "$c" >/dev/null && fixed+=("$name")
+    elif stale_in "$c"; then
+      echo "restarting $name (its view of a share is stale)"
       docker restart "$c" >/dev/null && fixed+=("$name")
     fi
   elif [ "$status" = exited ] && [ -n "$err" ]; then   # failed to start, not a manual stop

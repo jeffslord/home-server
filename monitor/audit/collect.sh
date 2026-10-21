@@ -95,6 +95,6 @@ git -C "$REPO" status --short | head -40
 echo "uncommitted files: $(git -C "$REPO" status --short | wc -l)"
 echo "unpushed commits: $(git -C "$REPO" log --oneline '@{u}..' 2>/dev/null | wc -l)"
 echo "last commit: $(git -C "$REPO" log -1 --format='%h %ad %s' --date=short)"
-for d in /home/jeff/llm /home/jeff/flightdensity; do
+for d in /home/jeff/flightdensity; do   # ~/llm moved into the repo (ai/) 2026-10-19
   git -C "$d" rev-parse 2>/dev/null && echo "$d: git repo" || echo "$d: NOT in git"
 done

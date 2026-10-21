@@ -84,6 +84,13 @@ auth.{$DOMAIN_NAME} {
 		reverse_proxy games-launcher:8080
 	}
 
+	# household/immich: personal photos. No forward_auth (the mobile app calls
+	# the API directly); Immich itself only allows Authentik OIDC login.
+	@photos host photos.{$DOMAIN_NAME}
+	handle @photos {
+		reverse_proxy immich_photos_server:2283
+	}
+
 	#
 	# AUTHENTIK PROTECTED
 	#
@@ -112,6 +119,13 @@ auth.{$DOMAIN_NAME} {
 	handle @actual {
 		import forward_auth_authentik
 		reverse_proxy actual-budget:5006
+	}
+
+	# finance/sure: Authentik in front, and Sure itself logs in via Authentik OIDC.
+	@sure host sure.{$DOMAIN_NAME}
+	handle @sure {
+		import forward_auth_authentik
+		reverse_proxy sure-web:3000
 	}
 
 	@grocy host grocy.{$DOMAIN_NAME}
@@ -236,6 +250,14 @@ auth.{$DOMAIN_NAME} {
 	handle @vintagestory {
 		import forward_auth_authentik
 		reverse_proxy vintagestory:42420
+	}
+
+	# Unraid web GUI (NAS admin, includes a root web terminal): Authentik, then
+	# Unraid's own login. Unraid itself stays plain HTTP on the LAN.
+	@nas host nas.{$DOMAIN_NAME}
+	handle @nas {
+		import forward_auth_authentik
+		reverse_proxy 192.168.1.172:80
 	}
 
 	# Anything else under *.{$DOMAIN_NAME}: no such service. The header is a

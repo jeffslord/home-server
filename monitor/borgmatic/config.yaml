@@ -5,6 +5,22 @@ source_directories:
   - /home/jeff/volumes
   - /home/jeff/flightdensity
   - /home/jeff/development/github.com/home-server   # includes the gitignored .env files
+  - /mnt/nas/paperless/media                        # Paperless originals + archived PDFs (DB is dumped below)
+  - /mnt/nas/backup/unraid-flash                    # Unraid flash config incl. the disk LUKS keyfile (NAS cron 01:30)
+  - /host/etc                                       # eris /etc (fstab, daemon.json, systemd units, ufw, ssh host keys); packages etc. in volumes/monitor/host-state
+  # Home-folder items that exist only on eris (not on GitHub, not regenerable)
+  - /home/jeff/.claude   # my Claude notes (memory) and past sessions
+  - /home/jeff/.ssh   # SSH keys incl. the NAS key; the agent sockets are skipped
+  - /home/jeff/.config   # app settings incl. the rclone Drive login
+  - /home/jeff/.local/share/opencode   # OpenCode sessions (~5 MB)
+  - /home/jeff/scratch   # Home Assistant helper scripts
+  - /home/jeff/llm
+  - /home/jeff/rezero-audio
+  - /home/jeff/regal-empty
+  - /home/jeff/development/local
+  - /home/jeff/development/github.com/boyo-bot   # no git remote
+  - /home/jeff/development/github.com/social-media-monitor   # not a git repo
+  - /home/jeff/development/github.com/actualbudget   # not a git repo
 
 repositories:
   - path: /mnt/nas/backup/home-server-volumes
@@ -30,7 +46,11 @@ exclude_patterns:
   - /home/jeff/volumes/ollama
   - /home/jeff/volumes/photon                        # Photon planet geocoder DB (~100 GB, re-downloadable)
   - /home/jeff/volumes/photon-dl                      # its download parts while fetching
-  - /home/jeff/volumes/immich                        # leftover from an Immich install that isn't running
+  - /home/jeff/volumes/immich/postgres               # Immich DB, dumped below instead
+  - /home/jeff/volumes/immich/model_cache            # ML models, re-downloaded on start
+  - /home/jeff/volumes/immich-photos/postgres        # Immich DB, dumped below instead
+  - /home/jeff/volumes/sure/postgres                 # Sure DB, dumped below instead
+  - /home/jeff/volumes/immich-photos/model_cache
   - /home/jeff/volumes/borgmatic/borg-cache
   - /home/jeff/volumes/open-webui                   # chat history not worth keeping
   - /home/jeff/volumes/actual-helpers/cache
@@ -72,6 +92,10 @@ exclude_patterns:
   - /home/jeff/flightdensity/data/public            # 15-minute copy of flights.db (dumped above)
   - /home/jeff/flightdensity/ref/aircraftDatabase.csv
   - sh:/home/jeff/flightdensity/**/__pycache__
+
+  # Home-folder projects: virtualenvs and bytecode are rebuilt from requirements
+  - sh:/home/jeff/**/.venv
+  - sh:/home/jeff/**/__pycache__
 
   # home-server repo: downloaded test mods
   - /home/jeff/development/github.com/home-server/games/vintage-story/mod-updater/test
@@ -121,12 +145,31 @@ postgresql_databases:
   - name: paperless
     hostname: paperless-db-1
     username: paperless
-    password: paperless            # same literal as household/paperless/docker-compose.yml
+    password: ${PAPERLESS_DB_PASSWORD}
     format: custom
   - name: dawarich
     hostname: dawarich-db
     username: dawarich
     password: ${DAWARICH_DB_PASSWORD}
+    format: custom
+  - name: sure_production
+    hostname: sure-db
+    username: sure
+    password: ${SURE_DB_PASSWORD}
+    format: custom
+  # Immich (both stacks). Restore into the same ghcr.io/immich-app/postgres
+  # image (needs the vectorchord/pgvecto.rs extensions). Photo files themselves live on the NAS.
+  - name: immich
+    label: immich-photos
+    hostname: immich_photos_postgres
+    username: postgres
+    password: ${IMMICH_PHOTOS_DB_PASSWORD}
+    format: custom
+  - name: immich
+    label: immich
+    hostname: immich_postgres
+    username: postgres
+    password: ${IMMICH_DB_PASSWORD}
     format: custom
 
 ntfy:

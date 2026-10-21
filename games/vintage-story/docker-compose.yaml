@@ -9,6 +9,7 @@ networks:
 
 services:
   vintagestory:
+    mem_limit: 5g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
     image: zsuatem/vintagestory:1.21.6
     container_name: vintagestory
     restart: unless-stopped

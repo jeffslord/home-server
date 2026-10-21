@@ -26,7 +26,7 @@ configs:
 
 services:
   fail2ban:
-    image: lscr.io/linuxserver/fail2ban:latest
+    image: lscr.io/linuxserver/fail2ban:1.1.0
     container_name: fail2ban
     restart: unless-stopped
     cap_add:

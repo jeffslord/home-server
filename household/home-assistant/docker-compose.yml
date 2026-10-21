@@ -4,7 +4,8 @@ networks:
 
 services:
   home-assistant:
-    image: lscr.io/linuxserver/homeassistant:latest
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
+    image: lscr.io/linuxserver/homeassistant:2026.9.2
     container_name: home-assistant
     # network_mode: host
     networks:
@@ -15,12 +16,16 @@ services:
       TZ: ${TZ}
     volumes:
       - ${SSD_PATH}/home-assistant/data:/config
+      # Front door AI snapshot automation writes here (shown in notifications as
+      # /media/local/doorbell/...). Mounted so it survives container recreation.
+      - ${SSD_PATH}/home-assistant/media/doorbell:/media/doorbell
     ports:
       - 8123:8123 #optional
     restart: unless-stopped
 
   matter-server:
-    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
+    image: ghcr.io/home-assistant-libs/python-matter-server:8
     container_name: matter-server
     restart: unless-stopped
     # Matter commissioning needs mDNS + IPv6 on the LAN, so this one runs on the host network
@@ -41,7 +46,7 @@ services:
   # (Piper, CPU). HA reaches them over the `web` network via the Wyoming integration at
   # whisper:10300 and piper:10200; no host ports, nothing else needs them.
   whisper:
-    image: lscr.io/linuxserver/faster-whisper:gpu
+    image: lscr.io/linuxserver/faster-whisper:gpu-v3.8.1-ls68
     container_name: whisper
     networks:
       - web
@@ -66,7 +71,7 @@ services:
     restart: unless-stopped
 
   piper:
-    image: lscr.io/linuxserver/piper:latest
+    image: lscr.io/linuxserver/piper:2.5.2
     container_name: piper
     networks:
       - web
@@ -80,10 +85,11 @@ services:
     restart: unless-stopped
 
   zwavejs2mqtt:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     container_name: zwavejs2mqtt
     networks:
       - web
-    image: zwavejs/zwave-js-ui:latest
+    image: zwavejs/zwave-js-ui:11
     restart: always
     tty: true
     stop_signal: SIGINT
@@ -108,9 +114,8 @@ services:
       - web
     container_name: ring-mqtt
     restart: unless-stopped
-    image: tsightler/ring-mqtt
-    ports:
-      - 8554:8554 # Enable RTSP port for external media player access
+    image: tsightler/ring-mqtt:5.9.3
+    # RTSP 8554 not published: Home Assistant pulls the streams over `web`.
     volumes:
       - ${SSD_PATH}/home-assistant/ring-mqtt/data:/data # Mapping of local folder to provide persistent storage
     logging:
@@ -120,9 +125,10 @@ services:
         max-file: "3"
 
   mosquitto:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     networks:
       - web
-    image: eclipse-mosquitto
+    image: eclipse-mosquitto:2
     container_name: mosquitto
     restart: always
     volumes:
@@ -130,8 +136,32 @@ services:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro # pwfile stays in the volume
       - ${SSD_PATH}/home-assistant/mosquitto/data:/mosquitto/data
       - ${SSD_PATH}/home-assistant/mosquitto/log:/mosquitto/log
+    # Containers use mosquitto:1883 on `web`; the host port is for host-network
+    # wol-relay only, so it stays on localhost (websockets 9001 unused, not published).
     ports:
-      - 1883:1883
-      - 9001:9001
+      - 127.0.0.1:1883:1883
     stdin_open: true
     tty: true
+
+  # Wake-on-LAN for HA: host networking so the magic-packet broadcast reaches the
+  # LAN (HA on the `web` bridge can't). Adds MQTT "Wake" buttons + "Online" sensors.
+  wol-relay:
+    build: ./wol-relay
+    image: wol-relay
+    container_name: wol-relay
+    restart: unless-stopped
+    network_mode: host
+    user: "1000:1000"
+    depends_on:
+      - mosquitto
+    volumes:
+      - ./wol-relay/relay.py:/app/relay.py:ro
+    environment:
+      - MQTT_HOST=127.0.0.1                # mosquitto's published port
+      - MQTT_USER=wol
+      - MQTT_PASSWORD=${WOL_MQTT_PASSWORD}
+      - TARGETS=${WOL_TARGETS}             # id|Name|mac|ip;... kept in .env
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"

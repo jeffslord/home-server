@@ -24,6 +24,7 @@ notify() {  # notify <title> <priority 1-5> <tags> ; body on stdin
   echo "ntfy publish \"$1\": HTTP $code"   # lands in `journalctl --user -u weekly-audit`
 }
 
+"$REPO/monitor/host-state/snapshot.sh" >/dev/null 2>&1 || echo "host-state snapshot failed"   # packages etc. for a rebuild
 "$HERE/collect.sh" > "$snapshot" 2>&1
 
 {

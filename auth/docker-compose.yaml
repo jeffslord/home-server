@@ -4,6 +4,7 @@ networks:
 
 services:
   postgresql:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     container_name: authentik-postgresql
     image: docker.io/library/postgres:16-alpine
     restart: unless-stopped
@@ -23,6 +24,7 @@ services:
       POSTGRES_DB: ${PG_DB:-authentik}
 
   authentik-server:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     container_name: authentik-server
     image: ghcr.io/goauthentik/server:2026.8.3
     restart: unless-stopped
@@ -47,6 +49,7 @@ services:
         condition: service_healthy
 
   authentik-worker:
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
     container_name: authentik-worker
     image: ghcr.io/goauthentik/server:2026.8.3
     restart: unless-stopped

@@ -48,9 +48,9 @@ services:
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD}   # only read when initialising a new data dir
   paperless:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.1
     restart: unless-stopped
     networks:
       - web
@@ -70,6 +70,7 @@ services:
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD}
       PAPERLESS_URL: https://paperless.${DOMAIN_NAME}
       # SSO via Authentik OIDC (application "paperless"). Regular login stays on for
       # the mobile apps. Membership in Authentik group "Paperless Admins" -> superuser.
@@ -79,7 +80,7 @@ services:
       PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS: "true"
       PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP: Paperless Admins
       # Built-in AI (suggestions, "Apply AI suggestions" workflow action, document
-      # chat) via the local Ollama in ~/llm. Context matches Ollama's
+      # chat) via the local Ollama (ai/). Context matches Ollama's
       # OLLAMA_CONTEXT_LENGTH so switching between Paperless and OpenCode doesn't
       # force a model reload.
       PAPERLESS_AI_ENABLED: "true"

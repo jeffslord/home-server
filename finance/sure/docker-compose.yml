@@ -1,0 +1,125 @@
+#
+# Sure (community fork of Maybe Finance), at sure.$DOMAIN_NAME.
+#
+# Based on upstream compose.example.yml:
+# https://github.com/we-promise/sure/blob/main/compose.example.yml
+#
+# Behind Caddy forward_auth, and Sure itself logs in with Authentik OIDC
+# (provider/app "Sure", bound to jeff). Local password login is off except for
+# the super admin (AUTH_LOCAL_ADMIN_OVERRIDE_ENABLED) as break-glass.
+#
+# .env (own file, not the shared one): POSTGRES_USER, POSTGRES_PASSWORD,
+#   POSTGRES_DB, SECRET_KEY_BASE, OIDC_CLIENT_SECRET
+#
+# The web container is also on `web`, where other stacks' "db"/"redis" names
+# resolve too, so DB_HOST / REDIS_URL use these unique container names.
+# The DB is dumped by monitor/borgmatic.
+#
+
+name: sure
+
+networks:
+  web:
+    external: true
+
+x-db-env: &db_env
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  POSTGRES_DB: ${POSTGRES_DB}
+
+x-rails-env: &rails_env
+  <<: *db_env
+  SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+  SELF_HOSTED: "true"
+  APP_DOMAIN: sure.jeffslord.com
+  RAILS_FORCE_SSL: "false"          # Caddy terminates TLS
+  RAILS_ASSUME_SSL: "true"
+  DB_HOST: sure-db
+  DB_PORT: 5432
+  REDIS_URL: redis://sure-redis:6379/1
+  TZ: America/New_York
+  # Auth: Authentik OIDC only; super admin may still use a password.
+  OIDC_ISSUER: https://authentik.jeffslord.com/application/o/sure/
+  OIDC_CLIENT_ID: sure
+  OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+  OIDC_REDIRECT_URI: https://sure.jeffslord.com/auth/openid_connect/callback
+  OIDC_BUTTON_LABEL: Sign in with Authentik
+  AUTH_LOCAL_LOGIN_ENABLED: "false"
+  AUTH_LOCAL_ADMIN_OVERRIDE_ENABLED: "true"
+  AUTH_JIT_MODE: link_only
+  WEBAUTHN_RP_ID: sure.jeffslord.com
+  WEBAUTHN_ALLOWED_ORIGINS: https://sure.jeffslord.com
+  # AI (chat, auto-categorization, merchant detection): local Ollama (ai/ stack)
+  # via its OpenAI-compatible API, so transactions stay on the LAN. Ollama has no
+  # auth; the token just has to be non-empty. Context matches OLLAMA_CONTEXT_LENGTH.
+  OPENAI_ACCESS_TOKEN: ollama
+  OPENAI_URI_BASE: http://ollama:11434/v1
+  OPENAI_MODEL: qwen3:8b
+  LLM_CONTEXT_WINDOW: "16384"
+  OPENAI_REQUEST_TIMEOUT: "180"     # GTX 1080 + cold model load
+  AI_RESPONSE_TIMEOUT: "600"
+
+services:
+  web:
+    container_name: sure-web
+    image: ghcr.io/we-promise/sure:0.7.5-hotfix.2
+    volumes:
+      - ${SSD_PATH:-/home/jeff/volumes}/sure/storage:/rails/storage
+    # Not published: reached only via Caddy.
+    expose:
+      - "3000"
+    restart: unless-stopped
+    environment:
+      <<: *rails_env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+      - web
+
+  worker:
+    container_name: sure-worker
+    image: ghcr.io/we-promise/sure:0.7.5-hotfix.2
+    command: bundle exec sidekiq
+    volumes:
+      - ${SSD_PATH:-/home/jeff/volumes}/sure/storage:/rails/storage
+    restart: unless-stopped
+    environment:
+      <<: *rails_env
+    networks:
+      - default
+      - web                          # reaches ollama for the AI jobs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    container_name: sure-db
+    image: postgres:16
+    restart: unless-stopped
+    volumes:
+      - ${SSD_PATH:-/home/jeff/volumes}/sure/postgres:/var/lib/postgresql/data
+    environment:
+      <<: *db_env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: sure-redis
+    image: redis:7
+    restart: unless-stopped
+    volumes:
+      - ${SSD_PATH:-/home/jeff/volumes}/sure/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

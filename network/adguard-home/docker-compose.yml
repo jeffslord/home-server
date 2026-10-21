@@ -1,6 +1,7 @@
 services:
   adguardhome:
-    image: adguard/adguardhome
+    oom_score_adj: -500  # core service: kernel kills others first if the host runs out of RAM
+    image: adguard/adguardhome:v0.107.79
     container_name: adguardhome
     restart: unless-stopped
     # Deliberately NOT on `web`: containers point their DNS at 192.168.1.162

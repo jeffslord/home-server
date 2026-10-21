@@ -9,7 +9,8 @@ networks:
 
 services:
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
+    mem_limit: 4g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
+    image: lscr.io/linuxserver/jellyfin:12.1ubu2604-ls50
     container_name: jellyfin
     networks:
       - web
@@ -32,7 +33,7 @@ services:
 
   # Media Organizers
   sonarr:
-    image: "lscr.io/linuxserver/sonarr:latest"
+    image: "lscr.io/linuxserver/sonarr:4.0.20"
     container_name: sonarr
     networks:
       - web
@@ -49,7 +50,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: "lscr.io/linuxserver/radarr:latest"
+    image: "lscr.io/linuxserver/radarr:6.4.4"
     container_name: radarr
     networks:
       - web
@@ -66,7 +67,8 @@ services:
     restart: unless-stopped
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    mem_limit: 2g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
+    image: ghcr.io/flaresolverr/flaresolverr:v3.5.2
     container_name: flaresolverr
     networks:
       - web
@@ -81,7 +83,7 @@ services:
     restart: unless-stopped
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
+    image: lscr.io/linuxserver/prowlarr:2.6.5
     container_name: prowlarr
     networks:
       - web
@@ -94,22 +96,22 @@ services:
     restart: unless-stopped
 
   sabnzbdvpn:
-    image: binhex/arch-sabnzbdvpn:latest
+    mem_limit: 5g  # 2026-10-19: ceiling well above observed peak; see docs/runbooks/host.md
+    image: binhex/arch-sabnzbdvpn:5
     container_name: sabnzbdvpn
     networks:
       - web
+    # WireGuard needs only NET_ADMIN + this sysctl (+ the host's wireguard module);
+    # binhex's docs suggest privileged, which was dropped 2026-10-19.
+    cap_add:
+      - NET_ADMIN
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-    privileged: true
     # Web UI (8080/8090) not published: reached only via Caddy -> Authentik.
-    # Privoxy/SOCKS and the incoming torrent port stay on the host for the LAN.
+    # Privoxy/SOCKS are off and unpublished: they never started (Loki, 2026-09-19 onwards),
+    # so nothing used them. Usenet needs no incoming port.
     expose:
       - "8080"
-    ports:
-      - "8118:8118"
-      - "9118:9118"
-      - "58946:58946"
-      - "58946:58946/udp"
     environment:
       <<: *common-env
       VPN_ENABLED: true
@@ -117,9 +119,9 @@ services:
       VPN_PROV: pia
       VPN_USER: ${VPN_USER}
       VPN_PASS: ${VPN_PASS}
-      ENABLE_PRIVOXY: true
+      ENABLE_PRIVOXY: false
       STRICT_PORT_FORWARD: true
-      ENABLE_SOCKS: true
+      ENABLE_SOCKS: false
       SOCKS_USER: ${VPN_USER}
       SOCKS_PASS: ${VPN_PASS}
       LAN_NETWORK: ${LAN_NETWORK}
@@ -131,7 +133,7 @@ services:
     restart: unless-stopped
 
   qbittorrentvpn:
-    image: ghcr.io/hotio/qbittorrent:latest
+    image: ghcr.io/hotio/qbittorrent:release-5.2.3
     container_name: qbittorrentvpn
     networks:
       web:
@@ -163,7 +165,7 @@ services:
 
   # Subtitles
   bazarr:
-    image: "lscr.io/linuxserver/bazarr:latest"
+    image: "lscr.io/linuxserver/bazarr:1.6.1"
     container_name: bazarr
     networks:
       - web
@@ -182,7 +184,7 @@ services:
     restart: unless-stopped
 
   seerr:
-    image: ghcr.io/seerr-team/seerr:latest
+    image: ghcr.io/seerr-team/seerr:v3
     container_name: seerr
     init: true
     networks:
