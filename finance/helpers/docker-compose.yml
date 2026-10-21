@@ -4,6 +4,8 @@
 #   actual-helpers   syncs investment/401k balances from SimpleFIN into Actual
 #   actual-networth  exports balances by account type to SQLite for Grafana's
 #                    "Net worth" dashboard (networth-export.js)
+#   actual-dividend-cleanup  drops the fake money-market reinvestment legs in
+#                    the Vanguard/Fidelity cash accounts (dividend-cleanup.js)
 # Manual run:  docker compose run --rm <service>
 networks:
   web:
@@ -43,6 +45,24 @@ services:
       - ./networth-export.js:/usr/src/app/networth-export.js:ro
       - ${SSD_PATH}/actual-networth/cache:/cache
       - ${SSD_PATH}/actual-networth/out:/out   # read by grafana (monitor/)
+
+  actual-dividend-cleanup:
+    container_name: actual-dividend-cleanup
+    image: ghcr.io/psybers/actual-helpers:latest   # upstream publishes only latest/main; exact digest in running-images.tsv
+    entrypoint: ["node"]
+    command: ["dividend-cleanup.js"]
+    restart: "no"
+    user: "1000:1000"
+    env_file: .env
+    environment:
+      - ACTUAL_CACHE_DIR=/cache      # own cache, like actual-networth
+      - HOME=/tmp
+      - TZ=America/New_York
+    networks:
+      - web
+    volumes:
+      - ./dividend-cleanup.js:/usr/src/app/dividend-cleanup.js:ro
+      - ${SSD_PATH}/actual-dividend-cleanup/cache:/cache
 
   # Long-running: serves the dashboard's "Refresh now" link (networth-refresh.js),
   # reached as grafana.${DOMAIN_NAME}/actual-refresh via Caddy + Authentik.
