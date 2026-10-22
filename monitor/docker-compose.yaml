@@ -33,7 +33,6 @@ configs:
       - labels: { group: authentik }
         targets:
           - https://actual.${DOMAIN_NAME}
-          - https://grocy.${DOMAIN_NAME}
           - https://sonarr.${DOMAIN_NAME}
           - https://radarr.${DOMAIN_NAME}
           - https://prowlarr.${DOMAIN_NAME}

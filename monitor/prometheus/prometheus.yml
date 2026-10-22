@@ -68,7 +68,6 @@ scrape_configs:
           - http://open-webui:8080/health
           - http://ollama:11434/
           - http://home-assistant:8123/
-          - http://grocy/
           - http://actual-budget:5006/
           - http://sonarr:8989/ping
           - http://radarr:7878/ping
