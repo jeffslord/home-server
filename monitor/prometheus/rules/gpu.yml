@@ -1,6 +1,17 @@
 groups:
   - name: gpu
     rules:
+      # The exporter is a GPU container itself, so it's the canary for every GPU
+      # container losing the device (NVML "Unknown Error" after a systemd reload).
+      - alert: GpuUnavailable
+        expr: nvidia_smi_command_exit_code != 0 or absent(nvidia_smi_gpu_info)
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "GPU not usable from containers"
+          description: "nvidia-smi fails inside nvidia-gpu-exporter. Jellyfin, Ollama, Whisper and Immich ML have probably lost the GPU too and are on CPU or failing."
+          runbook: "docs/runbooks/host.md"
+
       - alert: GpuHot
         expr: nvidia_smi_temperature_gpu > 85
         for: 5m

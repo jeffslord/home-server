@@ -40,8 +40,9 @@ services:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: 1
+            # CDI so the GPU survives `systemctl daemon-reload` (docs/runbooks/host.md "GPU").
+            - driver: cdi
+              device_ids: [nvidia.com/gpu=all]
               capabilities:
                 - gpu
 

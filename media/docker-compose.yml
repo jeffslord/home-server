@@ -14,12 +14,18 @@ services:
     container_name: jellyfin
     networks:
       - web
-    gpus: all
+    # CDI so the GPU survives `systemctl daemon-reload` (docs/runbooks/host.md "GPU").
+    # CDI injects all driver libs (incl. NVENC/NVDEC), so no NVIDIA_* env is needed.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: cdi
+              device_ids: [nvidia.com/gpu=all]
+              capabilities: [gpu]
     environment:
       <<: *common-env
       JELLYFIN_PublishedServerUrl: "https://jellyfin.${DOMAIN_NAME}" #optional
-      NVIDIA_VISIBLE_DEVICES: all
-      NVIDIA_DRIVER_CAPABILITIES: compute,video,utility
     volumes:
       - ${SSD_PATH}/media-system/jellyfin/config:/config
       - ${SSD_PATH}/media-system/jellyfin/cache:/cache

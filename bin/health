@@ -67,6 +67,12 @@ mem=$(awk '/MemAvailable/ {a=$2} /MemTotal/ {t=$2} END {printf "%d", a*100/t}' /
 [ "$mem" -ge 10 ] && ok "memory ${mem}% available" || warn "memory only ${mem}% available" host.md
 [ -f /var/run/reboot-required ] && warn "reboot required since $(stat -c %y /var/run/reboot-required | cut -d' ' -f1)" host.md
 nvidia-smi -L >/dev/null 2>&1 && ok "GPU visible" || warn "nvidia-smi can't see the GPU (Ollama/Whisper/Immich ML)" host.md
+gpu_lost=""
+for c in $(docker ps --format '{{.Names}}'); do
+  docker inspect -f '{{json .HostConfig.DeviceRequests}}' "$c" | grep -q gpu || continue
+  timeout 10 docker exec "$c" nvidia-smi -L >/dev/null 2>&1 || gpu_lost+=" $c"
+done
+[ -z "$gpu_lost" ] && ok "GPU usable in containers" || fail "GPU lost inside:$gpu_lost (restart them)" host.md
 systemctl is-active -q nas-watchdog.timer && ok "nas-watchdog timer active" || fail "nas-watchdog timer not active" nas.md
 
 section "NAS shares (from eris)"

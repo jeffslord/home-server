@@ -133,8 +133,10 @@ services:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: all
+            # CDI (not the legacy nvidia hook) so the GPU is in the container's
+            # cgroup spec and survives `systemctl daemon-reload` (docs/runbooks/host.md "GPU").
+            - driver: cdi
+              device_ids: [nvidia.com/gpu=all]
               capabilities: [gpu]
     networks:
       - monitoring
