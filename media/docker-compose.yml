@@ -139,7 +139,7 @@ services:
     restart: unless-stopped
 
   qbittorrentvpn:
-    image: ghcr.io/hotio/qbittorrent:release-5.2.3
+    image: ghcr.io/hotio/qbittorrent:release-5.3.0
     container_name: qbittorrentvpn
     networks:
       web:

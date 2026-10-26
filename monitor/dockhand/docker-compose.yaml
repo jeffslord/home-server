@@ -4,7 +4,7 @@ networks:
 
 services:
   dockhand:
-    image: fnsys/dockhand:v1.0.18
+    image: fnsys/dockhand:v1.0.55
     container_name: dockhand
     restart: unless-stopped
     volumes:
